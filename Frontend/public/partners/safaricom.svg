@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 48" role="img" aria-label="Safaricom">
+  <circle cx="18" cy="24" r="14" fill="#6cbe45"/>
+  <path d="M18 14c5.5 0 10 4.5 10 10" fill="none" stroke="#fff" stroke-width="2"/>
+  <text x="42" y="31" font-family="Arial, Helvetica, sans-serif" font-size="20" font-weight="700" fill="#222">Safaricom</text>
+</svg>
