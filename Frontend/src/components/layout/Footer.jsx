@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { aboutLinks } from "../../data/about";
+import { corporateNavLinks } from "../../data/corporate";
 import { navLinks, site } from "../../data/site";
 
 export default function Footer() {
@@ -34,6 +35,18 @@ export default function Footer() {
                 </Link>
               </li>
             ))}
+          </ul>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-gold">Corporate</p>
+          <ul className="mt-2 space-y-2 text-sm text-white/80">
+            {corporateNavLinks
+              .filter((link) => link.to.startsWith("/corporate"))
+              .map((link) => (
+                <li key={link.to}>
+                  <Link to={link.to} className="hover:text-gold">
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
           </ul>
           <p className="mt-6 text-xs font-semibold uppercase tracking-[0.16em] text-gold">About</p>
           <ul className="mt-2 space-y-2 text-sm text-white/80">

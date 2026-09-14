@@ -29,6 +29,9 @@ import AdminLogin from "./pages/AdminLogin";
 import Apply from "./pages/Apply";
 import Community from "./pages/Community";
 import Corporate from "./pages/Corporate";
+import CorporateHire from "./pages/CorporateHire";
+import CorporatePartner from "./pages/CorporatePartner";
+import CorporateTraining from "./pages/CorporateTraining";
 import CourseCategory from "./pages/CourseCategory";
 import CourseProgram from "./pages/CourseProgram";
 import Courses from "./pages/Courses";
@@ -67,6 +70,9 @@ export default function App() {
             <Route path="/about/careers" element={<Careers />} />
             <Route path="/about/faqs" element={<Faqs />} />
             <Route path="/corporate" element={<Corporate />} />
+            <Route path="/corporate/hire" element={<CorporateHire />} />
+            <Route path="/corporate/training" element={<CorporateTraining />} />
+            <Route path="/corporate/partner" element={<CorporatePartner />} />
             <Route path="/community" element={<Community />} />
             <Route path="*" element={<NotFound />} />
           </Route>
@@ -99,7 +105,7 @@ function NotFound() {
         <Link to="/" className="font-semibold text-gold">
           Home
         </Link>
-      </div>
-    </section>
+        </div>
+      </section>
   );
 }
