@@ -7,7 +7,9 @@ function visitorId() {
   const key = "hassazVisitorId";
   let id = localStorage.getItem(key);
   if (!id) {
-    id = crypto.randomUUID();
+    id =
+      globalThis.crypto?.randomUUID?.() ||
+      `v-${Date.now()}-${Math.random().toString(16).slice(2)}`;
     localStorage.setItem(key, id);
   }
   return id;

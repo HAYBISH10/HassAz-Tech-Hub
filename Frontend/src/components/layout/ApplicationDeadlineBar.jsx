@@ -2,7 +2,7 @@ import Countdown from "../ui/Countdown";
 import { useApplicationWindow } from "../../context/ApplicationWindowContext";
 
 export default function ApplicationDeadlineBar() {
-  const { isOpen, openAt, closeAt, reason, loading, refresh } = useApplicationWindow();
+  const { isOpen, globalOpen, openAt, closeAt, reason, loading, refresh } = useApplicationWindow();
 
   if (loading) return null;
 
@@ -24,7 +24,9 @@ export default function ApplicationDeadlineBar() {
           Director For HassAz Tech Hub
         </p>
       ) : (
-        <p className="text-white/70">Course applications are open — no closing date set.</p>
+        <p className="text-white/70">
+          {globalOpen ? "Course applications are open — no closing date set." : "Selected courses are open for application."}
+        </p>
       )}
     </div>
   );

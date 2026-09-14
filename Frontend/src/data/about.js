@@ -31,6 +31,14 @@ export const about = {
       bio: "Hassan leads HassAz Tech Hub and sets the direction for training, delivery, and partnerships. As a Senior Data Scientist he keeps the institution close to practice — so learners are taught the methods used to collect, analyse, and communicate data in real work, not only in theory.",
     },
     {
+      name: "Iqra D. Hanshi",
+      title: "Lead Organizer & Project Manager",
+      role: "Operations & Delivery",
+      image: "/about/iqra-hanshi.jpg",
+      cover: true,
+      bio: "Iqra organises HassAz programs and manages delivery from plan to classroom. As Lead Organizer and Project Manager she keeps cohorts, partners, and internal work on schedule — so learners and organisations meet a clear owner for every engagement.",
+    },
+    {
       name: "Abdiaziz A. Ali",
       title: "Academic Director",
       role: "Senior Software Engineer",

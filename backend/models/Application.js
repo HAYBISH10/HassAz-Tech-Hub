@@ -30,6 +30,10 @@ const applicationSchema = new mongoose.Schema(
     userId: { type: String, default: "" },
     emailKey: { type: String, default: "" },
     phoneKey: { type: String, default: "" },
+    intakeName: { type: String, default: "" },
+    intakeYear: { type: Number, default: null },
+    intakeKey: { type: String, default: "" },
+    intakeCohort: { type: String, default: "" },
   },
   { timestamps: { createdAt: "submittedAt", updatedAt: true } }
 );

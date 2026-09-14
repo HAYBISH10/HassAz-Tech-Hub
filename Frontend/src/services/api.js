@@ -172,6 +172,7 @@ export async function downloadApplicationsFile(kind, applicationNumber, filters 
   const params = new URLSearchParams();
   if (filters.categorySlug) params.set("categorySlug", filters.categorySlug);
   if (filters.programSlug) params.set("programSlug", filters.programSlug);
+  if (filters.intakeKey) params.set("intakeKey", filters.intakeKey);
   const query = params.toString();
   const path = applicationNumber
     ? `/api/applications/${encodeURIComponent(applicationNumber)}/export/excel`
@@ -252,11 +253,15 @@ export async function verifyCertificate(payload) {
   return data;
 }
 
-export async function fetchApplicationWindow() {
+export async function fetchApplicationWindow(params = {}) {
   try {
-    return await getJson("/api/settings/applications");
+    const query = new URLSearchParams();
+    if (params.category) query.set("category", params.category);
+    if (params.program) query.set("program", params.program);
+    const suffix = query.toString() ? `?${query}` : "";
+    return await getJson(`/api/settings/applications${suffix}`);
   } catch {
-    return { openAt: null, closeAt: null, isOpen: true, reason: "", now: new Date().toISOString() };
+    return { openAt: null, closeAt: null, isOpen: true, anyOpen: true, globalOpen: true, reason: "", now: new Date().toISOString() };
   }
 }
 
@@ -275,6 +280,10 @@ export async function updateApplicationWindow(payload) {
     throw new Error(data.message || "Could not update the application window.");
   }
   return response.json();
+}
+
+export async function fetchDatabase() {
+  return getJsonAuthed("/api/database");
 }
 
 export async function submitContact(payload) {

@@ -7,13 +7,20 @@ const closedMessage =
   "New intake alert! HassAz Tech Hub bootcamps are now closed for Application Kindly Keep your eye on our Site";
 
 export default function TopBar() {
-  const { isOpen, openAt, closeAt, reason, refresh } = useApplicationWindow();
+  const { isOpen, globalOpen, openAt, closeAt, reason, refresh, openSummary } = useApplicationWindow();
+  const partial = isOpen && !globalOpen;
 
   return (
     <div className="w-full bg-navy-dark px-3 py-2 text-center text-[11px] leading-5 text-white sm:px-5 sm:text-[13px]">
       {isOpen ? (
         <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-          <span>{openMessage}</span>
+          <span>
+            {partial
+              ? `New intake alert! ${[...(openSummary?.areas || []), ...(openSummary?.courses || [])].join(", ") || "Selected courses"} ${
+                  (openSummary?.areas || []).length + (openSummary?.courses || []).length === 1 ? "is" : "are"
+                } now open`
+              : openMessage}
+          </span>
           <span className="hidden sm:inline">—</span>
           <ApplyCta className="font-semibold text-gold underline">Apply now</ApplyCta>
           {closeAt ? (

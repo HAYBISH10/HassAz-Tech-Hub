@@ -33,20 +33,20 @@ export default function Countdown({ target, className = "", onReached }) {
   if (!parts) return null;
 
   return (
-    <span className={`inline-flex items-baseline gap-1.5 font-mono tabular-nums ${className}`}>
-      <TimeBox value={parts.days} label="d" />
-      <TimeBox value={parts.hours} label="h" />
-      <TimeBox value={parts.minutes} label="m" />
-      <TimeBox value={parts.seconds} label="s" />
+    <span className={`inline-flex flex-wrap items-baseline justify-center gap-x-2.5 gap-y-1 font-mono tabular-nums ${className}`}>
+      <TimeBox value={parts.days} label="Days" />
+      <TimeBox value={parts.hours} label="Hours" />
+      <TimeBox value={parts.minutes} label="Minutes" />
+      <TimeBox value={parts.seconds} label="Seconds" />
     </span>
   );
 }
 
 function TimeBox({ value, label }) {
   return (
-    <span className="inline-flex items-baseline gap-0.5">
+    <span className="inline-flex items-baseline gap-1">
       <span className="text-base font-bold sm:text-lg">{String(value).padStart(2, "0")}</span>
-      <span className="text-[10px] uppercase opacity-70">{label}</span>
+      <span className="font-sans text-[10px] font-semibold tracking-wide opacity-80 sm:text-[11px]">{label}</span>
     </span>
   );
 }

@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import PageLoader from "../components/ui/PageLoader";
+import SelectOrCustom from "../components/ui/SelectOrCustom";
+import { COHORT_OPTIONS, INTAKE_OPTIONS, yearOptions } from "../data/cohorts";
+import { useCatalog } from "../hooks/useContent";
 import { fetchBroadcastPreview, sendBroadcast } from "../services/api";
 
 const KIND_TEMPLATES = {
@@ -63,8 +66,14 @@ const KIND_ORDER = ["announcement", "class", "event", "reminder", "general"];
 const inputClass = "w-full rounded-md border border-navy/15 px-4 py-3 text-ink outline-none focus:border-gold";
 
 export default function AdminBroadcast() {
+  const catalog = useCatalog();
   const [intakeId, setIntakeId] = useState("");
-  const [audience, setAudience] = useState("registered");
+  const [audience, setAudience] = useState("");
+  const [cohort, setCohort] = useState("Cohort 3");
+  const [year, setYear] = useState(String(new Date().getFullYear()));
+  const [intakeName, setIntakeName] = useState("December");
+  const [areaSlug, setAreaSlug] = useState("");
+  const [courseSlug, setCourseSlug] = useState("");
   const [kind, setKind] = useState("announcement");
   const [preview, setPreview] = useState({ year: new Date().getFullYear(), intakes: [], students: [], count: 0 });
   const [query, setQuery] = useState("");
@@ -78,10 +87,22 @@ export default function AdminBroadcast() {
   const [notice, setNotice] = useState("");
 
   const filters = useMemo(() => {
+    if (cohort || year || intakeName || areaSlug || courseSlug) {
+      return {
+        audience: "cohort",
+        cohort,
+        intakeCohort: cohort,
+        intakeYear: year,
+        year,
+        intakeName,
+        categorySlug: areaSlug,
+        programSlug: courseSlug,
+      };
+    }
     if (intakeId) return { intakeId, audience: "intake" };
     if (audience === "all") return { audience: "all" };
-    return { audience: "registered" };
-  }, [intakeId, audience]);
+    return {};
+  }, [intakeId, audience, cohort, year, intakeName, areaSlug, courseSlug]);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,18 +140,26 @@ export default function AdminBroadcast() {
     );
   }, [preview.students, query]);
   const count = preview.count || 0;
-  const hasSelection = Boolean(intakeId || audience === "all");
+  const hasSelection = Boolean(cohort || year || intakeName || areaSlug || courseSlug || intakeId || audience === "all");
   const canSend = subject.trim() && message.trim() && count > 0 && hasSelection && !sending;
   const previewName = students[0]?.fullName || preview.sampleNames?.[0] || "Hassan Issack Mohamed";
-  const groupLabel = selected
-    ? `${selected.programTitle} · ${selected.cohort} · ${selected.label}`
-    : audience === "all"
-      ? "all students and contacts"
-      : "this intake";
+  const groupLabel = [cohort, intakeName, year].filter(Boolean).join(" · ")
+    || (selected ? `${selected.programTitle} · ${selected.cohort} · ${selected.label}` : "")
+    || (audience === "all" ? "all students and contacts" : "this group");
+  const selectedArea = catalog.find((item) => item.slug === areaSlug);
+  const areaPrograms = selectedArea?.programs || [];
+  const cohortOptions = preview.options?.cohorts?.length ? preview.options.cohorts : COHORT_OPTIONS;
+  const yearList = preview.options?.years?.length ? preview.options.years : yearOptions(year);
+  const intakeOptions = preview.options?.intakeNames?.length ? preview.options.intakeNames : INTAKE_OPTIONS.map((item) => item.name);
 
   function chooseIntake(id) {
     setIntakeId(id);
     setAudience("intake");
+    setCohort("");
+    setYear("");
+    setIntakeName("");
+    setAreaSlug("");
+    setCourseSlug("");
     setQuery("");
     setNotice("");
   }
@@ -138,6 +167,11 @@ export default function AdminBroadcast() {
   function chooseAll() {
     setIntakeId("");
     setAudience("all");
+    setCohort("");
+    setYear("");
+    setIntakeName("");
+    setAreaSlug("");
+    setCourseSlug("");
     setQuery("");
     setNotice("");
   }
@@ -201,9 +235,89 @@ export default function AdminBroadcast() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Email students</h1>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-        Choose an intake on the left. The class list appears on the right. Then send an announcement, class update,
-        event invitation, or reminder — each student is greeted as <span className="font-semibold text-navy">Dear {previewName},</span>
+        Choose <span className="font-semibold text-navy">Cohort 1</span>, <span className="font-semibold text-navy">December</span>,
+        and <span className="font-semibold text-navy">2026</span> — then send. Every student in that cohort gets the
+        same message at once, each as <span className="font-semibold text-navy">Dear {previewName},</span>
       </p>
+      {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
+      {notice ? <p className="mt-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p> : null}
+
+      <div className="mt-6 grid gap-3 rounded-2xl border border-navy/10 bg-white p-4 sm:grid-cols-2 lg:grid-cols-5">
+        <SelectOrCustom
+          label="Cohort"
+          value={cohort}
+          options={cohortOptions}
+          placeholder="All cohorts"
+          customPlaceholder="e.g. Cohort 1"
+          onChange={(next) => {
+            setCohort(next);
+            setIntakeId("");
+            setAudience("cohort");
+          }}
+        />
+        <SelectOrCustom
+          label="Intake"
+          value={intakeName}
+          options={intakeOptions}
+          placeholder="All intakes"
+          customPlaceholder="e.g. December"
+          onChange={(next) => {
+            setIntakeName(next);
+            setIntakeId("");
+            setAudience("cohort");
+          }}
+        />
+        <SelectOrCustom
+          label="Year"
+          value={year}
+          options={yearList}
+          placeholder="All years"
+          customPlaceholder="e.g. 2026"
+          onChange={(next) => {
+            setYear(next);
+            setIntakeId("");
+            setAudience("cohort");
+          }}
+        />
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy/60">Course area</span>
+          <select
+            value={areaSlug}
+            onChange={(event) => {
+              setAreaSlug(event.target.value);
+              setCourseSlug("");
+              setIntakeId("");
+            }}
+            className="w-full rounded-md border border-navy/15 px-3 py-2 text-sm"
+          >
+            <option value="">All areas</option>
+            {catalog.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy/60">Specific course</span>
+          <select
+            value={courseSlug}
+            onChange={(event) => {
+              setCourseSlug(event.target.value);
+              setIntakeId("");
+            }}
+            className="w-full rounded-md border border-navy/15 px-3 py-2 text-sm"
+            disabled={!areaSlug}
+          >
+            <option value="">{areaSlug ? "All in this area" : "All courses"}</option>
+            {areaPrograms.map((program) => (
+              <option key={program.slug} value={program.slug}>
+                {program.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
       {notice ? <p className="mt-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p> : null}
 
@@ -271,7 +385,7 @@ export default function AdminBroadcast() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Class list</p>
                 <h2 className="font-heading mt-1 text-xl font-bold text-navy">
-                  {hasSelection ? groupLabel : "Select an intake"}
+                  {hasSelection ? groupLabel : "Choose cohort and year"}
                 </h2>
               </div>
               {hasSelection ? (
@@ -287,8 +401,8 @@ export default function AdminBroadcast() {
 
             {!hasSelection ? (
               <p className="mt-6 text-sm leading-6 text-muted">
-                Choose an intake from the sidebar. Every student registered on that intake will appear here, then you
-                can send them a message.
+                Choose cohort, year, and optionally a course above. Every student in that group appears here, then you
+                can send them one message.
               </p>
             ) : loading ? (
               <p className="mt-6 text-sm text-muted">Loading students…</p>
@@ -407,7 +521,7 @@ export default function AdminBroadcast() {
               disabled={!canSend}
               className="rounded-full bg-navy px-6 py-3 text-sm font-semibold text-white disabled:opacity-50"
             >
-              {sending ? "Sending…" : hasSelection ? `Send to ${count} student${count === 1 ? "" : "s"}` : "Select an intake to send"}
+              {sending ? "Sending…" : hasSelection ? `Send to ${count} student${count === 1 ? "" : "s"} at once` : "Choose a cohort to send"}
             </button>
           </form>
         </div>

@@ -8,12 +8,20 @@ import { useUserAuth } from "../../context/UserAuthContext";
  * and student authentication. Visitors are asked to sign up or log in before they
  * can reach the application or course-registration form.
  */
-export default function ApplyCta({ to = "/apply", className = "", children, closedLabel = "Applications Closed" }) {
-  const { isOpen, loading } = useApplicationWindow();
+export default function ApplyCta({
+  to = "/apply",
+  className = "",
+  children,
+  closedLabel = "Applications Closed",
+  category = "",
+  program = "",
+}) {
+  const { isOpen, loading, isCourseOpen } = useApplicationWindow();
   const { isLoggedIn } = useUserAuth();
   const [showGate, setShowGate] = useState(false);
+  const open = category || program ? isCourseOpen(category, program) : isOpen;
 
-  if (!loading && !isOpen) {
+  if (!loading && !open) {
     return (
       <span
         aria-disabled="true"

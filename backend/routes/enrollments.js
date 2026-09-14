@@ -5,7 +5,7 @@ import { Router } from "express";
 import mongoose from "mongoose";
 import Enrollment from "../models/Enrollment.js";
 import { catalog } from "../data/catalog.js";
-import { getApplicationWindowStatus } from "../utils/applicationWindow.js";
+import { resolveCourseWindow, getWindowValue } from "../utils/applicationWindow.js";
 import { readJson, writeJson } from "../utils/localJson.js";
 import { requireUser } from "../utils/userAuth.js";
 import { findUserById } from "../utils/usersRepo.js";
@@ -40,7 +40,9 @@ router.post("/", requireUser, async (req, res) => {
   const user = await findUserById(req.userId);
   if (!user) return res.status(401).json({ message: "Please sign in to continue." });
 
-  const windowStatus = await getApplicationWindowStatus();
+  const categorySlug = String(req.body?.categorySlug || "").trim();
+  const programSlug = String(req.body?.programSlug || "").trim();
+  const windowStatus = resolveCourseWindow(await getWindowValue(), categorySlug, programSlug);
   if (!windowStatus.isOpen) {
     return res.status(403).json({
       message: "This course is not open for registration. Kindly contact the Academic Director for HassAz Tech Hub.",
@@ -48,8 +50,6 @@ router.post("/", requireUser, async (req, res) => {
     });
   }
 
-  const categorySlug = String(req.body?.categorySlug || "").trim();
-  const programSlug = String(req.body?.programSlug || "").trim();
   const modeId = String(req.body?.modeId || "").trim();
   const match = findProgram(categorySlug, programSlug);
   if (!match) return res.status(404).json({ message: "That course was not found." });

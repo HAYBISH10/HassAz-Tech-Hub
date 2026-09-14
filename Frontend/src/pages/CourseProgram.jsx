@@ -15,7 +15,7 @@ function Field({ label, children }) {
   );
 }
 
-function IntakeCard({ offer, applyBase }) {
+function IntakeCard({ offer, applyBase, category, program }) {
   return (
     <article className="flex flex-col rounded-[22px] border border-gold bg-white p-6 shadow-sm">
       <h2 className="font-heading text-2xl font-bold text-gold">{offer.label}</h2>
@@ -47,6 +47,8 @@ function IntakeCard({ offer, applyBase }) {
       ) : null}
       <ApplyCta
         to={`${applyBase}&mode=${encodeURIComponent(offer.modeId || "")}`}
+        category={category}
+        program={program}
         className="mt-6 inline-flex w-full justify-center rounded-full bg-gold px-6 py-3 text-center text-sm font-semibold text-white hover:bg-gold-dark"
       >
         Apply Now
@@ -124,7 +126,13 @@ export default function CourseProgram() {
 
         <div className={`mx-auto mt-10 grid max-w-6xl gap-5 ${columns}`}>
           {offers.map((offer) => (
-            <IntakeCard key={offer.id || offer.modeId} offer={offer} applyBase={applyBase} />
+            <IntakeCard
+              key={offer.id || offer.modeId}
+              offer={offer}
+              applyBase={applyBase}
+              category={category.slug}
+              program={program.slug}
+            />
           ))}
         </div>
       </section>
@@ -140,6 +148,8 @@ export default function CourseProgram() {
         <h2 className="font-heading mx-auto max-w-3xl text-2xl font-bold text-navy sm:text-4xl">{program.headline}</h2>
         <ApplyCta
           to={`${applyBase}&mode=${encodeURIComponent(offers[0]?.modeId || program.modes[0]?.id || "")}`}
+          category={category.slug}
+          program={program.slug}
           className="mt-8 inline-flex rounded-full bg-gold px-8 py-3 font-semibold text-white hover:bg-gold-dark"
         >
           Get started — Apply now

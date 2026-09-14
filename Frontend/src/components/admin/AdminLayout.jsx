@@ -14,6 +14,7 @@ const navItems = [
   { to: adminPath("broadcast"), label: "Email Students" },
   { to: adminPath("visitors"), label: "Website Visitors" },
   { to: adminPath("intakes"), label: "Course Intakes" },
+  { to: adminPath("database"), label: "Database" },
 ];
 
 export default function AdminLayout() {

@@ -25,13 +25,19 @@ function isValidToken(token) {
   return true;
 }
 
+function safeEqual(left, right) {
+  const a = Buffer.from(String(left));
+  const b = Buffer.from(String(right));
+  if (a.length !== b.length) {
+    crypto.timingSafeEqual(a, Buffer.alloc(a.length));
+    return false;
+  }
+  return crypto.timingSafeEqual(a, b);
+}
+
 export function checkCredentials(username, password) {
-  return (
-    typeof username === "string" &&
-    typeof password === "string" &&
-    username.trim() === ADMIN_USERNAME &&
-    password === ADMIN_PASSWORD
-  );
+  if (typeof username !== "string" || typeof password !== "string") return false;
+  return safeEqual(username.trim(), ADMIN_USERNAME) && safeEqual(password, ADMIN_PASSWORD);
 }
 
 export function login(username, password) {
