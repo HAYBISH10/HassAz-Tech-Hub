@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import ApplicationSuccessDialog from "../components/ui/ApplicationSuccessDialog";
 import Countdown from "../components/ui/Countdown";
 import PageLoader from "../components/ui/PageLoader";
 import { useCatalog } from "../hooks/useContent";
@@ -90,21 +91,30 @@ export default function Apply() {
   const [intakeOffers, setIntakeOffers] = useState([]);
   const { isLoggedIn, ready, user } = useUserAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const nextPath = `${location.pathname}${location.search}`;
+  const [form, setForm] = useState({
+    ...emptyForm,
+    categorySlug: params.get("category") || "",
+    programSlug: params.get("program") || "",
+    modeId: params.get("mode") || "",
+  });
+
+  const urlCategory = params.get("category") || "";
+  const urlProgram = params.get("program") || "";
 
   const refreshWindow = useCallback(() => {
-    return fetchApplicationWindow()
+    return fetchApplicationWindow({
+      category: urlCategory,
+      program: urlProgram,
+    })
       .then(setWindow_)
       .catch(() => {
         // keep the last known window state on a transient network error
       });
-  }, []);
+  }, [urlCategory, urlProgram]);
 
   useEffect(() => {
-    // Check once immediately, then keep checking in the background so the
-    // opening date, closing date, or an admin closing applications takes
-    // effect automatically — the form appears or disappears on its own,
-    // without the visitor needing to refresh the page.
     refreshWindow().finally(() => setCheckingWindow(false));
     const id = setInterval(refreshWindow, 5000);
     return () => clearInterval(id);
@@ -115,12 +125,6 @@ export default function Apply() {
       .then((data) => setIntakeOffers(data.offers || []))
       .catch(() => {});
   }, []);
-  const [form, setForm] = useState({
-    ...emptyForm,
-    categorySlug: params.get("category") || "",
-    programSlug: params.get("program") || "",
-    modeId: params.get("mode") || "",
-  });
 
   useEffect(() => {
     if (!user) return;
@@ -176,6 +180,9 @@ export default function Apply() {
     }
     if (step === 3 && (!form.categorySlug || !form.programSlug || !form.modeId)) {
       return "Please choose a program and training mode.";
+    }
+    if (step === 3 && window_ && !courseWindowOpen(window_, form.categorySlug, form.programSlug)) {
+      return "That course is not open for application. Choose an open course or contact the Academic Director.";
     }
     if (step === 4 && (!form.computerAccess || !form.skillLevel)) {
       return "Please complete the technology background questions.";
@@ -306,8 +313,12 @@ export default function Apply() {
     );
   }
 
-  if (window_ && !window_.isOpen && !result) {
-    return <ApplicationsClosed window={window_} onReached={refreshWindow} />;
+  if (window_ && !result) {
+    const targeted = Boolean(urlCategory || urlProgram);
+    const closed = targeted ? window_.resolved && !window_.resolved.isOpen : !window_.anyOpen;
+    if (closed) {
+      return <ApplicationsClosed window={window_.resolved || window_} onReached={refreshWindow} />;
+    }
   }
 
   if (!ready) {
@@ -346,17 +357,8 @@ export default function Apply() {
 
   if (result) {
     return (
-      <section className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-sm font-semibold text-gold">Application received</p>
-        <h1 className="font-heading mt-2 text-3xl font-bold text-navy">Thank you, {form.fullName.split(" ")[0]}.</h1>
-        <p className="mt-4 text-muted">
-          Your application number is{" "}
-          <span className="font-semibold text-navy">{result.applicationNumber}</span>. Admissions will
-          contact you on WhatsApp or email.
-        </p>
-        <Link to="/courses" className="mt-8 inline-block font-semibold text-gold">
-          Back to courses
-        </Link>
+      <section className="mx-auto max-w-2xl px-4 py-16">
+        <ApplicationSuccessDialog open onOk={() => navigate("/courses")} />
       </section>
     );
   }
@@ -493,7 +495,9 @@ export default function Apply() {
                   onChange={(e) => setForm((current) => ({ ...current, categorySlug: e.target.value, programSlug: "", modeId: "" }))}
                 >
                   <option value="">Select</option>
-                  {catalogData.map((item) => (
+                  {catalogData
+                    .filter((item) => !window_ || areaWindowOpen(window_, item.slug))
+                    .map((item) => (
                     <option key={item.slug} value={item.slug}>
                       {item.title}
                     </option>
@@ -507,7 +511,9 @@ export default function Apply() {
                   onChange={(e) => setForm((current) => ({ ...current, programSlug: e.target.value, modeId: "" }))}
                 >
                   <option value="">Select</option>
-                  {(category?.programs || []).map((item) => (
+                  {(category?.programs || [])
+                    .filter((item) => !window_ || courseWindowOpen(window_, form.categorySlug, item.slug))
+                    .map((item) => (
                     <option key={item.slug} value={item.slug}>
                       {item.title}
                     </option>
@@ -872,4 +878,21 @@ function extraPrompt(categorySlug) {
     return { question: "Which school and class/form are you in?" };
   }
   return null;
+}
+
+function courseWindowOpen(win, categorySlug, programSlug) {
+  if (!win) return false;
+  if (win.globalOpen) return true;
+  const area = (win.catalog || []).find((item) => item.slug === categorySlug);
+  if (!area) return false;
+  if (area.isOpen) return true;
+  return Boolean(area.courses?.find((item) => item.slug === programSlug)?.isOpen);
+}
+
+function areaWindowOpen(win, categorySlug) {
+  if (!win) return false;
+  if (win.globalOpen) return true;
+  const area = (win.catalog || []).find((item) => item.slug === categorySlug);
+  if (!area) return false;
+  return area.isOpen || Boolean(area.courses?.some((item) => item.isOpen));
 }

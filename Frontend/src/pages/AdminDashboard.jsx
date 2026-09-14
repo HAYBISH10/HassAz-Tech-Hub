@@ -92,7 +92,8 @@ export default function AdminDashboard() {
             </div>
           ) : null}
           <p className="mt-3 text-sm text-muted">
-            Applications are strictly admin-controlled — no form is reachable anywhere on the site while closed.
+            Open all courses at once, or open one area (Software Engineering, Data Courses) or a single course
+            without opening the rest.
           </p>
           <Link
             to={adminPath("applications")}
@@ -190,6 +191,19 @@ export default function AdminDashboard() {
             className="mt-4 inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-gold hover:text-gold-dark"
           >
             Manage certificates
+          </Link>
+        </div>
+
+        <div className="rounded-2xl border border-navy/10 bg-white p-6 lg:col-span-1">
+          <h2 className="font-heading text-lg font-bold text-navy">Database</h2>
+          <p className="mt-3 text-sm text-muted">
+            View stored records in tables: applicants, users, calls, messages, and the rest.
+          </p>
+          <Link
+            to={adminPath("database")}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-gold hover:text-gold-dark"
+          >
+            Open database
           </Link>
         </div>
       </div>

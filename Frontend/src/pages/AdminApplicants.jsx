@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDeleteDialog from "../components/ui/ConfirmDeleteDialog";
 import PageLoader from "../components/ui/PageLoader";
+import SelectOrCustom from "../components/ui/SelectOrCustom";
+import { COHORT_OPTIONS, INTAKE_OPTIONS, yearOptions } from "../data/cohorts";
 import { useCatalog } from "../hooks/useContent";
 import {
   deleteApplication,
@@ -16,6 +18,10 @@ export default function AdminApplicants() {
   const [tab, setTab] = useState("Open");
   const [areaSlug, setAreaSlug] = useState("");
   const [courseSlug, setCourseSlug] = useState("");
+  const [intakeKey, setIntakeKey] = useState("");
+  const [cohortFilter, setCohortFilter] = useState("");
+  const [yearFilter, setYearFilter] = useState("");
+  const [intakeNameFilter, setIntakeNameFilter] = useState("");
   const [open, setOpen] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState("");
@@ -41,12 +47,37 @@ export default function AdminApplicants() {
 
   const selectedArea = catalog.find((item) => item.slug === areaSlug) || null;
   const areaPrograms = selectedArea?.programs || [];
+  const intakeGroups = useMemo(() => buildCohortTabs(apps), [apps]);
+
+  useEffect(() => {
+    if (yearFilter || intakeNameFilter || cohortFilter || !intakeGroups.length) return;
+    const withApps = intakeGroups.find((item) => item.key !== "unassigned" && item.count);
+    const upcoming = nearestUpcomingCohort(intakeGroups);
+    const chosen = withApps || upcoming || intakeGroups[0];
+    setIntakeNameFilter(chosen.name || "");
+    setYearFilter(chosen.year ? String(chosen.year) : "");
+    setCohortFilter("");
+  }, [intakeGroups, yearFilter, intakeNameFilter, cohortFilter]);
+
+  const cohortPool = useMemo(() => {
+    const pool = tab === "Closed" ? closedApps : openApps;
+    return pool.filter((app) => {
+      if (intakeKey && !matchesCohort(app, intakeKey)) return false;
+      if (cohortFilter && String(app.intakeCohort || app.intake?.cohort || "").toLowerCase() !== cohortFilter.toLowerCase()) {
+        return false;
+      }
+      if (yearFilter && String(app.intakeYear || app.intake?.year || "") !== String(yearFilter)) return false;
+      if (intakeNameFilter && String(app.intakeName || app.intake?.name || "").toLowerCase() !== intakeNameFilter.toLowerCase()) {
+        return false;
+      }
+      return true;
+    });
+  }, [tab, openApps, closedApps, intakeKey, cohortFilter, yearFilter, intakeNameFilter]);
 
   const visible = useMemo(() => {
-    const pool = tab === "Closed" ? closedApps : openApps;
     const byArea = areaSlug
-      ? pool.filter((app) => applicantAreaSlug(app, catalog) === areaSlug)
-      : pool;
+      ? cohortPool.filter((app) => applicantAreaSlug(app, catalog) === areaSlug)
+      : cohortPool;
     const byCourse = courseSlug
       ? byArea.filter((app) => applicantProgramSlug(app, catalog) === courseSlug)
       : byArea;
@@ -62,13 +93,14 @@ export default function AdminApplicants() {
         app.program?.category,
         app.program?.program,
         app.program?.mode,
+        applicantIntakeLabel(app),
       ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase();
       return haystack.includes(needle);
     });
-  }, [apps, tab, query, openApps, closedApps, areaSlug, courseSlug, catalog]);
+  }, [cohortPool, query, areaSlug, courseSlug, catalog]);
 
   async function setState(applicationNumber, state) {
     setSaving(applicationNumber);
@@ -128,22 +160,26 @@ export default function AdminApplicants() {
     }
   }
 
-  const listFilters = areaSlug || courseSlug ? { categorySlug: areaSlug, programSlug: courseSlug } : {};
+  const listFilters =
+    areaSlug || courseSlug || intakeKey
+      ? { categorySlug: areaSlug, programSlug: courseSlug, intakeKey }
+      : {};
   const selectedCourse = areaPrograms.find((item) => item.slug === courseSlug);
   const excelLabel = courseSlug
     ? `Download ${selectedCourse?.title || "this course"} as Excel`
     : areaSlug
       ? `Download ${selectedArea?.title || "this area"} as Excel`
-      : "Download all as Excel (.xlsx)";
+      : intakeKey
+        ? `Download ${intakeGroups.find((item) => item.key === intakeKey)?.label || "this intake"} as Excel`
+        : "Download all as Excel (.xlsx)";
 
   return (
     <section className="mx-auto max-w-7xl">
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Applicants</h1>
       <p className="mt-2 text-sm text-muted">
-        View applicants by program area — Software Engineering, Data Courses, and the rest each have their own
-        list. Choose a course inside an area to see only those students. Download all as Excel with one sheet per
-        program area, or download just the list you are viewing.
+        Choose cohort, year, course area, and specific course from the dropdowns — or type your own. Students stay
+        in their own list, for example Cohort 1 · December 2026 · Data Science Bootcamp.
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -161,7 +197,7 @@ export default function AdminApplicants() {
         >
           {downloading === "excel" ? "Preparing…" : "Download all as Excel (.xlsx)"}
         </button>
-        {areaSlug ? (
+        {areaSlug || intakeKey ? (
           <button
             type="button"
             disabled={downloading === "excel-filtered"}
@@ -181,85 +217,101 @@ export default function AdminApplicants() {
         </button>
       </div>
       <p className="mt-2 text-xs text-muted">
-        The full Excel file has one sheet per program area (Software Engineering, Data Courses, and so on). Open
-        any row to view that applicant inside the site, or download just that one record.
+        The Excel file has one sheet per cohort and course area, for example “Dec 2026 Data Courses” and
+        “Jan 2027 Software Engineering”. Open any row to reply to that applicant.
       </p>
 
-      <div className="mt-6 flex flex-wrap gap-2">
-        <TabButton
-          active={!areaSlug}
-          onClick={() => {
-            setAreaSlug("");
-            setCourseSlug("");
+      <div className="mt-6 grid gap-3 rounded-2xl border border-navy/10 bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SelectOrCustom
+          label="Cohort"
+          value={cohortFilter}
+          options={COHORT_OPTIONS}
+          placeholder="All cohorts"
+          customPlaceholder="Type a cohort name"
+          onChange={(next) => {
+            setCohortFilter(next);
+            setIntakeKey("");
             setOpen("");
           }}
-        >
-          All areas ({(tab === "Closed" ? closedApps : openApps).length})
-        </TabButton>
-        {catalog.map((category) => {
-          const pool = tab === "Closed" ? closedApps : openApps;
-          const count = pool.filter((app) => applicantAreaSlug(app, catalog) === category.slug).length;
-          return (
-            <TabButton
-              key={category.slug}
-              active={areaSlug === category.slug}
-              onClick={() => {
-                setAreaSlug(category.slug);
-                setCourseSlug("");
-                setOpen("");
-              }}
-            >
-              {category.title} ({count})
-            </TabButton>
-          );
-        })}
-      </div>
-
-      {selectedArea ? (
-        <div className="mt-3 flex flex-wrap gap-2">
-          <TabButton
-            active={!courseSlug}
-            onClick={() => {
+        />
+        <SelectOrCustom
+          label="Intake"
+          value={intakeNameFilter}
+          options={INTAKE_OPTIONS.map((item) => item.name)}
+          placeholder="All intakes"
+          customPlaceholder="Type an intake name"
+          onChange={(next) => {
+            setIntakeNameFilter(next);
+            setIntakeKey("");
+            setOpen("");
+          }}
+        />
+        <SelectOrCustom
+          label="Year"
+          value={yearFilter}
+          options={yearOptions(yearFilter)}
+          placeholder="All years"
+          customPlaceholder="Type a year"
+          onChange={(next) => {
+            setYearFilter(next);
+            setIntakeKey("");
+            setOpen("");
+          }}
+        />
+        <label className="block">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy/60">Course area</span>
+          <select
+            value={areaSlug}
+            onChange={(event) => {
+              setAreaSlug(event.target.value);
               setCourseSlug("");
               setOpen("");
             }}
+            className="w-full rounded-md border border-navy/15 px-3 py-2 text-sm"
           >
-            All {selectedArea.title} courses (
-            {(tab === "Closed" ? closedApps : openApps).filter(
-              (app) => applicantAreaSlug(app, catalog) === selectedArea.slug
-            ).length}
-            )
-          </TabButton>
-          {areaPrograms.map((program) => {
-            const pool = tab === "Closed" ? closedApps : openApps;
-            const count = pool.filter(
-              (app) =>
-                applicantAreaSlug(app, catalog) === selectedArea.slug &&
-                applicantProgramSlug(app, catalog) === program.slug
-            ).length;
-            return (
-              <TabButton
-                key={program.slug}
-                active={courseSlug === program.slug}
-                onClick={() => {
-                  setCourseSlug(program.slug);
-                  setOpen("");
-                }}
-              >
-                {program.title} ({count})
-              </TabButton>
-            );
-          })}
-        </div>
-      ) : null}
+            <option value="">All areas in this selection</option>
+            {catalog.map((category) => (
+              <option key={category.slug} value={category.slug}>
+                {category.title}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="block sm:col-span-2 lg:col-span-2">
+          <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-navy/60">Specific course</span>
+          <select
+            value={courseSlug}
+            onChange={(event) => {
+              setCourseSlug(event.target.value);
+              setOpen("");
+            }}
+            className="w-full rounded-md border border-navy/15 px-3 py-2 text-sm"
+            disabled={!areaSlug}
+          >
+            <option value="">{areaSlug ? "All courses in this area" : "Choose a course area first"}</option>
+            {areaPrograms.map((program) => (
+              <option key={program.slug} value={program.slug}>
+                {program.title}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p className="mt-2 text-xs text-muted">
+        Showing {visible.length} applicant{visible.length === 1 ? "" : "s"}
+        {cohortFilter || intakeNameFilter || yearFilter
+          ? ` for ${[cohortFilter, intakeNameFilter, yearFilter].filter(Boolean).join(" · ")}`
+          : ""}
+        .
+      </p>
 
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">
           <TabButton active={tab === "Open"} onClick={() => setTab("Open")}>
-            Open ({openApps.length})
+            Open ({tab === "Open" ? cohortPool.length : openApps.filter((app) => matchesDropdowns(app, { cohortFilter, yearFilter, intakeNameFilter, intakeKey })).length})
           </TabButton>
           <TabButton active={tab === "Closed"} onClick={() => setTab("Closed")}>
-            Closed ({closedApps.length})
+            Closed ({tab === "Closed" ? cohortPool.length : closedApps.filter((app) => matchesDropdowns(app, { cohortFilter, yearFilter, intakeNameFilter, intakeKey })).length})
           </TabButton>
         </div>
         <div className="flex flex-wrap items-center gap-3">
@@ -467,6 +519,103 @@ export default function AdminApplicants() {
   );
 }
 
+function applicantIntakeKey(app) {
+  return app.intakeKey || app.intake?.key || "";
+}
+
+function applicantIntakeLabel(app) {
+  if (app.intake?.cohortLabel) return app.intake.cohortLabel;
+  const cohort = app.intakeCohort || app.intake?.cohort;
+  const name = app.intakeName || app.intake?.name;
+  const year = app.intakeYear || app.intake?.year;
+  if (cohort && name && year) return `${cohort} · ${name} ${year}`;
+  if (app.intake?.label) return app.intake.label;
+  if (name && year) return `${name} ${year}`;
+  return applicantIntakeKey(app) || "Unassigned";
+}
+
+function matchesDropdowns(app, { cohortFilter, yearFilter, intakeNameFilter, intakeKey }) {
+  if (intakeKey && !matchesCohort(app, intakeKey)) return false;
+  if (cohortFilter && String(app.intakeCohort || app.intake?.cohort || "").toLowerCase() !== cohortFilter.toLowerCase()) {
+    return false;
+  }
+  if (yearFilter && String(app.intakeYear || app.intake?.year || "") !== String(yearFilter)) return false;
+  if (intakeNameFilter && String(app.intakeName || app.intake?.name || "").toLowerCase() !== intakeNameFilter.toLowerCase()) {
+    return false;
+  }
+  return true;
+}
+
+function matchesCohort(app, key) {
+  if (!key) return false;
+  if (key === "unassigned") return !applicantIntakeKey(app);
+  return applicantIntakeKey(app) === key;
+}
+
+function intakeKeyValue(year, month) {
+  return `${year}-${String(month + 1).padStart(2, "0")}`;
+}
+
+function buildCohortTabs(apps = []) {
+  const names = ["January", "June", "December"];
+  const months = [0, 5, 11];
+  const now = new Date();
+  const startYear = now.getFullYear() - 1;
+  const endYear = now.getFullYear() + 2;
+  const list = [];
+  for (let year = startYear; year <= endYear; year += 1) {
+    for (let i = 0; i < months.length; i += 1) {
+      const key = intakeKeyValue(year, months[i]);
+      list.push({
+        key,
+        label: `${names[i]} ${year}`,
+        name: names[i],
+        cohort: i === 0 ? "Cohort 1" : i === 1 ? "Cohort 2" : "Cohort 3",
+        month: months[i],
+        year,
+        count: apps.filter((app) => applicantIntakeKey(app) === key || (Number(app.intakeYear) === year && app.intakeName === names[i])).length,
+      });
+    }
+  }
+  const upcoming = nearestUpcomingCohort(list) || list[0];
+  const upcomingIndex = Math.max(0, list.findIndex((item) => item.key === upcoming.key));
+  const windowed = list.slice(Math.max(0, upcomingIndex - 1), upcomingIndex + 3);
+  const visible = new Map(windowed.map((item) => [item.key, item]));
+  for (const app of apps) {
+    const key = applicantIntakeKey(app);
+    if (!key || visible.has(key)) continue;
+    const extra = list.find((item) => item.key === key);
+    if (extra) visible.set(key, extra);
+    else {
+      visible.set(key, {
+        key,
+        label: applicantIntakeLabel(app),
+        count: apps.filter((item) => applicantIntakeKey(item) === key).length,
+      });
+    }
+  }
+  const tabs = [...visible.values()].sort((a, b) => String(a.key).localeCompare(String(b.key)));
+  if (apps.some((app) => !applicantIntakeKey(app))) {
+    tabs.push({
+      key: "unassigned",
+      label: "Unassigned",
+      count: apps.filter((app) => !applicantIntakeKey(app)).length,
+    });
+  }
+  return tabs;
+}
+
+function nearestUpcomingCohort(tabs = []) {
+  const now = new Date();
+  const stamp = now.getFullYear() * 12 + now.getMonth();
+  return (
+    tabs.find((item) => {
+      if (!item.year && item.year !== 0) return false;
+      return item.year * 12 + item.month >= stamp;
+    }) || tabs[0]
+  );
+}
+
 function applicantAreaSlug(app, catalog = []) {
   const slug = app.program?.categorySlug;
   if (slug && catalog.some((item) => item.slug === slug)) return slug;
@@ -506,6 +655,7 @@ function flattenApplicant(app) {
     Status: app.status || "Submitted",
     State: app.state || "Open",
     "Submitted At": app.submittedAt ? new Date(app.submittedAt).toLocaleString() : "",
+    Cohort: applicantIntakeLabel(app),
   };
 
   const sections = [
@@ -644,7 +794,7 @@ function ApplicantRecord({
           <p className="text-xs font-semibold uppercase tracking-wide text-gold">Applicant record</p>
           <h2 className="font-heading mt-1 text-2xl font-bold text-navy">{name}</h2>
           <p className="mt-1 text-sm text-muted">
-            {app.applicationNumber} · {app.program?.program || "—"} · {app.program?.mode || "—"}
+            {app.applicationNumber} · {applicantIntakeLabel(app)} · {app.program?.program || "—"} · {app.program?.mode || "—"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

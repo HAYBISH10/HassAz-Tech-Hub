@@ -13,15 +13,22 @@ import {
   sendApplicationRejectedEmail,
   sendDuplicateApplicationEmail,
 } from "../utils/mail.js";
-import { getApplicationWindowStatus, getWindowValue } from "../utils/applicationWindow.js";
+import {
+  currentIntake,
+  getWindowValue,
+  resolveCourseWindow,
+  withApplicationIntake,
+} from "../utils/applicationWindow.js";
 import { requireUser } from "../utils/userAuth.js";
 import { rateLimit } from "../utils/rateLimit.js";
 import { findUserById } from "../utils/usersRepo.js";
 import { catalog } from "../data/catalog.js";
 
-function applicationMatchesFilters(app, categorySlug, programSlug) {
+function applicationMatchesFilters(app, categorySlug, programSlug, intakeKey) {
   const cat = String(categorySlug || "").trim();
   const prog = String(programSlug || "").trim();
+  const intake = String(intakeKey || "").trim();
+  if (intake && String(app.intakeKey || app.intake?.key || "") !== intake) return false;
   if (!cat && !prog) return true;
 
   const storedCat = app.program?.categorySlug || "";
@@ -111,7 +118,7 @@ async function allApplications() {
     if (key) seen.add(key);
     merged.push(app);
   }
-  return merged.sort(sortNewest);
+  return merged.sort(sortNewest).map((app) => withApplicationIntake(app));
 }
 
 function findDuplicate(existingApps, incoming, { allowRejectedReapply = true } = {}) {
@@ -149,8 +156,9 @@ router.get("/export/excel", requireAdmin, async (req, res) => {
   try {
     const categorySlug = String(req.query.categorySlug || "").trim();
     const programSlug = String(req.query.programSlug || "").trim();
+    const intakeKey = String(req.query.intakeKey || "").trim();
     const apps = (await allApplications()).filter((app) =>
-      applicationMatchesFilters(app, categorySlug, programSlug)
+      applicationMatchesFilters(app, categorySlug, programSlug, intakeKey)
     );
     const category = catalog.find((item) => item.slug === categorySlug);
     const program = catalog.flatMap((item) => item.programs || []).find((item) => item.slug === programSlug);
@@ -174,8 +182,9 @@ router.get("/export/pdf", requireAdmin, async (req, res) => {
   try {
     const categorySlug = String(req.query.categorySlug || "").trim();
     const programSlug = String(req.query.programSlug || "").trim();
+    const intakeKey = String(req.query.intakeKey || "").trim();
     const apps = (await allApplications()).filter((app) =>
-      applicationMatchesFilters(app, categorySlug, programSlug)
+      applicationMatchesFilters(app, categorySlug, programSlug, intakeKey)
     );
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="hassaz-applications-${Date.now()}.pdf"`);
@@ -352,18 +361,6 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
     });
   }
 
-  try {
-    const windowStatus = await getApplicationWindowStatus();
-    if (!windowStatus.isOpen) {
-      return res.status(403).json({
-        message: "No application windows that are open, Kindly Contact Academic Director For HassAz Tech Hub",
-        window: windowStatus,
-      });
-    }
-  } catch {
-    // If the window status cannot be read, fail safe by allowing submission rather than blocking a real applicant.
-  }
-
   const body = req.body || {};
   const email = normalizeEmail(body.contactInformation?.email || user.email);
   const phone = normalizePhone(body.contactInformation?.phone || user.phone);
@@ -374,8 +371,25 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
     contactInformation: { ...(body.contactInformation || {}), email, phone: body.contactInformation?.phone || user.phone },
   };
 
+  let rules = {};
+  let windowStatus = null;
   try {
-    const rules = await getWindowValue();
+    rules = await getWindowValue();
+    const categorySlug = String(body.program?.categorySlug || body.categorySlug || "").trim();
+    const programSlug = String(body.program?.programSlug || body.programSlug || "").trim();
+    windowStatus = resolveCourseWindow(rules, categorySlug, programSlug);
+    if (!windowStatus.isOpen) {
+      return res.status(403).json({
+        message: "No application windows that are open, Kindly Contact Academic Director For HassAz Tech Hub",
+      });
+    }
+  } catch {
+    return res.status(503).json({
+      message: "Applications are temporarily unavailable. Please try again shortly.",
+    });
+  }
+
+  try {
     const allowRejectedReapply = rules.allowRejectedReapply !== false;
     const existingApps = await allApplications();
     const duplicate = findDuplicate(existingApps, incoming, { allowRejectedReapply });
@@ -407,6 +421,7 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
     console.error("Duplicate application check failed:", error.message);
   }
 
+  const intake = windowStatus?.intake || currentIntake(rules);
   const payload = {
     ...incoming,
     applicationNumber: applicationNumber(),
@@ -415,6 +430,11 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
     userId: req.userId,
     emailKey: email,
     phoneKey: phone,
+    intakeName: intake.name,
+    intakeYear: intake.year,
+    intakeKey: intake.key,
+    intakeCohort: intake.cohort,
+    intake,
   };
 
   try {

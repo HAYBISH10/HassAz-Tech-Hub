@@ -23,6 +23,7 @@ import AdminApplicants from "./pages/AdminApplicants";
 import AdminApplications from "./pages/AdminApplications";
 import AdminCalls from "./pages/AdminCalls";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminDatabase from "./pages/AdminDatabase";
 import AdminGraduates from "./pages/AdminGraduates";
 import AdminIntakes from "./pages/AdminIntakes";
 import AdminLogin from "./pages/AdminLogin";
@@ -82,6 +83,7 @@ export default function App() {
             <Route path="broadcast" element={<AdminBroadcast />} />
             <Route path="visitors" element={<AdminVisitors />} />
             <Route path="intakes" element={<AdminIntakes />} />
+            <Route path="database" element={<AdminDatabase />} />
           </Route>
         </Routes>
       </BrowserRouter>

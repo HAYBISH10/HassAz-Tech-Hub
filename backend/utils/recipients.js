@@ -25,6 +25,9 @@ function addRecipient(map, row) {
     modeId: row.modeId || current?.modeId || "",
     modeLabel: row.modeLabel || current?.modeLabel || "",
     cohort: row.cohort || current?.cohort || "",
+    intakeName: row.intakeName || current?.intakeName || "",
+    intakeYear: row.intakeYear || current?.intakeYear || "",
+    intakeKey: row.intakeKey || current?.intakeKey || "",
     source: row.source || current?.source || "",
   };
   map.set(email, next);
@@ -101,6 +104,8 @@ export async function listBroadcastRecords() {
       modeId: row.modeId || "",
       modeLabel: offer?.label || "",
       cohort: offer?.cohort || "",
+      intakeName: "",
+      intakeYear: "",
       source: "enrollment",
     };
     addRecipient(registered, record);
@@ -118,7 +123,10 @@ export async function listBroadcastRecords() {
       programTitle: app.program?.program || "",
       modeId: app.program?.modeId || "",
       modeLabel: offer?.label || app.program?.mode || "",
-      cohort: offer?.cohort || "",
+      cohort: app.intakeCohort || app.intake?.cohort || offer?.cohort || "",
+      intakeName: app.intakeName || app.intake?.name || "",
+      intakeYear: app.intakeYear || app.intake?.year || "",
+      intakeKey: app.intakeKey || app.intake?.key || "",
       source: "application",
     };
     addRecipient(everyone, record);
@@ -148,14 +156,27 @@ export function filterBroadcastRecords(records, filters = {}) {
     if (!offer) return [];
     return records.registered.filter((item) => matchesIntake(item, offer));
   }
-  const pool = filters.audience === "registered" || filters.audience === "intake" ? records.registered : records.all;
+  const audience = String(filters.audience || "").trim();
+  const pool = audience === "all" ? records.all : records.registered;
   const categorySlug = String(filters.categorySlug || "").trim();
   const programSlug = String(filters.programSlug || "").trim();
-  const cohort = String(filters.cohort || "").trim();
+  const cohort = String(filters.cohort || filters.intakeCohort || "").trim().toLowerCase();
+  const intakeName = String(filters.intakeName || "").trim().toLowerCase();
+  const intakeYear = String(filters.intakeYear || filters.year || "").trim();
+  const scoped =
+    Boolean(categorySlug || programSlug || cohort || intakeName || intakeYear) ||
+    audience === "registered" ||
+    audience === "cohort";
+  if (!scoped && audience !== "all") return [];
   return pool.filter((item) => {
     if (categorySlug && item.categorySlug !== categorySlug) return false;
     if (programSlug && item.programSlug !== programSlug) return false;
-    if (cohort && item.cohort !== cohort) return false;
+    if (cohort) {
+      const studentCohort = String(item.cohort || "").toLowerCase();
+      if (studentCohort && studentCohort !== cohort) return false;
+    }
+    if (intakeName && String(item.intakeName || "").toLowerCase() !== intakeName) return false;
+    if (intakeYear && String(item.intakeYear || "") !== String(intakeYear)) return false;
     return true;
   });
 }
@@ -171,6 +192,8 @@ function publicStudent(item) {
     email: item.email,
     programTitle: item.programTitle || "",
     cohort: item.cohort || "",
+    intakeName: item.intakeName || "",
+    intakeYear: item.intakeYear || "",
     modeLabel: item.modeLabel || "",
     source: item.source || "",
   };
@@ -178,8 +201,15 @@ function publicStudent(item) {
 
 export async function broadcastPreview(filters = {}) {
   const records = await listBroadcastRecords();
-  const scoped = Boolean(String(filters.intakeId || "").trim()) || String(filters.audience || "") === "all";
-  const recipients = scoped ? filterBroadcastRecords(records, filters) : [];
+  const hasFilter =
+    Boolean(String(filters.intakeId || "").trim()) ||
+    Boolean(String(filters.cohort || filters.intakeCohort || "").trim()) ||
+    Boolean(String(filters.intakeYear || filters.year || "").trim()) ||
+    Boolean(String(filters.intakeName || "").trim()) ||
+    Boolean(String(filters.categorySlug || "").trim()) ||
+    Boolean(String(filters.programSlug || "").trim()) ||
+    String(filters.audience || "") === "all";
+  const recipients = hasFilter ? filterBroadcastRecords(records, { ...filters, audience: filters.audience || "cohort" }) : [];
   const programs = flattenPrograms();
   const programBySlug = new Map(programs.map((item) => [item.slug, item]));
   const intakes = (records.offers || [])
@@ -203,14 +233,36 @@ export async function broadcastPreview(filters = {}) {
     .sort((a, b) => a.categoryTitle.localeCompare(b.categoryTitle) || a.programTitle.localeCompare(b.programTitle));
 
   const selected = intakes.find((item) => item.id === String(filters.intakeId || "")) || null;
+  const unique = (values) => [...new Set(values.filter(Boolean).map((item) => String(item)))].sort();
 
   return {
     year: records.year,
     count: recipients.length,
-    audience: filters.intakeId ? "intake" : filters.audience || "all",
+    audience: filters.intakeId ? "intake" : filters.audience || "cohort",
     selectedIntake: selected,
     intakes,
     students: recipients.map(publicStudent),
     sampleNames: recipients.slice(0, 8).map((item) => item.fullName),
+    options: {
+      cohorts: unique([
+        ...records.registered.map((item) => item.cohort),
+        ...intakes.map((item) => item.cohort),
+        "Cohort 1",
+        "Cohort 2",
+        "Cohort 3",
+      ]),
+      years: unique([
+        ...records.registered.map((item) => item.intakeYear),
+        records.year,
+        new Date().getFullYear(),
+        new Date().getFullYear() + 1,
+      ]),
+      intakeNames: unique([
+        ...records.registered.map((item) => item.intakeName),
+        "January",
+        "June",
+        "December",
+      ]),
+    },
   };
 }

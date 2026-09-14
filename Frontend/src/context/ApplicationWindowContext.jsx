@@ -1,28 +1,39 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { fetchApplicationWindow } from "../services/api";
 
-const ApplicationWindowContext = createContext({
-  isOpen: true,
+const empty = {
+  isOpen: false,
+  anyOpen: false,
+  globalOpen: false,
   openAt: null,
   closeAt: null,
   reason: "",
+  catalog: [],
+  openSummary: { global: false, areas: [], courses: [] },
+  intake: null,
   loading: true,
+};
+
+const ApplicationWindowContext = createContext({
+  ...empty,
   refresh: () => {},
+    isCourseOpen: () => false,
 });
 
-// Poll fairly often so an admin-set window opens or closes itself for every
-// visitor automatically, without anyone needing to refresh the page. Any
-// Countdown reaching zero also calls refresh() directly for an instant flip.
 const POLL_MS = 5000;
 
+export function isCourseOpenIn(data, categorySlug, programSlug) {
+  if (!data) return false;
+  if (data.globalOpen) return true;
+  const area = (data.catalog || []).find((item) => item.slug === categorySlug);
+  if (area?.isOpen) return true;
+  const course = area?.courses?.find((item) => item.slug === programSlug);
+  if (course?.isOpen) return true;
+  return false;
+}
+
 export function ApplicationWindowProvider({ children }) {
-  const [state, setState] = useState({
-    isOpen: true,
-    openAt: null,
-    closeAt: null,
-    reason: "",
-    loading: true,
-  });
+  const [state, setState] = useState(empty);
   const activeRef = useRef(true);
 
   const load = useCallback(() => {
@@ -30,10 +41,15 @@ export function ApplicationWindowProvider({ children }) {
       .then((data) => {
         if (!activeRef.current) return;
         setState({
-          isOpen: data.isOpen !== false,
-          openAt: data.openAt || null,
-          closeAt: data.closeAt || null,
-          reason: data.reason || "",
+          isOpen: Boolean(data.displayDeadline?.isOpen ?? (data.anyOpen !== false && data.isOpen !== false)),
+          anyOpen: data.anyOpen !== false,
+          globalOpen: Boolean(data.globalOpen),
+          openAt: data.displayDeadline?.openAt || data.openAt || null,
+          closeAt: data.displayDeadline?.closeAt || data.closeAt || null,
+          reason: data.displayDeadline?.reason || data.reason || "",
+          catalog: data.catalog || [],
+          openSummary: data.openSummary || { global: false, areas: [], courses: [] },
+          intake: data.intake || null,
           loading: false,
         });
       })
@@ -52,8 +68,13 @@ export function ApplicationWindowProvider({ children }) {
     };
   }, [load]);
 
+  const isCourseOpen = useCallback(
+    (categorySlug, programSlug) => isCourseOpenIn(state, categorySlug, programSlug),
+    [state]
+  );
+
   return (
-    <ApplicationWindowContext.Provider value={{ ...state, refresh: load }}>
+    <ApplicationWindowContext.Provider value={{ ...state, refresh: load, isCourseOpen }}>
       {children}
     </ApplicationWindowContext.Provider>
   );

@@ -99,12 +99,19 @@ export async function buildKnowledge() {
       },
     },
     applications: {
-      isOpen: Boolean(window.isOpen),
+      isOpen: Boolean(window.anyOpen ?? window.isOpen),
       openAt: window.openAt,
       closeAt: window.closeAt,
       reason: window.reason || "",
-      note: window.isOpen
-        ? "Course applications are currently open. Learners should create an account, then apply from /apply."
+      openSummary: window.openSummary || { global: Boolean(window.isOpen), areas: [], courses: [] },
+      note: window.anyOpen || window.isOpen
+        ? window.globalOpen
+          ? "Course applications are currently open for all programs. Learners should create an account, then apply from /apply."
+          : `Selected courses are open for application${
+              (window.openSummary?.areas || []).length || (window.openSummary?.courses || []).length
+                ? `: ${[...(window.openSummary?.areas || []), ...(window.openSummary?.courses || [])].join(", ")}.`
+                : "."
+            } Learners should create an account, then apply from /apply.`
         : "Course applications are currently closed. Direct people to Contact Us or to book an admissions call.",
     },
     categories,

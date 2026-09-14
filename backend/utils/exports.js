@@ -6,6 +6,8 @@ export function flattenApplication(app) {
     Status: app.status || "",
     State: app.state || "Open",
     "Submitted At": app.submittedAt ? new Date(app.submittedAt).toLocaleString() : "",
+    Cohort: app.intake?.cohortLabel || (app.intakeName && app.intakeYear ? `${app.intakeName} ${app.intakeYear} cohort` : ""),
+    Intake: app.intake?.label || (app.intakeName && app.intakeYear ? `${app.intakeName} ${app.intakeYear}` : ""),
   };
 
   const sections = [
@@ -47,16 +49,17 @@ export async function buildApplicationsWorkbook(
   if (!groupByArea) {
     groups.set(sheetName(sheetLabel || "Applications"), applications);
   } else {
-    for (const category of catalog) {
-      groups.set(sheetName(category.title), []);
-    }
-    groups.set("Other", []);
-    for (const app of applications) {
+    const ordered = [...applications].sort((a, b) => {
+      const left = String(a.intakeKey || a.intake?.key || "");
+      const right = String(b.intakeKey || b.intake?.key || "");
+      if (left !== right) return left.localeCompare(right);
+      return sheetNameForApp(a).localeCompare(sheetNameForApp(b));
+    });
+    for (const app of ordered) {
       const name = sheetNameForApp(app);
       if (!groups.has(name)) groups.set(name, []);
       groups.get(name).push(app);
     }
-    if (!groups.get("Other")?.length) groups.delete("Other");
   }
 
   for (const [name, apps] of groups) {
@@ -73,21 +76,30 @@ function sheetName(value) {
   return (clean || "Other").slice(0, 31);
 }
 
-function sheetNameForApp(app) {
+function areaSheetName(app) {
   const slug = app.program?.categorySlug;
   const bySlug = catalog.find((item) => item.slug === slug);
-  if (bySlug) return sheetName(bySlug.title);
+  if (bySlug) return bySlug.title;
   const areaTitle = String(app.program?.category || "").trim();
   const byTitle = catalog.find((item) => item.title.toLowerCase() === areaTitle.toLowerCase());
-  if (byTitle) return sheetName(byTitle.title);
+  if (byTitle) return byTitle.title;
   const programTitle = String(app.program?.program || app.program?.title || "")
     .trim()
     .toLowerCase();
   const byProgram = catalog.find((item) =>
     item.programs?.some((program) => String(program.title).toLowerCase() === programTitle)
   );
-  if (byProgram) return sheetName(byProgram.title);
-  return sheetName(areaTitle || "Other");
+  if (byProgram) return byProgram.title;
+  return areaTitle || "Other";
+}
+
+function sheetNameForApp(app) {
+  const area = areaSheetName(app);
+  const cohort = String(app.intake?.label || (app.intakeName && app.intakeYear ? `${app.intakeName} ${app.intakeYear}` : ""))
+    .replace("January", "Jan")
+    .replace("June", "Jun")
+    .replace("December", "Dec");
+  return sheetName(cohort ? `${cohort} ${area}` : area);
 }
 
 function addApplicationSheet(workbook, name, applications) {

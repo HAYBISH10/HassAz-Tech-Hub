@@ -28,12 +28,17 @@ function parseFlyer(value) {
 }
 
 function filtersFrom(input = {}) {
-  const audience = String(input.audience || "all").trim();
+  const audience = String(input.audience || "cohort").trim();
+  const allowed = ["registered", "intake", "cohort", "all"];
   return {
-    audience: audience === "registered" || audience === "intake" ? audience : "all",
+    audience: allowed.includes(audience) ? audience : "cohort",
     categorySlug: String(input.categorySlug || "").trim(),
     programSlug: String(input.programSlug || "").trim(),
-    cohort: String(input.cohort || "").trim(),
+    cohort: String(input.cohort || input.intakeCohort || "").trim(),
+    intakeCohort: String(input.intakeCohort || input.cohort || "").trim(),
+    intakeName: String(input.intakeName || "").trim(),
+    intakeYear: String(input.intakeYear || input.year || "").trim(),
+    year: String(input.year || input.intakeYear || "").trim(),
     intakeId: String(input.intakeId || "").trim(),
     kind: String(input.kind || "announcement").trim(),
   };
@@ -98,7 +103,9 @@ router.post(
 
     const who = filters.intakeId
       ? `student${recipients.length === 1 ? "" : "s"} on this intake`
-      : `student${recipients.length === 1 ? "" : "s"}`;
+      : filters.cohort || filters.intakeName || filters.intakeYear
+        ? `student${recipients.length === 1 ? "" : "s"} in this cohort`
+        : `student${recipients.length === 1 ? "" : "s"}`;
     return res.json({
       ok: true,
       count: recipients.length,
