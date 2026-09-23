@@ -46,7 +46,7 @@ router.post("/", requireUser, async (req, res) => {
   if (!windowStatus.isOpen) {
     return res.status(403).json({
       message: "This course is not open for registration. Kindly contact the Academic Director for HassAz Tech Hub.",
-      window: windowStatus,
+      window: { isOpen: false, reason: windowStatus.reason || "" },
     });
   }
 
@@ -95,7 +95,7 @@ router.post("/", requireUser, async (req, res) => {
         message: "You are already registered for this course.",
       });
     }
-    return res.status(400).json({ message: error.message || "Could not register for this course." });
+    return res.status(400).json({ message: "Could not register for this course." });
   }
 });
 

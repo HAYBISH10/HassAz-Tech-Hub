@@ -1,8 +1,12 @@
+import { extractToken } from "./auth.js";
+import { verifyToken } from "./sessions.js";
+
 const buckets = new Map();
 
 export function rateLimit({ windowMs = 15 * 60 * 1000, max = 8, message } = {}) {
   return (req, res, next) => {
-    const key = `${req.ip || "unknown"}:${req.baseUrl}${req.path}`;
+    if (verifyToken(extractToken(req), "admin")) return next();
+    const key = `${req.method}:${req.ip || "unknown"}:${req.baseUrl}${req.path}`;
     const now = Date.now();
     const current = buckets.get(key) || [];
     const recent = current.filter((stamp) => now - stamp < windowMs);

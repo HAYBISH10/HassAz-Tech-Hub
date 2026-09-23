@@ -8,6 +8,7 @@ import { seedGraduates } from "../data/graduates.js";
 import { sendVerificationResultEmail } from "../utils/mail.js";
 import { certificateId, normalizeEmail, normalizeName } from "../utils/names.js";
 import { requireAdmin } from "../utils/auth.js";
+import { rateLimit } from "../utils/rateLimit.js";
 
 const storePath = join(dirname(fileURLToPath(import.meta.url)), "../data/graduates-store.json");
 const router = Router();
@@ -69,7 +70,7 @@ router.get("/", requireAdmin, async (_req, res) => {
   try {
     res.json(await allGraduates());
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not load graduates." });
   }
 });
 
@@ -108,11 +109,11 @@ router.post("/", requireAdmin, async (req, res) => {
     writeLocal(list);
     return res.status(201).json(record);
   } catch (error) {
-    return res.status(400).json({ message: error.message || "Could not save graduate." });
+    return res.status(400).json({ message: "Could not save graduate." });
   }
 });
 
-router.post("/verify", async (req, res) => {
+router.post("/verify", rateLimit({ max: 8 }), async (req, res) => {
   const fullName = String(req.body.fullName || "").trim();
   const email = String(req.body.email || "").trim();
   const cert = String(req.body.certificateId || "").trim();
@@ -132,7 +133,7 @@ router.post("/verify", async (req, res) => {
       return res.json({ ok: false, emailed: mail.emailed, message: mail.letter.text });
     }
 
-    // Match found: notify the registered graduate email that verification succeeded — again,
+    // Match found: notify the registered graduate email that verification succeeded, again,
     // without echoing certificate/program details back in the response or the email body.
     const mail = await sendVerificationResultEmail({
       to: match.email,
@@ -143,7 +144,7 @@ router.post("/verify", async (req, res) => {
 
     return res.json({ ok: true, emailed: mail.emailed, message: mail.letter.text });
   } catch (error) {
-    return res.status(400).json({ message: error.message, ok: false });
+    return res.status(400).json({ message: "Could not complete verification. Please try again.", ok: false });
   }
 });
 
@@ -166,7 +167,7 @@ router.delete("/:certificateId", requireAdmin, async (req, res) => {
     if (!deleted) return res.status(404).json({ message: "Graduate record not found." });
     return res.json({ message: "Graduate deleted.", certificateId: req.params.certificateId });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not delete this graduate." });
   }
 });
 

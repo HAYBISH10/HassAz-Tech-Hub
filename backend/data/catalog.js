@@ -37,7 +37,7 @@ function careerProgram(slug, title, summary, intro, careers, items) {
       },
       {
         title: "Why study at HassAz Tech Hub?",
-        body: "Live mentoring, hands-on labs, and a learning culture focused on building — not watching slides.",
+        body: "Live mentoring, hands-on labs, and a learning culture focused on building, not watching slides.",
       },
     ],
     curriculum: [{ title: "What you will learn", items }],
@@ -58,7 +58,7 @@ const catalogData = [
         summary: "Train for job-ready full stack work: interfaces, APIs, databases, and deployment.",
         headline: "Build complete web products from idea to launch",
         intro:
-          "This bootcamp takes you through practical software engineering — from programming fundamentals to shipping full stack applications. You will work in labs, code reviews, and a capstone that belongs in a portfolio.",
+          "This bootcamp takes you through practical software engineering, from programming fundamentals to shipping full stack applications. You will work in labs, code reviews, and a capstone that belongs in a portfolio.",
         careers: ["Junior Software Engineer", "Full Stack Developer", "Web Developer"],
         details: [
           {
@@ -75,7 +75,7 @@ const catalogData = [
           },
           {
             title: "Why study at HassAz Tech Hub?",
-            body: "Live mentoring, project reviews, and a learning culture focused on building — not watching slides.",
+            body: "Live mentoring, project reviews, and a learning culture focused on building, not watching slides.",
           },
         ],
         curriculum: [
@@ -191,7 +191,7 @@ const catalogData = [
       {
         slug: "computer-software-and-hardware-maintenance",
         title: "Computer Software and Hardware Maintenance",
-        summary: "Diagnose, repair, and maintain computers — from operating systems to internal hardware components.",
+        summary: "Diagnose, repair, and maintain computers, from operating systems to internal hardware components.",
         headline: "Learn to build, fix, and maintain computers with confidence",
         intro:
           "A practical, hands-on program covering computer assembly, hardware troubleshooting, operating system installation, and software maintenance. You will work directly on real machines and leave able to diagnose and resolve common computer problems for individuals, offices, and small businesses.",
@@ -211,7 +211,7 @@ const catalogData = [
           },
           {
             title: "Why study at HassAz Tech Hub?",
-            body: "Hands-on lab practice with real components and machines, mentor-led troubleshooting sessions, and practical assessments — not theory alone.",
+            body: "Hands-on lab practice with real components and machines, mentor-led troubleshooting sessions, and practical assessments, not theory alone.",
           },
         ],
         curriculum: [
@@ -238,7 +238,7 @@ const catalogData = [
         "computer-package",
         "Computer Package",
         "Core computer skills for office work: documents, spreadsheets, presentations, and internet use.",
-        "Build confidence with the computer tools used in schools, offices, and small businesses — from typing and files to Word, Excel, PowerPoint, email, and internet safety.",
+        "Build confidence with the computer tools used in schools, offices, and small businesses, from typing and files to Word, Excel, PowerPoint, email, and internet safety.",
         ["Office Assistant", "Data Entry", "Administrative support"],
         ["Computer fundamentals", "Microsoft Word, Excel, and PowerPoint", "Email, internet, and file management"]
       ),
@@ -264,7 +264,7 @@ const catalogData = [
     slug: "data-courses",
     title: "Data Courses",
     summary:
-      "Learn in-demand data skills and become a data expert — from analysis and visualization to data science, AI, and machine learning.",
+      "Learn in-demand data skills and become a data expert, from analysis and visualization to data science, AI, and machine learning.",
     programs: [
       {
         slug: "data-science-bootcamp",
@@ -364,7 +364,7 @@ const catalogData = [
   {
     slug: "cyber-security",
     title: "Cyber Security",
-    summary: "Your journey to becoming a cybersecurity expert starts here — beginner to advanced training available.",
+    summary: "Your journey to becoming a cybersecurity expert starts here, beginner to advanced training available.",
     programs: [
       {
         slug: "introduction-to-cybersecurity",
@@ -377,7 +377,7 @@ const catalogData = [
         details: [
           {
             title: "What is cybersecurity?",
-            body: "Cybersecurity is the practice of protecting systems, networks, and data from unauthorized access, disruption, and damage — across people, process, and technology.",
+            body: "Cybersecurity is the practice of protecting systems, networks, and data from unauthorized access, disruption, and damage, across people, process, and technology.",
           },
           {
             title: "Who is this course for?",
@@ -419,7 +419,7 @@ const catalogData = [
         details: [
           {
             title: "What is cybersecurity?",
-            body: "It is the discipline of defending digital assets — identifying weaknesses, monitoring for threats, and responding when incidents occur.",
+            body: "It is the discipline of defending digital assets, identifying weaknesses, monitoring for threats, and responding when incidents occur.",
           },
           {
             title: "Who is this course for?",
@@ -431,7 +431,7 @@ const catalogData = [
           },
           {
             title: "Why learn cybersecurity?",
-            body: "Demand continues for people who can protect organisations in Kenya and globally — from analysis to hands-on defence.",
+            body: "Demand continues for people who can protect organisations in Kenya and globally, from analysis to hands-on defence.",
           },
           {
             title: "Why study at HassAz Tech Hub?",
@@ -492,13 +492,13 @@ const catalogData = [
   {
     slug: "ai",
     title: "AI",
-    summary: "Practical AI for learning, work, and building — from essentials to applied engineering.",
+    summary: "Practical AI for learning, work, and building, from essentials to applied engineering.",
     programs: [
       {
         slug: "ai-for-learning",
         title: "AI for Learning",
         summary: "Use AI tools responsibly to study, research, and produce better academic and workplace work.",
-        headline: "Learn faster with AI — without losing your own thinking",
+        headline: "Learn faster with AI without losing your own thinking",
         intro:
           "An in-person program on prompting, verification, academic integrity, and everyday workflows with AI assistants.",
         careers: ["Knowledge worker upskilling", "Student productivity"],
@@ -561,7 +561,7 @@ const catalogData = [
       {
         slug: "digital-marketing-with-ai",
         title: "Digital Marketing with AI",
-        summary: "Plan campaigns, content, and measurement with AI as a teammate — not a replacement for strategy.",
+        summary: "Plan campaigns, content, and measurement with AI as a teammate, not a replacement for strategy.",
         headline: "Market smarter with AI-assisted workflows",
         intro: "Cover research, content drafts, channel planning, and analytics with human review at each step.",
         careers: ["Digital marketing associate", "Content operations"],
@@ -640,7 +640,7 @@ const catalogData = [
         summary: "Practical DPO skills for compliance, governance, and privacy operations.",
         headline: "Protect people and data with a working DPO practice",
         intro:
-          "Learn how to map processing, run DPIAs, handle requests, and advise leadership — with Kenya and international privacy principles in view.",
+          "Learn how to map processing, run DPIAs, handle requests, and advise leadership, with Kenya and international privacy principles in view.",
         careers: ["Data Protection Officer", "Privacy analyst", "Compliance support"],
         details: [
           {

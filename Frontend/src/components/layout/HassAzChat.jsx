@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { sendChat } from "../../services/api";
 
 const WELCOME =
-  "Hello — I am HassAz AI.\n\nAsk me anything: HassAz courses, applying, study help, research, writing, or a problem to solve. I will think it through and answer step by step.";
+  "Hello, I am HassAz AI.\n\nAsk me anything: HassAz courses, applying, study help, research, writing, or a problem to solve. I will think it through and answer step by step.";
 
 const THINKING_LABELS = ["Thinking…", "Searching…", "Working through this step by step…"];
 
@@ -65,7 +65,7 @@ export default function HassAzChat() {
   }
 
   return (
-    <div className="fixed right-3 bottom-16 z-50 sm:right-5 sm:bottom-14">
+    <div className="fixed right-3 bottom-6 z-50 sm:right-5 sm:bottom-6">
       {open ? (
         <div className="mb-3 flex h-[min(72vh,560px)] w-[min(calc(100vw-1.5rem),400px)] flex-col overflow-hidden rounded-2xl border border-navy/15 bg-white shadow-2xl">
           <div className="flex items-center gap-2 bg-navy px-3 py-2.5 text-white">
@@ -109,6 +109,7 @@ export default function HassAzChat() {
                   event.currentTarget.form?.requestSubmit();
                 }
               }}
+              maxLength={4000}
               placeholder="Ask HassAz AI…"
               rows={1}
               className="min-h-10 max-h-24 min-w-0 flex-1 resize-none rounded-2xl border border-navy/15 px-3 py-2 text-sm text-ink outline-none focus:border-gold"

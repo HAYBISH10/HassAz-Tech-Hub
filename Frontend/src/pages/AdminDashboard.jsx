@@ -33,7 +33,7 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     // Keep the "Open now" / "Closed now" badge live without a manual refresh.
-    const id = setInterval(refreshWindow, 5000);
+    const id = setInterval(refreshWindow, 30000);
     return () => clearInterval(id);
   }, [refreshWindow]);
 
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
           {win?.isOpen && win?.closeAt ? (
             <div className="mt-3">
               <p className="text-xs text-muted">Closes in:</p>
-              <Countdown target={win.closeAt} className="mt-1 text-gold-dark" onReached={refreshWindow} />
+              <Countdown target={win.closeAt} warnAtDays={5} className="mt-1 text-gold-dark" onReached={refreshWindow} />
             </div>
           ) : null}
           {!win?.isOpen && win?.reason === "not-yet-open" && win?.openAt ? (

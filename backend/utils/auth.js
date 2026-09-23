@@ -1,31 +1,18 @@
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
+import { isProduction } from "./env.js";
+import { ADMIN_COOKIE, USER_COOKIE, clearAuthCookie, readCookie } from "./cookies.js";
+import { revokeToken, signToken, verifyToken } from "./sessions.js";
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "HassAz Tech Hub";
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "HassAziHUb@008";
-const TOKEN_TTL_MS = 12 * 60 * 60 * 1000; // 12 hours
+const rawAdminPassword = String(process.env.ADMIN_PASSWORD || "").trim();
+const ADMIN_PASSWORD_HASH = rawAdminPassword
+  ? bcrypt.hashSync(rawAdminPassword, 12)
+  : isProduction()
+    ? ""
+    : bcrypt.hashSync("HassAziHUb@008", 12);
 
-// In-memory admin session tokens. Fine for a single-admin panel; resets on restart.
-const tokens = new Map();
-
-function issueToken() {
-  const token = crypto.randomBytes(32).toString("hex");
-  const expiresAt = Date.now() + TOKEN_TTL_MS;
-  tokens.set(token, expiresAt);
-  return { token, expiresAt };
-}
-
-function isValidToken(token) {
-  if (!token) return false;
-  const expiresAt = tokens.get(token);
-  if (!expiresAt) return false;
-  if (Date.now() > expiresAt) {
-    tokens.delete(token);
-    return false;
-  }
-  return true;
-}
-
-function safeEqual(left, right) {
+function timingEqual(left, right) {
   const a = Buffer.from(String(left));
   const b = Buffer.from(String(right));
   if (a.length !== b.length) {
@@ -35,31 +22,47 @@ function safeEqual(left, right) {
   return crypto.timingSafeEqual(a, b);
 }
 
-export function checkCredentials(username, password) {
-  if (typeof username !== "string" || typeof password !== "string") return false;
-  return safeEqual(username.trim(), ADMIN_USERNAME) && safeEqual(password, ADMIN_PASSWORD);
-}
-
-export function login(username, password) {
-  if (!checkCredentials(username, password)) return null;
-  return issueToken();
-}
-
-export function logout(token) {
-  if (token) tokens.delete(token);
-}
-
-function extractToken(req) {
+export function bearerToken(req) {
   const header = req.headers.authorization || "";
   return header.startsWith("Bearer ") ? header.slice(7).trim() : "";
 }
 
-export function requireAdmin(req, res, next) {
-  const token = extractToken(req);
-  if (!isValidToken(token)) {
-    return res.status(401).json({ message: "Please sign in as admin to continue." });
-  }
-  next();
+export function extractToken(req) {
+  return bearerToken(req);
 }
 
-export { extractToken };
+export function extractUserToken(req) {
+  return bearerToken(req) || readCookie(req, USER_COOKIE);
+}
+
+export async function checkCredentials(username, password) {
+  if (typeof username !== "string" || typeof password !== "string") return false;
+  if (!ADMIN_PASSWORD_HASH) return false;
+  const userOk = timingEqual(username.trim(), ADMIN_USERNAME);
+  const passOk = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
+  return userOk && passOk;
+}
+
+export async function login(username, password) {
+  if (!(await checkCredentials(username, password))) return null;
+  return signToken("admin", "staff");
+}
+
+export function attachAdminSession(res, _issued) {
+  if (res) clearAuthCookie(res, ADMIN_COOKIE);
+}
+
+export function logout(token, res) {
+  revokeToken(token);
+  if (res) clearAuthCookie(res, ADMIN_COOKIE);
+}
+
+export function requireAdmin(req, res, next) {
+  const token = extractToken(req);
+  const session = verifyToken(token, "admin");
+  if (!session) {
+    return res.status(401).json({ message: "Please sign in as admin to continue." });
+  }
+  req.adminSession = session;
+  next();
+}

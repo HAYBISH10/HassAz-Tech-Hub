@@ -28,8 +28,8 @@ export default function Verify() {
     setError("");
     setResult(null);
     try {
-      // Note: the response only ever contains a generic outcome message — never the matched
-      // graduate's name, program, or certificate details — so the student cannot see any
+      // Note: the response only ever contains a generic outcome message, never the matched
+      // graduate's name, program, or certificate details, so the student cannot see any
       // verification information beyond whether it was confirmed or not.
       const data = await verifyCertificate({
         fullName: fullName.trim(),

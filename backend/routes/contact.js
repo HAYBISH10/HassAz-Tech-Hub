@@ -8,12 +8,12 @@ import { requireAdmin } from "../utils/auth.js";
 import { readJson, writeJson } from "../utils/localJson.js";
 import { rateLimit } from "../utils/rateLimit.js";
 import { sendContactAcknowledgementEmail, sendContactDecisionEmail, sendMail } from "../utils/mail.js";
+import { clip, isEmail } from "../utils/sanitize.js";
 
 const storePath = join(dirname(fileURLToPath(import.meta.url)), "../data/contact-store.json");
 const router = Router();
 const notifyTo = process.env.CONTACT_NOTIFY_EMAIL || "hassaztechhub@gmail.com";
 const STATUSES = ["unread", "read", "resolved", "approved", "rejected"];
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function withId(row) {
   return { ...row, id: String(row.id || row._id || ""), status: row.status || "unread" };
@@ -69,7 +69,7 @@ router.patch("/:id/status", requireAdmin, async (req, res) => {
     }
     return res.json(updated);
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not update this message." });
   }
 });
 
@@ -85,23 +85,23 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     const [removed] = list.splice(index, 1);
     writeJson(storePath, list);
     return res.json({ ok: true, id: String(removed.id) });
-  } catch (error) {
-    return res.status(400).json({ message: error.message });
+  } catch {
+    return res.status(400).json({ message: "Could not delete this message." });
   }
 });
 
 router.post("/", rateLimit({ max: 8 }), async (req, res) => {
   const body = req.body || {};
-  const fullName = String(body.fullName || "").trim();
-  const email = String(body.email || "").trim();
-  const phone = String(body.phone || "").trim();
-  const subject = String(body.subject || "").trim();
-  const message = String(body.message || "").trim();
+  const fullName = clip(body.fullName, 120);
+  const email = clip(body.email, 160);
+  const phone = clip(body.phone, 40);
+  const subject = clip(body.subject, 160);
+  const message = clip(body.message, 4000);
 
   if (!fullName || !email || !phone || !subject || !message) {
     return res.status(400).json({ message: "Please complete all fields before submitting the form." });
   }
-  if (!EMAIL_RE.test(email)) {
+  if (!isEmail(email)) {
     return res.status(400).json({ message: "Please enter a valid email address." });
   }
 

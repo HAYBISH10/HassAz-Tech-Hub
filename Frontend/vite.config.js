@@ -4,6 +4,18 @@ import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    sourcemap: false,
+    cssMinify: true,
+    chunkSizeWarningLimit: 900,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+        },
+      },
+    },
+  },
   server: {
     host: true,
     port: 5175,

@@ -196,8 +196,8 @@ function Testimonials() {
         <article className="flex flex-col items-center gap-5 rounded-2xl bg-navy-dark p-5 text-white sm:p-8 md:flex-row md:items-center md:gap-6">
           <div className="flex-1">
             <p className="text-sm leading-7 text-white/90 sm:text-base sm:leading-8">
-              HassAz Tech Hub is built so learners do not only attend class —
-              they practise, build, and leave with work they can show. That is
+              HassAz Tech Hub is built so learners do not only attend class.
+              They practise, build, and leave with work they can show. That is
               the standard we hold for every program.
             </p>
             <p className="mt-4 font-semibold text-gold sm:mt-5">{site.name}</p>
@@ -253,6 +253,7 @@ function StayUpdated() {
     try {
       const response = await fetch("/api/inquiries", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
@@ -260,7 +261,7 @@ function StayUpdated() {
       setStatus("Thank you. We will keep you updated.");
       setForm({ firstName: "", lastName: "", email: "", role: "", interests: [] });
     } catch {
-      setStatus("Saved locally for now. Start the backend to store inquiries.");
+      setStatus("Could not subscribe just now. Please try again.");
     }
   }
 
@@ -296,8 +297,7 @@ function StayUpdated() {
         <form onSubmit={handleSubmit} className="rounded-2xl bg-navy-dark p-5 text-white sm:p-8">
           <h2 className="font-heading text-2xl font-bold sm:text-3xl">Stay Updated with HassAz</h2>
           <p className="mt-2 text-sm text-white/80">
-            Sign up to receive learning resources, event invites, and important
-            updates.
+            Get learning resources, event invites, and important updates.
           </p>
           <div className="mt-6 grid gap-4">
             <input

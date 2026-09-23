@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { requireAdmin } from "../utils/auth.js";
-import { rateLimit } from "../utils/rateLimit.js";
 import {
   getPresentedWindow,
   getWindowValue,
@@ -57,7 +56,7 @@ router.get("/applications", async (req, res) => {
   }
 });
 
-router.put("/applications", requireAdmin, rateLimit({ max: 40, windowMs: 15 * 60 * 1000 }), async (req, res) => {
+router.put("/applications", requireAdmin, async (req, res) => {
   try {
     const current = await getWindowValue();
     const body = req.body || {};

@@ -93,7 +93,7 @@ export default function AccountDashboard() {
         <article className="rounded-2xl border border-navy/10 bg-white p-5">
           <h2 className="font-heading text-xl font-bold text-navy">Available Courses</h2>
           <p className="mt-2 text-sm text-muted">
-            Choose a program area first, then a course in that area — the same flow as the application form.
+            Choose a program area first, then a course in that area, the same flow as the application form.
           </p>
           <label className="mt-4 block text-sm">
             <span className="font-semibold text-navy">Program area</span>

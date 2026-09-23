@@ -20,7 +20,7 @@ const ApplicationWindowContext = createContext({
     isCourseOpen: () => false,
 });
 
-const POLL_MS = 5000;
+const POLL_MS = 8000;
 
 export function isCourseOpenIn(data, categorySlug, programSlug) {
   if (!data) return false;

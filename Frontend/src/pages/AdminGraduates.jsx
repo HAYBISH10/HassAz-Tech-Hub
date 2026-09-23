@@ -145,8 +145,8 @@ export default function AdminGraduates() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Awarded certificates</h1>
       <p className="mt-2 text-sm leading-6 text-muted">
-        Choose a program area to see only those verified students. Then choose a course — for example Data
-        Science Bootcamp — to see only that course. The same applies to Software Engineering and every other path.
+        Choose a program area to see only those verified students. Then choose a course, for example Data
+        Science Bootcamp, to see only that course. The same applies to Software Engineering and every other path.
       </p>
 
       <form onSubmit={onSubmit} className="relative mt-8 grid gap-4 rounded-2xl border border-navy/10 bg-white p-5 sm:p-7">
@@ -224,8 +224,8 @@ export default function AdminGraduates() {
         <div>
           <h2 className="font-heading text-xl font-bold text-navy">Verified students</h2>
           <p className="mt-1 text-sm text-muted">
-            Choose a program area to see only those awarded students. Then choose a course — for example Data
-            Science Bootcamp — to narrow the list further.
+            Choose a program area to see only those awarded students. Then choose a course, for example Data
+            Science Bootcamp, to narrow the list further.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -284,7 +284,7 @@ export default function AdminGraduates() {
             : filterAreaSlug
               ? filterCategory?.title
               : "All program areas"}{" "}
-          — verified students
+          verified students
         </h3>
         <p className="text-sm text-muted">
           {visibleList.length} student{visibleList.length === 1 ? "" : "s"} in this list.

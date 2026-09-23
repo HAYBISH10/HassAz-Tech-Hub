@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { useUserAuth } from "../../context/UserAuthContext";
 import { navLinks, site } from "../../data/site";
+import ApplyCta from "../ui/ApplyCta";
 import AboutMenu from "./AboutMenu";
 import CoursesMegaMenu from "./CoursesMegaMenu";
 
@@ -11,8 +11,6 @@ export default function Navbar({ onSearch, onBook }) {
   const closeTimer = useRef(null);
   const location = useLocation();
   const aboutActive = location.pathname.startsWith("/about");
-  const { user, isLoggedIn, logout } = useUserAuth();
-  const [accountOpen, setAccountOpen] = useState(false);
 
   function showMenu(name) {
     clearTimeout(closeTimer.current);
@@ -126,40 +124,11 @@ export default function Navbar({ onSearch, onBook }) {
           >
             Book for Calls
           </button>
-          {isLoggedIn ? (
-            <div className="relative" onMouseEnter={hideMenuNow}>
-              <button
-                type="button"
-                onClick={() => setAccountOpen((value) => !value)}
-                className="rounded-full border border-navy/15 px-4 py-2 text-sm font-semibold text-navy"
-              >
-                {user.fullName.split(" ")[0]}
-              </button>
-              {accountOpen ? (
-                <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-navy/10 bg-white p-2 shadow-lg">
-                  <Link to="/account" onClick={() => setAccountOpen(false)} className="block rounded-lg px-3 py-2 text-sm font-semibold text-navy hover:bg-soft">
-                    My dashboard
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      logout();
-                    }}
-                    className="block w-full rounded-lg px-3 py-2 text-left text-sm font-semibold text-red-700 hover:bg-soft"
-                  >
-                    Log out
-                  </button>
-                </div>
-              ) : null}
-            </div>
-          ) : (
-            <div className="flex items-center gap-2" onMouseEnter={hideMenuNow}>
-              <Link to="/register" className="rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white">
-                Sign Up
-              </Link>
-            </div>
-          )}
+          <div onMouseEnter={hideMenuNow}>
+            <ApplyCta className="rounded-full bg-navy px-4 py-2 text-sm font-semibold whitespace-nowrap text-white hover:bg-navy/90">
+              Apply
+            </ApplyCta>
+          </div>
         </nav>
 
         <button
@@ -226,29 +195,11 @@ export default function Navbar({ onSearch, onBook }) {
             >
               Book for Calls
             </button>
-            {isLoggedIn ? (
-              <>
-                <NavLink to="/account" onClick={closeAll} className="py-1 text-sm font-semibold text-navy">
-                  My dashboard
-                </NavLink>
-                <button
-                  type="button"
-                  className="py-1 text-left text-sm font-semibold text-red-700"
-                  onClick={() => {
-                    closeAll();
-                    logout();
-                  }}
-                >
-                  Log out
-                </button>
-              </>
-            ) : (
-              <div className="mt-2">
-                <Link to="/register" onClick={closeAll} className="block rounded-full bg-navy px-4 py-2 text-center text-sm font-semibold text-white">
-                  Sign Up
-                </Link>
-              </div>
-            )}
+            <div className="mt-2" onClick={closeAll}>
+              <ApplyCta className="block rounded-full bg-navy px-4 py-3 text-center text-sm font-semibold text-white">
+                Apply
+              </ApplyCta>
+            </div>
           </div>
         </div>
       ) : null}

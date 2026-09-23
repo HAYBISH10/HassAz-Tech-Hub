@@ -48,7 +48,7 @@ router.get("/recipients", requireAdmin, async (req, res) => {
   try {
     res.json(await broadcastPreview(filtersFrom(req.query)));
   } catch (error) {
-    res.status(400).json({ message: error.message || "Could not load recipients." });
+    res.status(400).json({ message: "Could not load recipients." });
   }
 });
 

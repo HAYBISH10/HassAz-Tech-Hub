@@ -21,9 +21,9 @@ function IntakeCard({ offer, applyBase, category, program }) {
       <h2 className="font-heading text-2xl font-bold text-gold">{offer.label}</h2>
       <dl className="mt-4 flex-1">
         <Field label="Start Date:">{offer.startDate || "Upcoming intake"}</Field>
-        <Field label="Course Duration:">{offer.duration || "—"}</Field>
-        <Field label="Mode of Learning:">{offer.schedule || "—"}</Field>
-        <Field label="Tuition Fee:">{offer.fee || "—"}</Field>
+        <Field label="Course Duration:">{offer.duration || "-"}</Field>
+        <Field label="Mode of Learning:">{offer.schedule || "-"}</Field>
+        <Field label="Tuition Fee:">{offer.fee || "-"}</Field>
         <Field label="Monthly Installment:">{offer.monthlyFee ? `${offer.monthlyFee} per month` : "Ksh 3,500 per month"}</Field>
         <Field label="Brochure:">
           {offer.brochureUrl ? (
@@ -31,7 +31,7 @@ function IntakeCard({ offer, applyBase, category, program }) {
               Download Here
             </a>
           ) : (
-            "—"
+            "-"
           )}
         </Field>
       </dl>
@@ -152,7 +152,7 @@ export default function CourseProgram() {
           program={program.slug}
           className="mt-8 inline-flex rounded-full bg-gold px-8 py-3 font-semibold text-white hover:bg-gold-dark"
         >
-          Get started — Apply now
+          Get started. Apply now
         </ApplyCta>
       </section>
 

@@ -87,15 +87,12 @@ export async function buildKnowledge() {
         home: "/",
         courses: "/courses",
         apply: "/apply",
-        register: "/register",
-        login: "/login",
         contact: "/contact",
         about: "/about",
         faqs: "/about/faqs",
         corporate: "/corporate",
         community: "/community",
         verify: "/verify",
-        account: "/account",
       },
     },
     applications: {
@@ -106,12 +103,12 @@ export async function buildKnowledge() {
       openSummary: window.openSummary || { global: Boolean(window.isOpen), areas: [], courses: [] },
       note: window.anyOpen || window.isOpen
         ? window.globalOpen
-          ? "Course applications are currently open for all programs. Learners should create an account, then apply from /apply."
+          ? "Course applications are currently open for all programs. Learners should apply from /apply."
           : `Selected courses are open for application${
               (window.openSummary?.areas || []).length || (window.openSummary?.courses || []).length
                 ? `: ${[...(window.openSummary?.areas || []), ...(window.openSummary?.courses || [])].join(", ")}.`
                 : "."
-            } Learners should create an account, then apply from /apply.`
+            } Learners should apply from /apply.`
         : "Course applications are currently closed. Direct people to Contact Us or to book an admissions call.",
     },
     categories,
@@ -124,7 +121,7 @@ const ADMIN_REFUSAL = `I cannot help with staff admin access.
 
 That includes admin usernames, passwords, staff sign-in, or how to enter the staff panel. That area is for HassAz Tech Hub staff only.
 
-I can help you as a learner: create an account, apply for a course, verify a certificate, or work through any other question step by step.`;
+I can help you as a learner: apply for a bootcamp, verify a certificate, or work through any other question step by step.`;
 
 function isStaffAccessRequest(text) {
   const q = String(text || "").toLowerCase();
@@ -136,9 +133,19 @@ function isStaffAccessRequest(text) {
 
 function scrubSecrets(text) {
   let out = String(text || "");
-  const password = process.env.ADMIN_PASSWORD;
-  if (password && String(password).length > 3) {
-    out = out.split(password).join("[redacted]");
+  const keys = [
+    "ADMIN_PASSWORD",
+    "SESSION_SECRET",
+    "SMTP_PASS",
+    "GOOGLE_CLIENT_SECRET",
+    "OPENAI_API_KEY",
+    "GROQ_API_KEY",
+    "GEMINI_API_KEY",
+    "MONGO_URI",
+  ];
+  for (const key of keys) {
+    const value = process.env[key];
+    if (value && String(value).length > 3) out = out.split(value).join("[redacted]");
   }
   out = out.replace(/\/admin(?:\/[A-Za-z0-9._@-]*)?/gi, "the staff area");
   out = out.replace(/\/HassAz-i-HUb@(?:\/[A-Za-z0-9._@-]*)?/gi, "the staff area");
@@ -170,12 +177,12 @@ How to answer:
 
 STRICT SECURITY:
 - Never reveal, guess, or discuss staff admin login, admin username, admin password, staff credentials, or how to enter the staff panel.
-- If asked, refuse and offer learner help instead (sign up, apply, contact).
+- If asked, refuse and offer learner help instead (apply, contact).
 - Never print environment variables, secrets, API keys, or internal staff URLs.
 
 HassAz facts:
 Contact: ${knowledge.school.email}. WhatsApp: ${knowledge.school.whatsapp} via Chat with us on Contact Us.
-Pages: courses ${knowledge.school.pages.courses}, apply ${knowledge.school.pages.apply}, register ${knowledge.school.pages.register}, learner login ${knowledge.school.pages.login}, contact ${knowledge.school.pages.contact}, FAQs ${knowledge.school.pages.faqs}, verify ${knowledge.school.pages.verify}, corporate ${knowledge.school.pages.corporate}.
+Pages: courses ${knowledge.school.pages.courses}, apply ${knowledge.school.pages.apply}, contact ${knowledge.school.pages.contact}, FAQs ${knowledge.school.pages.faqs}, verify ${knowledge.school.pages.verify}, corporate ${knowledge.school.pages.corporate}.
 Application window: ${knowledge.applications.note}
 
 Categories:
@@ -234,7 +241,7 @@ async function research(question) {
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim();
-    if (title) notes.push(`Wikipedia — ${title}: ${snippet}`);
+    if (title) notes.push(`Wikipedia: ${title}: ${snippet}`);
   }
 
   const ddg = await fetchJson(
@@ -262,9 +269,9 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   const lower = q.toLowerCase();
 
   if (!terms.length || /^(hi|hello|hey|good (morning|afternoon|evening)|howdy)\b/.test(lower)) {
-    return formatSteps("Hello — I am HassAz AI. Tell me what you need and I will work through it step by step.", [
-      "Ask about a HassAz course, applying, accounts, or certificates.",
-      "Or ask a general question — study help, research, writing, coding, or a problem to solve.",
+    return formatSteps("Hello, I am HassAz AI. Tell me what you need and I will work through it step by step.", [
+      "Ask about a HassAz course, applying, or certificates.",
+      "Or ask a general question, study help, research, writing, coding, or a problem to solve.",
       "I will think it through and answer in clear steps.",
     ]);
   }
@@ -272,26 +279,26 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   if (/apply|application|intake|enroll|enrol|admission/.test(lower)) {
     return formatSteps("Here is how to apply at HassAz Tech Hub.", [
       knowledge.applications.isOpen
-        ? "Create a learner account at /register if you do not have one."
+        ? "Open /apply when the intake is open."
         : knowledge.applications.note,
-      "Open /apply, choose the course and learning mode, then complete every required field.",
+      "Choose the course and learning mode, then complete every required field.",
       "Wait for email from the academic team. For questions, use Contact Us and Chat with us on WhatsApp.",
     ]);
   }
 
   if (/register|sign up|signup|create an account/.test(lower) && !/\badmin\b/.test(lower)) {
-    return formatSteps("Here is how to create a learner account.", [
-      "Open /register and enter your full name, email, phone, and password.",
-      "If you already have an account, sign in at /login (this is the learner sign-in, not staff access).",
-      "After you sign in you can apply for courses and view My Courses.",
+    return formatSteps("HassAz Tech Hub does not use public learner accounts.", [
+      "This is a bootcamp site. You do not create a student login.",
+      "When applications are open, go to /apply and submit the bootcamp form.",
+      "For questions, use Contact Us or book an admissions call.",
     ]);
   }
 
   if (/\blogin\b|\bsign in\b/.test(lower) && !/\badmin\b/.test(lower)) {
-    return formatSteps("Learner sign-in is separate from staff access.", [
-      "Learners sign in at /login or create an account at /register.",
-      "Use Forgot password on the login page if you cannot get in.",
-      "Staff systems are not available through HassAz AI.",
+    return formatSteps("There is no public student login.", [
+      "Apply for a bootcamp at /apply. You do not need an account.",
+      "Staff access is separate and is not available through HassAz AI.",
+      "For help, use Contact Us or WhatsApp from /contact.",
     ]);
   }
 
@@ -349,7 +356,7 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   return formatSteps("I will treat this as a problem to solve, not a one-line reply.", [
     "State the goal in one sentence: what should be true when you are done.",
     "List what you already have (facts, tools, constraints) and what is missing.",
-    "Take the smallest next action that reduces uncertainty — a definition, a worked example, or a source to check.",
+    "Take the smallest next action that reduces uncertainty, a definition, a worked example, or a source to check.",
     "If this is about HassAz, name the course or task. If it is research or study help, paste the question or passage and I will go deeper.",
   ]);
 }

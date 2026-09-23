@@ -215,7 +215,7 @@ export default function AdminIntakes() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Course intakes</h1>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
-        Choose a program area first, then a course in that area — the same flow as the application form. Update start
+        Choose a program area first, then a course in that area, the same flow as the application form. Update start
         dates, duration, learning mode, and tuition. Download Here / installment PDFs use the HassAz logo with that
         course&apos;s own content.
       </p>

@@ -178,7 +178,7 @@ export default function AdminApplicants() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Applicants</h1>
       <p className="mt-2 text-sm text-muted">
-        Choose cohort, year, course area, and specific course from the dropdowns — or type your own. Students stay
+        Choose cohort, year, course area, and specific course from the dropdowns, or type your own. Students stay
         in their own list, for example Cohort 1 · December 2026 · Data Science Bootcamp.
       </p>
 
@@ -373,10 +373,10 @@ export default function AdminApplicants() {
         {loading ? <PageLoader overlay label="Loading applicants..." /> : null}
         {visible.map((app) => {
           const name = app.personalInformation?.fullName || "Unnamed applicant";
-          const email = app.contactInformation?.email || "—";
-          const phone = app.contactInformation?.phone || "—";
-          const program = app.program?.program || "—";
-          const mode = app.program?.mode || "—";
+          const email = app.contactInformation?.email || "-";
+          const phone = app.contactInformation?.phone || "-";
+          const program = app.program?.program || "-";
+          const mode = app.program?.mode || "-";
           const active = open === app.applicationNumber;
           const isClosed = app.state === "Closed";
           const status = app.status || "Submitted";
@@ -475,7 +475,7 @@ export default function AdminApplicants() {
                   <Block title="Technology" data={app.technologyBackground} />
                   <p>
                     <span className="font-semibold text-navy">Skills: </span>
-                    {(app.skills || []).join(", ") || "—"}
+                    {(app.skills || []).join(", ") || "-"}
                   </p>
                   <Block title="Experience" data={app.experience} />
                   <Block title="Goals" data={app.goals} />
@@ -483,7 +483,7 @@ export default function AdminApplicants() {
                   <Block title="Documents" data={app.documents} />
                   <p>
                     <span className="font-semibold text-navy">Heard about us: </span>
-                    {app.source || "—"}
+                    {app.source || "-"}
                   </p>
                   <p className="text-muted">Mode applied: {mode}</p>
                 </div>
@@ -759,7 +759,7 @@ function ApplicantsTable({ apps, selected, downloading, onView, onDownload, onAs
                     className="cursor-pointer whitespace-nowrap border border-navy/10 px-3 py-1.5 text-navy/90"
                     onClick={() => onView(id)}
                   >
-                    {row[col] === "" || row[col] === undefined || row[col] === null ? "—" : String(row[col])}
+                    {row[col] === "" || row[col] === undefined || row[col] === null ? "-" : String(row[col])}
                   </td>
                 ))}
               </tr>
@@ -794,7 +794,7 @@ function ApplicantRecord({
           <p className="text-xs font-semibold uppercase tracking-wide text-gold">Applicant record</p>
           <h2 className="font-heading mt-1 text-2xl font-bold text-navy">{name}</h2>
           <p className="mt-1 text-sm text-muted">
-            {app.applicationNumber} · {applicantIntakeLabel(app)} · {app.program?.program || "—"} · {app.program?.mode || "—"}
+            {app.applicationNumber} · {applicantIntakeLabel(app)} · {app.program?.program || "-"} · {app.program?.mode || "-"}
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -870,7 +870,7 @@ function ApplicantRecord({
         <Block title="Technology" data={app.technologyBackground} />
         <p>
           <span className="font-semibold text-navy">Skills: </span>
-          {(app.skills || []).join(", ") || "—"}
+          {(app.skills || []).join(", ") || "-"}
         </p>
         <Block title="Experience" data={app.experience} />
         <Block title="Goals" data={app.goals} />
@@ -878,7 +878,7 @@ function ApplicantRecord({
         <Block title="Documents" data={app.documents} />
         <p>
           <span className="font-semibold text-navy">Heard about us: </span>
-          {app.source || "—"}
+          {app.source || "-"}
         </p>
       </div>
     </article>

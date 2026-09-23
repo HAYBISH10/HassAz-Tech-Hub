@@ -67,7 +67,7 @@ export default function AdminDatabase() {
                     <tr key={row.id || index} className={index % 2 ? "bg-soft/40" : "bg-white"}>
                       {current.columns.map((col) => (
                         <td key={col} className="max-w-xs truncate whitespace-nowrap border border-navy/10 px-3 py-1.5 text-navy/90">
-                          {row[col] === "" || row[col] == null ? "—" : String(row[col])}
+                          {row[col] === "" || row[col] == null ? "-" : String(row[col])}
                         </td>
                       ))}
                     </tr>

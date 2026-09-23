@@ -37,7 +37,13 @@ function formatDate(value) {
 
 function paragraphs(lines) {
   return lines
-    .map((line) => `<p style="margin:0 0 14px; color:#1f2937; font-size:14px; line-height:1.7;">${line}</p>`)
+    .map((line) => {
+      const html = escapeHtml(line)
+        .replace(/&lt;strong&gt;/gi, "<strong>")
+        .replace(/&lt;\/strong&gt;/gi, "</strong>")
+        .replace(/&lt;br\s*\/?&gt;/gi, "<br/>");
+      return `<p style="margin:0 0 14px; color:#1f2937; font-size:14px; line-height:1.7;">${html}</p>`;
+    })
     .join("");
 }
 
@@ -52,7 +58,7 @@ function wrapHtml({ bodyHtml }) {
     .trim()
     .slice(0, 140);
   const logoImg = logoSrc
-    ? `<img src="${logoSrc}" alt="" width="72" height="72" style="display:block; margin:0 auto; height:72px; width:auto; border:0;" />`
+    ? `<img src="${escapeHtml(logoSrc)}" alt="" width="72" height="72" style="display:block; margin:0 auto; height:72px; width:auto; border:0;" />`
     : "";
   return `<!doctype html>
 <html>
@@ -152,8 +158,11 @@ export async function sendMail({ to, subject, text, html, attachments }) {
     const transporter = nodemailer.createTransport({
       host,
       port: Number(process.env.SMTP_PORT || 587),
-      secure: false,
+      secure: Number(process.env.SMTP_PORT) === 465,
       auth: { user, pass },
+      tls: { minVersion: "TLSv1.2" },
+      disableFileAccess: true,
+      disableUrlAccess: true,
     });
     await transporter.sendMail({
       from: `HassAz Tech Hub <${fromAddress}>`,
@@ -178,7 +187,7 @@ export async function sendMail({ to, subject, text, html, attachments }) {
 }
 
 export function applicationReceivedLetter({ fullName, program, applicationNumber }) {
-  const subject = `We've received your application for ${program} — HassAz Tech Hub`;
+  const subject = `We've received your application for ${program}: HassAz Tech Hub`;
   const text = [
     `Dear ${firstName(fullName)},`,
     "",
@@ -211,7 +220,7 @@ export function applicationReceivedLetter({ fullName, program, applicationNumber
 }
 
 export function applicationApprovedLetter({ fullName, email, program, appliedAt }) {
-  const subject = `Congratulations — You've Been Selected for the ${program}!`;
+  const subject = `Congratulations, You've Been Selected for the ${program}!`;
   const text = [
     `Dear ${firstName(fullName)},`,
     "",
@@ -248,7 +257,7 @@ export function applicationApprovedLetter({ fullName, email, program, appliedAt 
 }
 
 export function applicationRejectedLetter({ fullName, program }) {
-  const subject = `Update on your HassAz Tech Hub application — ${program}`;
+  const subject = `Update on your HassAz Tech Hub application: ${program}`;
   const text = [
     `Dear ${firstName(fullName)},`,
     "",
@@ -387,7 +396,7 @@ export function bookingRejectedLetter({ name, date, time, timezone }) {
   const text = [
     `Dear ${firstName(name)},`,
     "",
-    `We're sorry — we're unable to confirm your call booked for ${formattedDate} at ${time} (${
+    `We're sorry, we're unable to confirm your call booked for ${formattedDate} at ${time} (${
       timezone || "Africa/Nairobi"
     }) at this time.`,
     "",
@@ -402,7 +411,7 @@ export function bookingRejectedLetter({ name, date, time, timezone }) {
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${firstName(name)}</strong>,`,
-      `We're sorry — we're unable to confirm your call booked for <strong>${formattedDate} at ${time} (${
+      `We're sorry, we're unable to confirm your call booked for <strong>${formattedDate} at ${time} (${
         timezone || "Africa/Nairobi"
       })</strong> at this time.`,
       "Please book another time that works for you, and our team will be happy to speak with you then.",
@@ -466,7 +475,7 @@ export async function sendWelcomeEmail({ to, fullName }) {
 
 export async function sendDuplicateApplicationEmail({ to, fullName, applicationNumber, status }) {
   const letter = brandedLetter({
-    subject: "Application already exists — HassAz Tech Hub",
+    subject: "Application already exists: HassAz Tech Hub",
     greeting: firstName(fullName) || "Student",
     lines: [
       "We found a previous HassAz Tech Hub application linked to this email address or phone number.",
@@ -511,7 +520,7 @@ export async function sendPasswordChangedEmail({ to, fullName }) {
 
 export async function sendEnrollmentEmail({ to, fullName, programTitle }) {
   const letter = brandedLetter({
-    subject: `You are registered for ${programTitle} — HassAz Tech Hub`,
+    subject: `You are registered for ${programTitle}: HassAz Tech Hub`,
     greeting: firstName(fullName),
     lines: [
       `You have successfully registered for ${programTitle}.`,
@@ -525,7 +534,7 @@ export async function sendEnrollmentEmail({ to, fullName, programTitle }) {
 
 export async function sendContactAcknowledgementEmail({ to, fullName, subject }) {
   const letter = brandedLetter({
-    subject: "We received your message — HassAz Tech Hub",
+    subject: "We received your message: HassAz Tech Hub",
     greeting: firstName(fullName) || "there",
     lines: [
       "Thank you for contacting HassAz Tech Hub. We have received your message and will reply as soon as we can.",
@@ -540,7 +549,7 @@ export async function sendContactAcknowledgementEmail({ to, fullName, subject })
 export async function sendContactDecisionEmail({ to, fullName, subject, approved }) {
   const letter = brandedLetter({
     subject: approved
-      ? "Your message has been approved — HassAz Tech Hub"
+      ? "Your message has been approved: HassAz Tech Hub"
       : "Update on your HassAz Tech Hub enquiry",
     greeting: firstName(fullName) || "there",
     lines: approved
@@ -602,7 +611,7 @@ export async function sendBroadcastEmail({ to, fullName, subject, message, flyer
   });
   return sendMail({
     to,
-    subject: `${safeSubject} — HassAz Tech Hub`,
+    subject: `${safeSubject}: HassAz Tech Hub`,
     text,
     html,
     attachments: flyer?.content ? [flyer] : undefined,

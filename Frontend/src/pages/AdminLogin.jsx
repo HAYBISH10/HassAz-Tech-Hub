@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminPath } from "../adminPath";
 import PageLoader from "../components/ui/PageLoader";
-import { adminLogin, isAuthenticated } from "../services/auth";
+import { adminLogin, clearSession } from "../services/auth";
 
 const inputClass =
   "w-full rounded-md border border-navy/15 px-4 py-3 text-ink outline-none focus:border-gold";
@@ -15,8 +15,8 @@ export default function AdminLogin() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated()) navigate(adminPath(), { replace: true });
-  }, [navigate]);
+    clearSession();
+  }, []);
 
   async function onSubmit(event) {
     event.preventDefault();
@@ -49,14 +49,14 @@ export default function AdminLogin() {
             Admin Access
           </p>
         </div>
-        <form onSubmit={onSubmit} className="mt-8 space-y-4">
+        <form onSubmit={onSubmit} autoComplete="off" className="mt-8 space-y-4">
           <label className="block">
             <span className="mb-1 block text-sm font-semibold text-navy">Username</span>
             <input
               className={inputClass}
               value={username}
               onChange={(event) => setUsername(event.target.value)}
-              autoComplete="username"
+              autoComplete="off"
               required
             />
           </label>
@@ -67,7 +67,7 @@ export default function AdminLogin() {
               className={inputClass}
               value={password}
               onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
+              autoComplete="off"
               required
             />
           </label>

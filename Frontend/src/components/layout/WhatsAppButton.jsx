@@ -14,7 +14,7 @@ export default function WhatsAppButton({ variant = "floating" }) {
       aria-label="Chat with us on WhatsApp"
       className={
         floating
-          ? "fixed right-3 bottom-28 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-3 py-2 text-xs font-semibold text-white shadow-lg sm:right-5 sm:bottom-[6.75rem] sm:px-4 sm:py-2.5 sm:text-sm"
+          ? "fixed right-3 bottom-20 z-50 flex items-center gap-2 rounded-full bg-[#25D366] px-3 py-2 text-xs font-semibold text-white shadow-lg sm:right-5 sm:bottom-20 sm:px-4 sm:py-2.5 sm:text-sm"
           : "inline-flex items-center gap-2 rounded-full bg-[#25D366] px-3 py-2 text-xs font-semibold text-white shadow-lg sm:px-4 sm:py-2.5 sm:text-sm"
       }
     >

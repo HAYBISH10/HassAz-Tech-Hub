@@ -3,7 +3,7 @@ export const site = {
   motto: "Learn. Build. Innovate.",
   tagline: "Technology Education + Innovation + Digital Solutions",
   announcement:
-    "New intake alert! HassAz Tech Hub bootcamps are now open — Apply now",
+    "New intake alert! HassAz Tech Hub bootcamps are now open. Apply now",
   email: "hassaztechhub@gmail.com",
   admissionsEmail: "hassaztechhub@gmail.com",
   location: "Kenya",
@@ -62,7 +62,7 @@ export { catalog, courses } from "./catalog.js";
 export const features = [
   {
     title: "Accelerated Project-Based Learning",
-    text: "Learn by building. Every HassAz program is anchored in labs, reviews, and working projects — not slides alone.",
+    text: "Learn by building. Every HassAz program is anchored in labs, reviews, and working projects, not slides alone.",
     color: "bg-gold",
     image:
       "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",

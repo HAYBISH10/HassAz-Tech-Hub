@@ -40,6 +40,7 @@ export function userHeaders() {
 export async function registerUser(payload) {
   const response = await fetch("/api/users/register", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -56,6 +57,7 @@ export async function registerUser(payload) {
 export async function loginUser(payload) {
   const response = await fetch("/api/users/login", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -73,6 +75,7 @@ export async function loginUser(payload) {
 export async function loginWithGoogle(credential) {
   const response = await fetch("/api/users/google", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ credential }),
   });
@@ -85,9 +88,7 @@ export async function loginWithGoogle(credential) {
 }
 
 export async function fetchCurrentUser() {
-  const token = getUserToken();
-  if (!token) return null;
-  const response = await fetch("/api/users/me", { headers: userHeaders() });
+  const response = await fetch("/api/users/me", { credentials: "include", headers: userHeaders() });
   if (!response.ok) {
     clearUserSession();
     return null;
@@ -100,9 +101,12 @@ export async function fetchCurrentUser() {
 export async function logoutUser() {
   const token = getUserToken();
   clearUserSession();
-  if (!token) return;
   try {
-    await fetch("/api/users/logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+    await fetch("/api/users/logout", {
+      method: "POST",
+      credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
   } catch {
     // ignore
   }
@@ -111,6 +115,7 @@ export async function logoutUser() {
 export async function requestPasswordReset(email) {
   const response = await fetch("/api/users/forgot-password", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
   });
@@ -122,6 +127,7 @@ export async function requestPasswordReset(email) {
 export async function resetPassword(payload) {
   const response = await fetch("/api/users/reset-password", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
@@ -132,7 +138,7 @@ export async function resetPassword(payload) {
 
 export async function fetchGoogleConfig() {
   try {
-    const response = await fetch("/api/users/google/config");
+    const response = await fetch("/api/users/google/config", { credentials: "include" });
     if (!response.ok) return { enabled: false, clientId: "" };
     return response.json();
   } catch {

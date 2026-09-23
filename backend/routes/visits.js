@@ -194,7 +194,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     writeJson(storePath, next);
     return res.json({ ok: true, id });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not update this visitor record." });
   }
 });
 

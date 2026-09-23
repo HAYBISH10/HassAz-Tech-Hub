@@ -7,6 +7,9 @@ import mongoose from "mongoose";
 import { siteContent } from "../data/content.js";
 import Booking from "../models/Booking.js";
 import { requireAdmin } from "../utils/auth.js";
+import { rateLimit } from "../utils/rateLimit.js";
+import { publicFail } from "../utils/httpErrors.js";
+import { clip, isEmail } from "../utils/sanitize.js";
 import {
   sendBookingApprovedEmail,
   sendBookingConfirmationEmail,
@@ -103,10 +106,17 @@ router.get("/", requireAdmin, async (_req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
-  const { name, email, phone, date, time } = req.body || {};
+router.post("/", rateLimit({ max: 8 }), async (req, res) => {
+  const name = clip(req.body?.name, 120);
+  const email = clip(req.body?.email, 160);
+  const phone = clip(req.body?.phone, 40);
+  const date = clip(req.body?.date, 40);
+  const time = clip(req.body?.time, 40);
   if (!name || !email || !date || !time) {
     return res.status(400).json({ message: "Name, email, date and time are required." });
+  }
+  if (!isEmail(email)) {
+    return res.status(400).json({ message: "Please enter a valid email address." });
   }
 
   const payload = {
@@ -131,7 +141,7 @@ router.post("/", async (req, res) => {
       });
     }
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return publicFail(res, 400, "Could not book this call. Please try again.", error);
   }
 
   let emailed = false;
@@ -197,7 +207,7 @@ router.patch("/:id/status", requireAdmin, async (req, res) => {
 
     return res.json({ ...updated, emailed });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return publicFail(res, 400, "Could not update this booking.", error);
   }
 });
 
@@ -221,7 +231,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     if (!deleted) return res.status(404).json({ message: "Booking not found." });
     return res.json({ message: "Booking deleted.", id: req.params.id });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return publicFail(res, 400, "Could not delete this booking.", error);
   }
 });
 

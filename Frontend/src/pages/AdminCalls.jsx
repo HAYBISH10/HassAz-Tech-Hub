@@ -58,7 +58,7 @@ export default function AdminCalls() {
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Booked calls</h1>
       <p className="mt-2 text-sm text-muted">
         Everyone who has booked a call with HassAz Tech Hub. Approve or reject a booking to notify the student by
-        email — approved bookers get a congratulations message, rejected bookers are asked to book another time.
+        email. Approved bookers get a congratulations message; rejected bookers are asked to book another time.
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
@@ -145,7 +145,7 @@ function toDateTime(booking) {
 }
 
 function formatDate(dateStr) {
-  if (!dateStr) return "—";
+  if (!dateStr) return "-";
   const [year, month, day] = dateStr.split("-").map(Number);
   if (!year) return dateStr;
   return new Date(year, month - 1, day).toLocaleDateString(undefined, {
@@ -187,7 +187,7 @@ function BookingCard({
         {formatDate(booking.date)} at {booking.time} ({booking.timezone || "Africa/Nairobi"})
       </p>
       <p className="mt-1 text-sm text-muted">
-        {booking.email || "—"} · {booking.phone || "—"}
+        {booking.email || "-"} · {booking.phone || "-"}
       </p>
 
       <div className="mt-4 flex flex-wrap gap-2">

@@ -236,7 +236,7 @@ export default function AdminBroadcast() {
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Email students</h1>
       <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
         Choose <span className="font-semibold text-navy">Cohort 1</span>, <span className="font-semibold text-navy">December</span>,
-        and <span className="font-semibold text-navy">2026</span> — then send. Every student in that cohort gets the
+        and <span className="font-semibold text-navy">2026</span>, then send. Every student in that cohort gets the
         same message at once, each as <span className="font-semibold text-navy">Dear {previewName},</span>
       </p>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
@@ -424,9 +424,9 @@ export default function AdminBroadcast() {
                       <tr key={`${item.email}-${item.fullName}`} className="border-t border-navy/10">
                         <td className="px-3 py-2 font-semibold text-navy">{item.fullName}</td>
                         <td className="px-3 py-2 text-muted">{item.email}</td>
-                        <td className="px-3 py-2 text-navy">{item.programTitle || "—"}</td>
+                        <td className="px-3 py-2 text-navy">{item.programTitle || "-"}</td>
                         <td className="px-3 py-2 text-muted">
-                          {[item.cohort, item.modeLabel].filter(Boolean).join(" · ") || "—"}
+                          {[item.cohort, item.modeLabel].filter(Boolean).join(" · ") || "-"}
                         </td>
                       </tr>
                     ))}

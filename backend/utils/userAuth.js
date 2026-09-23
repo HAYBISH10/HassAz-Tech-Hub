@@ -1,37 +1,33 @@
-import crypto from "crypto";
-import { extractToken } from "./auth.js";
-
-const TOKEN_TTL_MS = 12 * 60 * 60 * 1000;
-const sessions = new Map();
+import { extractUserToken } from "./auth.js";
+import { USER_COOKIE, clearAuthCookie, setAuthCookie } from "./cookies.js";
+import { revokeToken, signToken, verifyToken } from "./sessions.js";
 
 export function issueUserToken(userId) {
-  const token = crypto.randomBytes(32).toString("hex");
-  const expiresAt = Date.now() + TOKEN_TTL_MS;
-  sessions.set(token, { userId: String(userId), expiresAt });
-  return { token, expiresAt };
+  return signToken("user", userId);
 }
 
-export function revokeUserToken(token) {
-  if (token) sessions.delete(token);
+export function attachUserSession(res, issued) {
+  if (!issued?.token) return;
+  setAuthCookie(res, USER_COOKIE, issued.token, issued.expiresAt);
+}
+
+export function revokeUserToken(token, res) {
+  revokeToken(token);
+  if (res) clearAuthCookie(res, USER_COOKIE);
 }
 
 export function readUserSession(token) {
-  if (!token) return null;
-  const session = sessions.get(token);
+  const session = verifyToken(token, "user");
   if (!session) return null;
-  if (Date.now() > session.expiresAt) {
-    sessions.delete(token);
-    return null;
-  }
-  return session;
+  return { userId: session.subject, expiresAt: session.expiresAt };
 }
 
 export function requireUser(req, res, next) {
-  const session = readUserSession(extractToken(req));
+  const session = readUserSession(extractUserToken(req));
   if (!session) {
     return res.status(401).json({
       title: "Sign in required",
-      message: "Please create an account or log in before registering for a course.",
+      message: "Please apply for a course from the Apply page.",
     });
   }
   req.userId = session.userId;
@@ -39,7 +35,7 @@ export function requireUser(req, res, next) {
 }
 
 export function optionalUser(req, _res, next) {
-  const session = readUserSession(extractToken(req));
+  const session = readUserSession(extractUserToken(req));
   if (session) req.userId = session.userId;
   next();
 }

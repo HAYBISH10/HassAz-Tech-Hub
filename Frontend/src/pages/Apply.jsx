@@ -1,10 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import ApplicationSuccessDialog from "../components/ui/ApplicationSuccessDialog";
 import Countdown from "../components/ui/Countdown";
 import PageLoader from "../components/ui/PageLoader";
 import { useCatalog } from "../hooks/useContent";
-import { useUserAuth } from "../context/UserAuthContext";
 import { fetchApplicationWindow, fetchIntakes, submitApplication } from "../services/api";
 
 const inputClass =
@@ -89,10 +88,7 @@ export default function Apply() {
   const [window_, setWindow_] = useState(null);
   const [checkingWindow, setCheckingWindow] = useState(true);
   const [intakeOffers, setIntakeOffers] = useState([]);
-  const { isLoggedIn, ready, user } = useUserAuth();
-  const location = useLocation();
   const navigate = useNavigate();
-  const nextPath = `${location.pathname}${location.search}`;
   const [form, setForm] = useState({
     ...emptyForm,
     categorySlug: params.get("category") || "",
@@ -125,16 +121,6 @@ export default function Apply() {
       .then((data) => setIntakeOffers(data.offers || []))
       .catch(() => {});
   }, []);
-
-  useEffect(() => {
-    if (!user) return;
-    setForm((current) => ({
-      ...current,
-      fullName: current.fullName || user.fullName || "",
-      email: current.email || user.email || "",
-      phone: current.phone || user.phone || "",
-    }));
-  }, [user]);
 
   const category = catalogData.find((item) => item.slug === form.categorySlug);
   const program = category?.programs.find((item) => item.slug === form.programSlug);
@@ -321,40 +307,6 @@ export default function Apply() {
     }
   }
 
-  if (!ready) {
-    return (
-      <section className="relative mx-auto min-h-[40vh] max-w-2xl px-4 py-16">
-        <PageLoader overlay label="Checking your account..." />
-      </section>
-    );
-  }
-
-  if (!isLoggedIn) {
-    return (
-      <section className="mx-auto max-w-2xl px-4 py-16 text-center">
-        <p className="text-sm font-semibold text-gold">Course Registration</p>
-        <h1 className="font-heading mt-2 text-3xl font-bold text-navy">Please sign up or log in</h1>
-        <p className="mt-4 text-sm leading-6 text-muted">
-          Please create an account or log in before registering for a course.
-        </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link
-            to={`/register?next=${encodeURIComponent(nextPath)}`}
-            className="rounded-full bg-navy px-6 py-3 text-sm font-semibold text-white"
-          >
-            Sign Up
-          </Link>
-          <Link
-            to={`/login?next=${encodeURIComponent(nextPath)}`}
-            className="rounded-full border border-navy/15 px-6 py-3 text-sm font-semibold text-navy"
-          >
-            Login
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
   if (result) {
     return (
       <section className="mx-auto max-w-2xl px-4 py-16">
@@ -370,9 +322,9 @@ export default function Apply() {
         <p className="text-sm font-semibold text-gold">HassAz Tech Hub application</p>
         <h1 className="font-heading mt-1 text-2xl font-bold text-navy sm:text-3xl">Course application</h1>
         {window_?.closeAt ? (
-          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-red-600">
+          <p className="mt-1 flex flex-wrap items-center gap-1.5 text-xs font-semibold text-navy">
             <span>Applications close automatically in:</span>
-            <Countdown target={window_.closeAt} className="text-red-600" onReached={refreshWindow} />
+            <Countdown target={window_.closeAt} warnAtDays={5} className="text-gold" onReached={refreshWindow} />
           </p>
         ) : null}
         <p className="mt-2 text-sm text-muted">
@@ -732,8 +684,8 @@ export default function Apply() {
             <>
               <div className="rounded-2xl bg-soft p-4 text-sm text-navy">
                 <p><span className="font-semibold">Applicant:</span> {form.fullName}</p>
-                <p className="mt-1"><span className="font-semibold">Course:</span> {program?.title || "—"}</p>
-                <p className="mt-1"><span className="font-semibold">Mode:</span> {mode?.label || "—"}</p>
+                <p className="mt-1"><span className="font-semibold">Course:</span> {program?.title || "-"}</p>
+                <p className="mt-1"><span className="font-semibold">Mode:</span> {mode?.label || "-"}</p>
                 <p className="mt-1"><span className="font-semibold">Email:</span> {form.email}</p>
               </div>
               <label className="flex items-start gap-3 text-sm">

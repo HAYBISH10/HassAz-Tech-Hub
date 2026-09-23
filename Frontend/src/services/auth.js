@@ -1,24 +1,40 @@
 const TOKEN_KEY = "hassazAdminToken";
 const EXPIRES_KEY = "hassazAdminTokenExpiresAt";
 
+let liveToken = "";
+let liveExpiresAt = 0;
+
+function dropSavedLogin() {
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(EXPIRES_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+    sessionStorage.removeItem(EXPIRES_KEY);
+  } catch {
+    // ignore storage access errors
+  }
+}
+
+dropSavedLogin();
+
 export function saveSession({ token, expiresAt }) {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(EXPIRES_KEY, String(expiresAt));
+  dropSavedLogin();
+  liveToken = String(token || "");
+  liveExpiresAt = Number(expiresAt) || 0;
 }
 
 export function clearSession() {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(EXPIRES_KEY);
+  liveToken = "";
+  liveExpiresAt = 0;
+  dropSavedLogin();
 }
 
 export function getToken() {
-  const token = localStorage.getItem(TOKEN_KEY);
-  const expiresAt = Number(localStorage.getItem(EXPIRES_KEY) || 0);
-  if (!token || !expiresAt || Date.now() > expiresAt) {
+  if (!liveToken || !liveExpiresAt || Date.now() > liveExpiresAt) {
     clearSession();
     return null;
   }
-  return token;
+  return liveToken;
 }
 
 export function isAuthenticated() {
@@ -28,6 +44,7 @@ export function isAuthenticated() {
 export async function adminLogin(username, password) {
   const response = await fetch("/api/auth/login", {
     method: "POST",
+    credentials: "include",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ username, password }),
   });
@@ -42,11 +59,11 @@ export async function adminLogin(username, password) {
 export async function adminLogout() {
   const token = getToken();
   clearSession();
-  if (!token) return;
   try {
     await fetch("/api/auth/logout", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      credentials: "include",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
   } catch {
     // ignore network errors on logout

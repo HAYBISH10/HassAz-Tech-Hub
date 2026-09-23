@@ -53,11 +53,13 @@ export default function About() {
           </p>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {about.team.map((person) => (
-              <article key={person.image} className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(10,46,109,0.08)]">
+              <article key={`${person.title}-${person.image}`} className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(10,46,109,0.08)]">
                 <div className="bg-white">
                   <img
                     src={person.image}
                     alt={`${person.name}, ${person.title}`}
+                    loading="lazy"
+                    decoding="async"
                     className={`mx-auto h-80 w-full sm:h-[22rem] ${
                       person.cover ? "object-cover object-[center_18%]" : "object-contain object-top"
                     }`}
@@ -66,7 +68,7 @@ export default function About() {
                 <div className="border-t border-gold/40 p-6">
                   <h3 className="font-heading text-lg font-bold text-navy">{person.name}</h3>
                   <p className="mt-1 text-sm font-semibold text-gold">{person.title}</p>
-                  <p className="mt-1 text-sm text-navy/80">{person.role}</p>
+                  {person.role ? <p className="mt-1 text-sm text-navy/80">{person.role}</p> : null}
                   <p className="mt-3 text-sm leading-6 text-muted">{person.bio}</p>
                 </div>
               </article>

@@ -16,8 +16,11 @@ router.post(
       const { reply } = await answerChat(req.body?.messages);
       res.json({ reply, name: "HassAz AI" });
     } catch (error) {
-      res.status(error.status || 500).json({
-        message: error.message || "HassAz AI could not answer just now. Please try again.",
+      res.status(error.status === 400 ? 400 : 503).json({
+        message:
+          error.status === 400
+            ? error.message
+            : "HassAz AI could not answer just now. Please try again.",
       });
     }
   }

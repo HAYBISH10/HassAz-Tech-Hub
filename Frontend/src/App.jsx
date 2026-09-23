@@ -1,20 +1,13 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import { ADMIN_BASE } from "./adminPath";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/admin/AdminLayout";
 import PageLoader from "./components/ui/PageLoader";
 import { ApplicationWindowProvider } from "./context/ApplicationWindowContext";
-import { UserAuthProvider } from "./context/UserAuthContext";
-import AccountDashboard from "./pages/AccountDashboard";
 import AdminContacts from "./pages/AdminContacts";
 import AdminBroadcast from "./pages/AdminBroadcast";
 import AdminVisitors from "./pages/AdminVisitors";
-import AuthCallback from "./pages/AuthCallback";
-import ForgotPassword from "./pages/ForgotPassword";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ResetPassword from "./pages/ResetPassword";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
@@ -46,7 +39,6 @@ export default function App() {
 
   return (
     <ApplicationWindowProvider>
-      <UserAuthProvider>
       {booting ? <PageLoader label="Please wait..." /> : null}
       <BrowserRouter>
         <Routes>
@@ -56,12 +48,12 @@ export default function App() {
             <Route path="/courses/:categorySlug" element={<CourseCategory />} />
             <Route path="/courses/:categorySlug/:programSlug" element={<CourseProgram />} />
             <Route path="/apply" element={<Apply />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-            <Route path="/account" element={<AccountDashboard />} />
+            <Route path="/register" element={<Navigate to="/apply" replace />} />
+            <Route path="/login" element={<Navigate to="/apply" replace />} />
+            <Route path="/forgot-password" element={<Navigate to="/apply" replace />} />
+            <Route path="/reset-password" element={<Navigate to="/apply" replace />} />
+            <Route path="/auth/callback" element={<Navigate to="/apply" replace />} />
+            <Route path="/account" element={<Navigate to="/apply" replace />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
@@ -87,7 +79,6 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
-      </UserAuthProvider>
     </ApplicationWindowProvider>
   );
 }

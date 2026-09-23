@@ -42,7 +42,7 @@ router.get("/", async (_req, res) => {
       offers: state.offers.filter((item) => item.published !== false).map(publicOffer),
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -55,7 +55,7 @@ router.get("/admin", requireAdmin, async (_req, res) => {
       offers: state.offers.map(publicOffer),
     });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -68,7 +68,7 @@ router.put("/settings", requireAdmin, async (req, res) => {
     const saved = await saveIntakeState(state);
     res.json({ year: saved.year, heading: saved.heading });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -83,7 +83,7 @@ router.post("/", requireAdmin, async (req, res) => {
     await saveIntakeState(state);
     res.status(201).json(publicOffer(offer));
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -96,7 +96,7 @@ router.put("/:id", requireAdmin, async (req, res) => {
     await saveIntakeState(state);
     res.json(publicOffer(state.offers[index]));
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -109,7 +109,7 @@ router.delete("/:id", requireAdmin, async (req, res) => {
     await saveIntakeState(state);
     res.json({ ok: true });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -128,7 +128,7 @@ router.get("/:id/brochure.pdf", async (req, res) => {
     if (!ctx) return res.status(404).json({ message: "Brochure not found." });
     streamBrochurePdf(ctx, res);
   } catch (error) {
-    if (!res.headersSent) res.status(400).json({ message: error.message });
+    if (!res.headersSent) res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -138,7 +138,7 @@ router.get("/:id/brochure", async (req, res) => {
     if (!ctx) return res.status(404).json({ message: "Brochure not found." });
     streamBrochurePdf(ctx, res);
   } catch (error) {
-    if (!res.headersSent) res.status(400).json({ message: error.message });
+    if (!res.headersSent) res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -148,7 +148,7 @@ router.get("/:id/installments.pdf", async (req, res) => {
     if (!ctx) return res.status(404).json({ message: "Payment guide not found." });
     streamInstallmentsPdf(ctx, res);
   } catch (error) {
-    if (!res.headersSent) res.status(400).json({ message: error.message });
+    if (!res.headersSent) res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -158,7 +158,7 @@ router.get("/:id/installments", async (req, res) => {
     if (!ctx) return res.status(404).json({ message: "Payment guide not found." });
     streamInstallmentsPdf(ctx, res);
   } catch (error) {
-    if (!res.headersSent) res.status(400).json({ message: error.message });
+    if (!res.headersSent) res.status(400).json({ message: "Could not complete this request." });
   }
 });
 

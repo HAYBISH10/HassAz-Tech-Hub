@@ -143,7 +143,7 @@ export function streamBrochurePdf({ program, categoryTitle, offer, year }, res) 
   sectionTitle(doc, "How to apply");
   body(
     doc,
-    "Create a learner account on the HassAz Tech Hub website, open Apply, choose this programme and learning mode, and complete the application. For questions write to hassaztechhub@gmail.com or use Chat with us on Contact Us."
+    "Open Apply on the HassAz Tech Hub website, choose this programme and learning mode, and complete the application. For questions write to hassaztechhub@gmail.com or use Chat with us on Contact Us."
   );
 
   doc.end();
@@ -168,7 +168,7 @@ export function streamInstallmentsPdf({ program, offer }, res) {
   );
 
   sectionTitle(doc, "Key information");
-  kvRow(doc, "Programme", `${program.title} — ${offer.label}`);
+  kvRow(doc, "Programme", `${program.title}: ${offer.label}`);
   kvRow(doc, "Class start date", offer.startDate || "Set at admissions");
   kvRow(doc, "Total tuition", offer.fee || "Confirmed during admissions");
   kvRow(doc, "Monthly installment", offer.monthlyFee ? `${offer.monthlyFee} per month` : "Ksh 3,500 per month");

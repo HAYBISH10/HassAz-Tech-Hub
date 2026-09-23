@@ -144,7 +144,7 @@ export default function BookingModal({ open, onClose }) {
               <p className="mt-3 text-sm text-muted">
                 {confirmed.emailed
                   ? `We've also emailed these details to ${confirmed.email}.`
-                  : "We could not confirm email delivery, but your booking is saved — please keep this day and time free."}
+                  : "We could not confirm email delivery, but your booking is saved. Please keep this day and time free."}
               </p>
               <button
                 type="button"

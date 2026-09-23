@@ -19,10 +19,13 @@ import {
   resolveCourseWindow,
   withApplicationIntake,
 } from "../utils/applicationWindow.js";
-import { requireUser } from "../utils/userAuth.js";
+import { optionalUser, requireUser } from "../utils/userAuth.js";
 import { rateLimit } from "../utils/rateLimit.js";
 import { findUserById } from "../utils/usersRepo.js";
 import { catalog } from "../data/catalog.js";
+import { isProduction } from "../utils/env.js";
+import { publicFail } from "../utils/httpErrors.js";
+import { isEmail, sanitizeObject } from "../utils/sanitize.js";
 
 function applicationMatchesFilters(app, categorySlug, programSlug, intakeKey) {
   const cat = String(categorySlug || "").trim();
@@ -174,7 +177,7 @@ router.get("/export/excel", requireAdmin, async (req, res) => {
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -190,7 +193,7 @@ router.get("/export/pdf", requireAdmin, async (req, res) => {
     res.setHeader("Content-Disposition", `attachment; filename="hassaz-applications-${Date.now()}.pdf"`);
     await streamApplicationsPdf(apps, res);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -215,7 +218,7 @@ router.get("/:applicationNumber/export/excel", requireAdmin, async (req, res) =>
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -267,7 +270,7 @@ router.patch("/:applicationNumber/status", requireAdmin, async (req, res) => {
 
     return res.json({ ...withState(updated), emailed });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -292,7 +295,7 @@ router.patch("/:applicationNumber", requireAdmin, async (req, res) => {
     writeLocal(list);
     return res.json(withState(list[index]));
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -317,7 +320,7 @@ router.delete("/:applicationNumber", requireAdmin, async (req, res) => {
     if (!deleted) return res.status(404).json({ message: "Application not found." });
     return res.json({ message: "Applicant deleted.", applicationNumber: req.params.applicationNumber });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -331,7 +334,7 @@ router.get("/:applicationNumber", requireAdmin, async (req, res) => {
     if (local) return res.json(withState(local));
     return res.status(404).json({ message: "Application not found." });
   } catch (error) {
-    return res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: "Could not complete this request." });
   }
 });
 
@@ -352,23 +355,35 @@ async function notifyApplicationReceived(application) {
   }
 }
 
-router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application attempts. Please wait a few minutes." }), async (req, res) => {
-  const user = await findUserById(req.userId);
-  if (!user) {
-    return res.status(401).json({
-      title: "Sign in required",
-      message: "Please create an account or log in before registering for a course.",
-    });
-  }
-
+router.post("/", optionalUser, rateLimit({ max: 5, message: "Too many application attempts. Please wait a few minutes." }), async (req, res) => {
+  const user = req.userId ? await findUserById(req.userId) : null;
   const body = req.body || {};
-  const email = normalizeEmail(body.contactInformation?.email || user.email);
-  const phone = normalizePhone(body.contactInformation?.phone || user.phone);
-  const fullName = String(body.personalInformation?.fullName || user.fullName || "").trim();
+  const email = normalizeEmail(body.contactInformation?.email || user?.email);
+  const phone = normalizePhone(body.contactInformation?.phone || user?.phone);
+  const fullName = String(body.personalInformation?.fullName || user?.fullName || "").trim();
+  if (!fullName || !email || !isEmail(email)) {
+    return res.status(400).json({ message: "Full name and a valid email address are required." });
+  }
   const incoming = {
-    ...body,
-    personalInformation: { ...(body.personalInformation || {}), fullName },
-    contactInformation: { ...(body.contactInformation || {}), email, phone: body.contactInformation?.phone || user.phone },
+    personalInformation: sanitizeObject(body.personalInformation),
+    contactInformation: sanitizeObject(body.contactInformation),
+    guardianInformation: sanitizeObject(body.guardianInformation),
+    education: sanitizeObject(body.education),
+    program: sanitizeObject(body.program),
+    technologyBackground: sanitizeObject(body.technologyBackground),
+    skills: Array.isArray(body.skills) ? body.skills.map((item) => String(item).slice(0, 80)).slice(0, 30) : [],
+    experience: sanitizeObject(body.experience),
+    goals: sanitizeObject(body.goals),
+    trainingPreferences: sanitizeObject(body.trainingPreferences),
+    documents: sanitizeObject(body.documents),
+    source: String(body.source || "").slice(0, 120),
+    consent: sanitizeObject(body.consent),
+  };
+  incoming.personalInformation = { ...incoming.personalInformation, fullName };
+  incoming.contactInformation = {
+    ...incoming.contactInformation,
+    email,
+    phone: body.contactInformation?.phone || user?.phone || "",
   };
 
   let rules = {};
@@ -427,7 +442,7 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
     applicationNumber: applicationNumber(),
     status: "Submitted",
     state: "Open",
-    userId: req.userId,
+    userId: req.userId || "",
     emailKey: email,
     phoneKey: phone,
     intakeName: intake.name,
@@ -443,6 +458,9 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
       notifyApplicationReceived(created);
       return res.status(201).json(created);
     }
+    if (isProduction()) {
+      return res.status(503).json({ message: "Could not save this application. Please try again shortly." });
+    }
     saveLocal(payload);
     notifyApplicationReceived(payload);
     return res.status(201).json(payload);
@@ -455,12 +473,15 @@ router.post("/", requireUser, rateLimit({ max: 5, message: "Too many application
       });
     }
     try {
-      saveLocal(payload);
-      notifyApplicationReceived(payload);
-      return res.status(201).json(payload);
+      if (!isProduction()) {
+        saveLocal(payload);
+        notifyApplicationReceived(payload);
+        return res.status(201).json(payload);
+      }
     } catch {
-      return res.status(400).json({ message: error.message || "Could not save application." });
+      /* production does not fall back to local files */
     }
+    return publicFail(res, 503, "Could not save this application. Please try again shortly.", error);
   }
 });
 

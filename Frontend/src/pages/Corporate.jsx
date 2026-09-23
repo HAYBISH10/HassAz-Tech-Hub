@@ -5,7 +5,7 @@ import { site } from "../data/site";
 const offers = [
   {
     title: "Staff training",
-    text: "Custom programs in software engineering, data, cybersecurity, and AI for teams that need skill they can use this quarter — not a generic seminar. Cohorts can run full-time, part-time, remote, or in person.",
+    text: "Custom programs in software engineering, data, cybersecurity, and AI for teams that need skill they can use this quarter, not a generic seminar. Cohorts can run full-time, part-time, remote, or in person.",
   },
   {
     title: "Capacity building",
@@ -17,7 +17,7 @@ const offers = [
   },
   {
     title: "Digital solutions",
-    text: "Partner with the hub on applied builds where learners and practitioners work on a defined problem with a professional standard — internal tools, public-facing products, or training platforms.",
+    text: "Partner with the hub on applied builds where learners and practitioners work on a defined problem with a professional standard: internal tools, public-facing products, or training platforms.",
   },
 ];
 
@@ -47,7 +47,7 @@ const pillars = [
 
 const stats = [
   { value: "6", label: "Learning paths for teams: software, data, cybersecurity, AI, DPO, and high-school tech" },
-  { value: "3", label: "Yearly learner intakes — January, June, and December — so hiring and training can be planned" },
+  { value: "3", label: "Yearly learner intakes (January, June, and December) so hiring and training can be planned" },
   { value: "Hands-on", label: "Project reviews, labs, and portfolio work instead of slide-only workshops" },
   { value: "Kenya", label: "Delivery for organisations, campuses, and public institutions across East Africa" },
 ];
@@ -86,7 +86,7 @@ const audiences = [
   },
   {
     title: "NGOs and public institutions",
-    text: "Build digital capacity for programs that need data, software, cybersecurity, or AI literacy — with training that matches the work your teams actually do.",
+    text: "Build digital capacity for programs that need data, software, cybersecurity, or AI literacy, with training that matches the work your teams actually do.",
   },
 ];
 
@@ -134,7 +134,7 @@ export default function Corporate() {
           <p className="mt-4 max-w-3xl text-sm leading-7 text-muted sm:text-base sm:leading-8">
             We work in Kenya and with partners who need East Africa-ready talent: product companies, universities,
             NGOs, and public institutions. Engagements can be remote, hybrid, or in person. Duration follows the
-            job — a focused staff workshop, a multi-week bootcamp, or a longer pipeline.
+            job: a focused staff workshop, a multi-week bootcamp, or a longer pipeline.
           </p>
         </div>
       </section>
@@ -143,7 +143,7 @@ export default function Corporate() {
         <div className="mx-auto max-w-6xl">
           <h2 className="font-heading text-center text-2xl font-bold sm:text-3xl">#WeAreHassAz</h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-7 text-white/80">
-            We train the next generation of builders through project-based learning — and we work with organisations
+            We train the next generation of builders through project-based learning, and we work with organisations
             that want the same standard for their people.
           </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -236,7 +236,7 @@ export default function Corporate() {
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-heading text-3xl font-bold sm:text-4xl">Schedule a consultation</h2>
           <p className="mt-4 text-sm leading-7 text-white/80 sm:text-base">
-            Tell us what you need trained, hired, or built. We will reply with a clear next step — a call, a
+            Tell us what you need trained, hired, or built. We will reply with a clear next step: a call, a
             written outline, or a cohort plan. There is no obligation to start until the scope is agreed.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">

@@ -48,7 +48,7 @@ export default function AdminApplications() {
       <p className="text-sm font-semibold text-gold">Staff only · Strictly admin controlled</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Course applications</h1>
       <p className="mt-2 text-sm leading-6 text-muted">
-        Use the dropdowns to choose cohort, year, course area, and specific course — or type your own. Save that
+        Use the dropdowns to choose cohort, year, course area, and specific course, or type your own. Save that
         window so December 2026 stays apart from January 2027, and Data Science stays apart from Software Engineering.
       </p>
 
@@ -92,7 +92,7 @@ function ApplicationWindowPanel() {
         setAllowRejectedReapply(data.allowRejectedReapply !== false);
       })
       .finally(() => setLoading(false));
-    const id = setInterval(refreshWindow, 5000);
+    const id = setInterval(refreshWindow, 30000);
     return () => clearInterval(id);
   }, [refreshWindow]);
 
@@ -145,6 +145,7 @@ function ApplicationWindowPanel() {
                   <p className="mt-2 text-xs text-muted">Closes in:</p>
                   <Countdown
                     target={win.displayDeadline.closeAt}
+                    warnAtDays={5}
                     className="mt-1 text-gold-dark"
                     onReached={refreshWindow}
                   />
@@ -443,7 +444,7 @@ function WindowForm({ win, allowRejectedReapply, onAllowRejectedChange, onSaved 
               {win.savedWindows.map((item) => (
                 <tr key={`${item.scope}-${item.slug}`} className="border-t border-navy/10">
                   <td className="px-3 py-2 font-semibold text-navy">{item.title}</td>
-                  <td className="px-3 py-2">{item.cohortLabel || "—"}</td>
+                  <td className="px-3 py-2">{item.cohortLabel || "-"}</td>
                   <td className="px-3 py-2">{item.isOpen ? "Open" : "Closed"}</td>
                   <td className="px-3 py-2 text-right">
                     <button

@@ -15,7 +15,7 @@ export function validatePasswordPair(password, confirmPassword) {
 }
 
 export async function hashPassword(password) {
-  return bcrypt.hash(String(password), 10);
+  return bcrypt.hash(String(password), 12);
 }
 
 export async function verifyPassword(password, passwordHash) {

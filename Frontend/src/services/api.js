@@ -3,8 +3,12 @@ import { site as fallbackSite } from "../data/site";
 import { clearSession, getToken } from "./auth";
 import { userHeaders } from "./userAuth";
 
+function apiFetch(path, options = {}) {
+  return fetch(path, { credentials: "include", ...options });
+}
+
 async function getJson(path) {
-  const response = await fetch(path);
+  const response = await apiFetch(path);
   if (!response.ok) throw new Error("Request failed");
   return response.json();
 }
@@ -17,7 +21,7 @@ function authHeaders() {
 }
 
 async function getJsonAuthed(path) {
-  const response = await fetch(path, { headers: authHeaders() });
+  const response = await apiFetch(path, { headers: authHeaders() });
   if (response.status === 401) {
     clearSession();
     throw new Error(SESSION_EXPIRED);
@@ -65,7 +69,7 @@ export async function fetchBookingConfig() {
 }
 
 export async function createBooking(payload) {
-  const response = await fetch("/api/bookings", {
+  const response = await apiFetch("/api/bookings", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -86,7 +90,7 @@ export async function fetchBookings() {
 }
 
 export async function updateBookingStatus(id, status) {
-  const response = await fetch(`/api/bookings/${encodeURIComponent(id)}/status`, {
+  const response = await apiFetch(`/api/bookings/${encodeURIComponent(id)}/status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ status }),
@@ -103,7 +107,7 @@ export async function updateBookingStatus(id, status) {
 }
 
 export async function deleteBooking(id) {
-  const response = await fetch(`/api/bookings/${encodeURIComponent(id)}`, {
+  const response = await apiFetch(`/api/bookings/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
@@ -119,7 +123,7 @@ export async function deleteBooking(id) {
 }
 
 export async function updateApplicationState(applicationNumber, state) {
-  const response = await fetch(`/api/applications/${encodeURIComponent(applicationNumber)}`, {
+  const response = await apiFetch(`/api/applications/${encodeURIComponent(applicationNumber)}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ state }),
@@ -136,7 +140,7 @@ export async function updateApplicationState(applicationNumber, state) {
 }
 
 export async function updateApplicationStatus(applicationNumber, status) {
-  const response = await fetch(`/api/applications/${encodeURIComponent(applicationNumber)}/status`, {
+  const response = await apiFetch(`/api/applications/${encodeURIComponent(applicationNumber)}/status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ status }),
@@ -153,7 +157,7 @@ export async function updateApplicationStatus(applicationNumber, status) {
 }
 
 export async function deleteApplication(applicationNumber) {
-  const response = await fetch(`/api/applications/${encodeURIComponent(applicationNumber)}`, {
+  const response = await apiFetch(`/api/applications/${encodeURIComponent(applicationNumber)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
@@ -179,7 +183,7 @@ export async function downloadApplicationsFile(kind, applicationNumber, filters 
     : kind === "pdf"
       ? `/api/applications/export/pdf${query ? `?${query}` : ""}`
       : `/api/applications/export/excel${query ? `?${query}` : ""}`;
-  const response = await fetch(path, { headers: authHeaders() });
+  const response = await apiFetch(path, { headers: authHeaders() });
   if (response.status === 401) {
     clearSession();
     throw new Error(SESSION_EXPIRED);
@@ -208,7 +212,7 @@ export async function fetchGraduates() {
 }
 
 export async function createGraduate(payload) {
-  const response = await fetch("/api/graduates", {
+  const response = await apiFetch("/api/graduates", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(payload),
@@ -225,7 +229,7 @@ export async function createGraduate(payload) {
 }
 
 export async function deleteGraduate(certificateId) {
-  const response = await fetch(`/api/graduates/${encodeURIComponent(certificateId)}`, {
+  const response = await apiFetch(`/api/graduates/${encodeURIComponent(certificateId)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
@@ -241,7 +245,7 @@ export async function deleteGraduate(certificateId) {
 }
 
 export async function verifyCertificate(payload) {
-  const response = await fetch("/api/graduates/verify", {
+  const response = await apiFetch("/api/graduates/verify", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -261,12 +265,12 @@ export async function fetchApplicationWindow(params = {}) {
     const suffix = query.toString() ? `?${query}` : "";
     return await getJson(`/api/settings/applications${suffix}`);
   } catch {
-    return { openAt: null, closeAt: null, isOpen: true, anyOpen: true, globalOpen: true, reason: "", now: new Date().toISOString() };
+    return { openAt: null, closeAt: null, isOpen: false, anyOpen: false, globalOpen: false, reason: "", now: new Date().toISOString() };
   }
 }
 
 export async function updateApplicationWindow(payload) {
-  const response = await fetch("/api/settings/applications", {
+  const response = await apiFetch("/api/settings/applications", {
     method: "PUT",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(payload),
@@ -287,7 +291,7 @@ export async function fetchDatabase() {
 }
 
 export async function submitContact(payload) {
-  const response = await fetch("/api/contact", {
+  const response = await apiFetch("/api/contact", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -301,9 +305,9 @@ export async function submitContact(payload) {
 
 export async function submitApplication(payload) {
   // Note: this intentionally does NOT fall back to a local/offline "fake success" on failure.
-  // Applications must actually reach the admin backend — including the closed-window rejection —
+  // Applications must actually reach the admin backend, including the closed-window rejection,
   // so no applicant is ever shown a success screen for a submission the admin never received.
-  const response = await fetch("/api/applications", {
+  const response = await apiFetch("/api/applications", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...userHeaders() },
     body: JSON.stringify(payload),
@@ -319,19 +323,19 @@ export async function submitApplication(payload) {
 }
 
 export async function fetchMyApplications() {
-  const response = await fetch("/api/applications/mine", { headers: userHeaders() });
+  const response = await apiFetch("/api/applications/mine", { headers: userHeaders() });
   if (!response.ok) return [];
   return response.json();
 }
 
 export async function fetchMyEnrollments() {
-  const response = await fetch("/api/enrollments/me", { headers: userHeaders() });
+  const response = await apiFetch("/api/enrollments/me", { headers: userHeaders() });
   if (!response.ok) return [];
   return response.json();
 }
 
 export async function enrollInCourse(payload) {
-  const response = await fetch("/api/enrollments", {
+  const response = await apiFetch("/api/enrollments", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...userHeaders() },
     body: JSON.stringify(payload),
@@ -350,7 +354,7 @@ export async function fetchContactMessages() {
 }
 
 export async function updateContactStatus(id, status) {
-  const response = await fetch(`/api/contact/${encodeURIComponent(id)}/status`, {
+  const response = await apiFetch(`/api/contact/${encodeURIComponent(id)}/status`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify({ status }),
@@ -367,7 +371,7 @@ export async function updateContactStatus(id, status) {
 }
 
 export async function deleteContactMessage(id) {
-  const response = await fetch(`/api/contact/${encodeURIComponent(id)}`, {
+  const response = await apiFetch(`/api/contact/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
@@ -392,7 +396,7 @@ export async function fetchBroadcastPreview(filters = {}) {
 }
 
 export async function sendBroadcast(payload) {
-  const response = await fetch("/api/broadcast", {
+  const response = await apiFetch("/api/broadcast", {
     method: "POST",
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(payload),
@@ -410,7 +414,7 @@ export async function sendBroadcast(payload) {
 
 export async function recordVisit(payload) {
   try {
-    await fetch("/api/visits", {
+    await apiFetch("/api/visits", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -424,12 +428,8 @@ export async function fetchVisitors() {
   return getJsonAuthed("/api/visits");
 }
 
-export async function fetchSignups() {
-  return getJsonAuthed("/api/users/signups");
-}
-
 export async function sendChat(messages) {
-  const response = await fetch("/api/chat", {
+  const response = await apiFetch("/api/chat", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ messages }),
@@ -454,7 +454,7 @@ export async function fetchAdminIntakes() {
 }
 
 async function sendJsonAuthed(path, method, body, fallbackMessage) {
-  const response = await fetch(path, {
+  const response = await apiFetch(path, {
     method,
     headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(body),
@@ -483,7 +483,7 @@ export async function updateIntakeOffer(id, payload) {
 }
 
 export async function deleteIntakeOffer(id) {
-  const response = await fetch(`/api/intakes/${encodeURIComponent(id)}`, {
+  const response = await apiFetch(`/api/intakes/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
@@ -499,7 +499,7 @@ export async function deleteIntakeOffer(id) {
 }
 
 export async function deleteVisitor(id) {
-  const response = await fetch(`/api/visits/${encodeURIComponent(id)}`, {
+  const response = await apiFetch(`/api/visits/${encodeURIComponent(id)}`, {
     method: "DELETE",
     headers: authHeaders(),
   });

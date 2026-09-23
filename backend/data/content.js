@@ -5,7 +5,7 @@ export const siteContent = {
   motto: "Learn. Build. Innovate.",
   tagline: "Technology Education + Innovation + Digital Solutions",
   announcement:
-    "New intake alert! HassAz Tech Hub bootcamps are now open — Apply now",
+    "New intake alert! HassAz Tech Hub bootcamps are now open. Apply now",
   email: "hassaztechhub@gmail.com",
   admissionsEmail: "hassaztechhub@gmail.com",
   location: "Kenya",
