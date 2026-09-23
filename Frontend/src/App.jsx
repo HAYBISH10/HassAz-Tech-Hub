@@ -1,25 +1,13 @@
-import { useEffect, useState } from "react";
+import { Suspense, lazy } from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import { ADMIN_BASE } from "./adminPath";
 import Layout from "./components/layout/Layout";
-import AdminLayout from "./components/admin/AdminLayout";
 import PageLoader from "./components/ui/PageLoader";
 import { ApplicationWindowProvider } from "./context/ApplicationWindowContext";
-import AdminContacts from "./pages/AdminContacts";
-import AdminBroadcast from "./pages/AdminBroadcast";
-import AdminVisitors from "./pages/AdminVisitors";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
 import Contact from "./pages/Contact";
 import Faqs from "./pages/Faqs";
-import AdminApplicants from "./pages/AdminApplicants";
-import AdminApplications from "./pages/AdminApplications";
-import AdminCalls from "./pages/AdminCalls";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminDatabase from "./pages/AdminDatabase";
-import AdminGraduates from "./pages/AdminGraduates";
-import AdminIntakes from "./pages/AdminIntakes";
-import AdminLogin from "./pages/AdminLogin";
 import Apply from "./pages/Apply";
 import Community from "./pages/Community";
 import Corporate from "./pages/Corporate";
@@ -29,17 +17,26 @@ import Courses from "./pages/Courses";
 import Home from "./pages/Home";
 import Verify from "./pages/Verify";
 
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const AdminLogin = lazy(() => import("./pages/AdminLogin"));
+const AdminDashboard = lazy(() => import("./pages/AdminDashboard"));
+const AdminApplications = lazy(() => import("./pages/AdminApplications"));
+const AdminApplicants = lazy(() => import("./pages/AdminApplicants"));
+const AdminCalls = lazy(() => import("./pages/AdminCalls"));
+const AdminGraduates = lazy(() => import("./pages/AdminGraduates"));
+const AdminContacts = lazy(() => import("./pages/AdminContacts"));
+const AdminBroadcast = lazy(() => import("./pages/AdminBroadcast"));
+const AdminVisitors = lazy(() => import("./pages/AdminVisitors"));
+const AdminIntakes = lazy(() => import("./pages/AdminIntakes"));
+const AdminDatabase = lazy(() => import("./pages/AdminDatabase"));
+
+function adminElement(element) {
+  return <Suspense fallback={<PageLoader overlay label="Loading..." />}>{element}</Suspense>;
+}
+
 export default function App() {
-  const [booting, setBooting] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setBooting(false), 900);
-    return () => clearTimeout(timer);
-  }, []);
-
   return (
     <ApplicationWindowProvider>
-      {booting ? <PageLoader label="Please wait..." /> : null}
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
@@ -64,8 +61,8 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          <Route path={`${ADMIN_BASE}/login`} element={<AdminLogin />} />
-          <Route path={ADMIN_BASE} element={<AdminLayout />}>
+          <Route path={`${ADMIN_BASE}/login`} element={adminElement(<AdminLogin />)} />
+          <Route path={ADMIN_BASE} element={adminElement(<AdminLayout />)}>
             <Route index element={<AdminDashboard />} />
             <Route path="applications" element={<AdminApplications />} />
             <Route path="applicants" element={<AdminApplicants />} />

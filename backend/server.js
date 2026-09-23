@@ -1,4 +1,5 @@
 import cors from "cors";
+import compression from "compression";
 import dotenv from "dotenv";
 import express from "express";
 import { existsSync } from "fs";
@@ -33,6 +34,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const frontendDist = join(here, "../Frontend/dist");
 
 app.disable("x-powered-by");
+app.use(compression());
   if (isProduction()) {
     app.set("trust proxy", 1);
   } else {
@@ -162,6 +164,7 @@ if (existsSync(join(frontendDist, "index.html"))) {
     express.static(frontendDist, {
       maxAge: isProduction() ? "7d" : 0,
       index: false,
+      redirect: false,
       setHeaders(res, filePath) {
         if (filePath.endsWith(".html")) res.setHeader("Cache-Control", "no-cache");
       },
@@ -185,11 +188,11 @@ app.use((err, _req, res, _next) => {
 app.listen(port, "0.0.0.0", () => {
   console.log(`HassAz backend running on http://localhost:${port}`);
   connectDb().catch((error) => {
-    console.error("MongoDB connection failed:", error.message);
     if (isProduction()) {
+      console.error("MongoDB connection failed:", error.message);
       console.error("MongoDB is required in production. Set MONGO_URI and ALLOW_REMOTE_MONGO=true for Atlas.");
       process.exit(1);
     }
-    console.log("API is running without MongoDB. Applications and graduates save to local files.");
+    console.log("MongoDB not detected. Using local file storage, which is normal for development.");
   });
 });
