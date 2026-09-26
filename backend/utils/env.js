@@ -12,6 +12,18 @@ export function backendOrigin() {
   return String(process.env.BACKEND_URL || "").replace(/\/$/, "");
 }
 
+// Base URL used in links sent to users (verification emails, QR codes).
+// Set PUBLIC_URL (or FRONTEND_URL) to the live domain in production, e.g. https://hiacdi.org
+export function publicBaseUrl(req) {
+  const configured = String(process.env.PUBLIC_URL || "").replace(/\/$/, "") || frontendOrigin();
+  if (configured) return configured;
+  if (req && req.get) {
+    const host = req.get("host");
+    if (host) return `${req.protocol || "http"}://${host}`;
+  }
+  return "";
+}
+
 export function usesHttps() {
   if (String(process.env.FORCE_HTTPS || "").toLowerCase() === "false") return false;
   if (isProduction()) return true;

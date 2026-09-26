@@ -1,19 +1,19 @@
 export { courses } from "./courses.js";
 
 export const siteContent = {
-  name: "HassAz Tech Hub",
+  name: "HIACDI Tech Hub",
   motto: "Learn. Build. Innovate.",
   tagline: "Technology Education + Innovation + Digital Solutions",
   announcement:
-    "New intake alert! HassAz Tech Hub bootcamps are now open. Apply now",
-  email: "hassaztechhub@gmail.com",
-  admissionsEmail: "hassaztechhub@gmail.com",
+    "New intake alert! HIACDI Tech Hub bootcamps are now open. Apply now",
+  email: "hiacditechhub@gmail.com",
+  admissionsEmail: "hiacditechhub@gmail.com",
   location: "Kenya",
   whatsapp: process.env.WHATSAPP || "0741808582",
   hero: {
     title: "Empowering the Next Generation of Digital Innovators",
-    text: "Whether you are a high school graduate, a university student or a working professional looking to upskill or switch to tech, HassAz Tech Hub offers practical training tailored to your journey. We meet you where you are and guide you to where you want to go in the tech world.",
-    logoSrc: "/brand/logo-wordmark.png?v=2",
+    text: "This is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
+    logoSrc: "/brand/logo-wordmark.png?v=3",
   },
   learningModes: [
     { id: "full-time", label: "Full-time Classes" },
@@ -22,13 +22,13 @@ export const siteContent = {
     { id: "in-person", label: "In-person Learning" },
   ],
   booking: {
-    host: "HassAz Tech Hub Contact",
+    host: "HIACDI Tech Hub Contact",
     title: "Admissions Open Hours",
     durationMinutes: 45,
     location: "Web conferencing details provided upon confirmation.",
     greeting: "Hello!",
     intro:
-      "We're looking forward to talking to you. This is a group info session with HassAz Academic Advisors.",
+      "We're looking forward to talking to you. This is a group info session with HIACDI Academic Advisors.",
     expect: [
       "Lots of friendly chats and one-on-one interactions",
       "Talk to our Academic Advisors and find out more about courses, learning models, payment options, etc",
@@ -52,12 +52,12 @@ export const siteContent = {
 
 export const faqs = [
   {
-    title: "What is HassAz Tech Hub?",
-    body: "HassAz Tech Hub is a Kenya-based technology institution. We combine professional training, mentorship, and digital solutions so learners can gain skills, build real work, and move into employment, further study, or their own products.",
+    title: "What is HIACDI Tech Hub?",
+    body: "HIACDI Tech Hub is a Kenya-based technology institution. We combine professional training, mentorship, and digital solutions so learners can gain skills, build real work, and move into employment, further study, or their own products.",
   },
   {
     title: "Who can apply?",
-    body: "High school leavers, university students, and working professionals. Programs are designed for people starting out and for people switching into technology. Each course page lists who the program is for.",
+    body: "Everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
   },
   {
     title: "How do you teach?",
@@ -69,11 +69,11 @@ export const faqs = [
   },
   {
     title: "Do you award certificates?",
-    body: "Yes. Learners who complete an awarded program receive a HassAz Tech Hub certificate. Only students saved in our graduate register can verify a certificate. Scan the QR on the certificate, then enter the registered full name and email.",
+    body: "Yes. Learners who complete an awarded program receive a HIACDI Tech Hub certificate. Only students saved in our graduate register can verify a certificate. Scan the QR on the certificate, then enter the registered full name and email.",
   },
   {
     title: "How do I verify a certificate?",
-    body: "Open the scan link on the certificate or go to /verify. If the name and email do not match an awarded graduate, the form will not send a confirmation.",
+    body: "Scan the QR code on the certificate or go to /verify, then enter the full name and email exactly as printed on the certificate. The result is shown immediately and a confirmation email is sent to the email address provided.",
   },
   {
     title: "How do I apply?",
@@ -81,10 +81,10 @@ export const faqs = [
   },
   {
     title: "Do you train organisations?",
-    body: "Yes. Universities, companies, NGOs, and public institutions can work with us on staff training, capacity building, and talent pipelines. See /corporate or write to hassaztechhub@gmail.com.",
+    body: "Yes. Universities, companies, NGOs, and public institutions can work with us on staff training, capacity building, and talent pipelines. See /corporate or write to hiacditechhub@gmail.com.",
   },
   {
     title: "Where are you based?",
-    body: "HassAz Tech Hub is based in Kenya. Remote learning is available on selected programs, and in-person options are listed on each course.",
+    body: "HIACDI Tech Hub is based in Kenya. Remote learning is available on selected programs, and in-person options are listed on each course.",
   },
 ];

@@ -42,7 +42,7 @@ export default function Navbar({ onSearch, onBook }) {
           onMouseEnter={hideMenuNow}
         >
           <img
-            src="/brand/logo-icon.png?v=4"
+            src="/brand/logo-icon.png?v=5"
             alt={site.name}
             width={88}
             height={40}

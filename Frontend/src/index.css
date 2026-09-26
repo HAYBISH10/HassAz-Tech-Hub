@@ -65,7 +65,7 @@ select:disabled {
   cursor: not-allowed;
 }
 
-/* ---- HassAz page loader / "Please wait" spinner ---- */
+/* ---- HIACDI page loader / "Please wait" spinner ---- */
 .page-loader {
   position: fixed;
   inset: 0;

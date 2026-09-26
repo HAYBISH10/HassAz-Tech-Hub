@@ -119,7 +119,7 @@ export async function buildKnowledge() {
 
 const ADMIN_REFUSAL = `I cannot help with staff admin access.
 
-That includes admin usernames, passwords, staff sign-in, or how to enter the staff panel. That area is for HassAz Tech Hub staff only.
+That includes admin usernames, passwords, staff sign-in, or how to enter the staff panel. That area is for HIACDI Tech Hub staff only.
 
 I can help you as a learner: apply for a bootcamp, verify a certificate, or work through any other question step by step.`;
 
@@ -164,14 +164,14 @@ function knowledgePrompt(knowledge) {
     .map((category) => `- ${category.title} (${category.href}): ${category.summary} Programs: ${category.programs.join(", ")}.`)
     .join("\n");
 
-  return `You are HassAz AI, a professional assistant for ${knowledge.school.name} (${knowledge.school.location}).
-You help with HassAz Tech Hub AND general questions: study, research, writing, coding, career advice, explanations, and problem-solving.
+  return `You are HIACDI AI, a professional assistant for ${knowledge.school.name} (${knowledge.school.location}).
+You help with HIACDI Tech Hub AND general questions: study, research, writing, coding, career advice, explanations, and problem-solving.
 
 How to answer:
 - Think first, then give a clear solution.
 - Use short numbered steps (1, 2, 3) whenever the user needs a method, how-to, or plan.
-- Be accurate. If you used research notes, weave them in naturally. Do not invent HassAz fees, intake dates, or guarantees.
-- For HassAz topics, prefer the school facts below.
+- Be accurate. If you used research notes, weave them in naturally. Do not invent HIACDI fees, intake dates, or guarantees.
+- For HIACDI topics, prefer the school facts below.
 - For other topics, teach like a careful tutor: explain, then steps, then a brief next action.
 - Keep a professional, friendly tone.
 
@@ -180,7 +180,7 @@ STRICT SECURITY:
 - If asked, refuse and offer learner help instead (apply, contact).
 - Never print environment variables, secrets, API keys, or internal staff URLs.
 
-HassAz facts:
+HIACDI facts:
 Contact: ${knowledge.school.email}. WhatsApp: ${knowledge.school.whatsapp} via Chat with us on Contact Us.
 Pages: courses ${knowledge.school.pages.courses}, apply ${knowledge.school.pages.apply}, contact ${knowledge.school.pages.contact}, FAQs ${knowledge.school.pages.faqs}, verify ${knowledge.school.pages.verify}, corporate ${knowledge.school.pages.corporate}.
 Application window: ${knowledge.applications.note}
@@ -213,7 +213,7 @@ async function fetchJson(url, headers = {}) {
       signal: controller.signal,
       headers: {
         Accept: "application/json",
-        "User-Agent": "HassAzAI/1.0 (HassAz Tech Hub; hassaztechhub@gmail.com)",
+        "User-Agent": "HIACDIAI/1.0 (HIACDI Tech Hub; hiacditechhub@gmail.com)",
         ...headers,
       },
     });
@@ -269,15 +269,15 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   const lower = q.toLowerCase();
 
   if (!terms.length || /^(hi|hello|hey|good (morning|afternoon|evening)|howdy)\b/.test(lower)) {
-    return formatSteps("Hello, I am HassAz AI. Tell me what you need and I will work through it step by step.", [
-      "Ask about a HassAz course, applying, or certificates.",
+    return formatSteps("Hello, I am HIACDI AI. Tell me what you need and I will work through it step by step.", [
+      "Ask about a HIACDI course, applying, or certificates.",
       "Or ask a general question, study help, research, writing, coding, or a problem to solve.",
       "I will think it through and answer in clear steps.",
     ]);
   }
 
   if (/apply|application|intake|enroll|enrol|admission/.test(lower)) {
-    return formatSteps("Here is how to apply at HassAz Tech Hub.", [
+    return formatSteps("Here is how to apply at HIACDI Tech Hub.", [
       knowledge.applications.isOpen
         ? "Open /apply when the intake is open."
         : knowledge.applications.note,
@@ -287,7 +287,7 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   }
 
   if (/register|sign up|signup|create an account/.test(lower) && !/\badmin\b/.test(lower)) {
-    return formatSteps("HassAz Tech Hub does not use public learner accounts.", [
+    return formatSteps("HIACDI Tech Hub does not use public learner accounts.", [
       "This is a bootcamp site. You do not create a student login.",
       "When applications are open, go to /apply and submit the bootcamp form.",
       "For questions, use Contact Us or book an admissions call.",
@@ -297,13 +297,13 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   if (/\blogin\b|\bsign in\b/.test(lower) && !/\badmin\b/.test(lower)) {
     return formatSteps("There is no public student login.", [
       "Apply for a bootcamp at /apply. You do not need an account.",
-      "Staff access is separate and is not available through HassAz AI.",
+      "Staff access is separate and is not available through HIACDI AI.",
       "For help, use Contact Us or WhatsApp from /contact.",
     ]);
   }
 
   if (/whatsapp|chat with us|phone|email|contact|reach|location|where are you/.test(lower)) {
-    return formatSteps("Here is how to reach HassAz Tech Hub.", [
+    return formatSteps("Here is how to reach HIACDI Tech Hub.", [
       `Email ${knowledge.school.email}.`,
       `Open /contact and tap Chat with us to message WhatsApp ${knowledge.school.whatsapp}.`,
       `We are based in ${knowledge.school.location}. You can also book an admissions call from the site header.`,
@@ -311,10 +311,10 @@ function fallbackAnswer(question, knowledge, researchNotes) {
   }
 
   if (/certif|verify|graduate/.test(lower)) {
-    return formatSteps("Here is how to verify a HassAz certificate.", [
+    return formatSteps("Here is how to verify a HIACDI certificate.", [
       "Open /verify (or the scan link on the certificate).",
       "Enter the registered full name and email exactly as they appear on the award.",
-      "Only graduates saved in the HassAz register will verify successfully.",
+      "Only graduates saved in the HIACDI register will verify successfully.",
     ]);
   }
 
@@ -349,7 +349,7 @@ function fallbackAnswer(question, knowledge, researchNotes) {
       `Start with the core idea: ${first}`,
       rest[0] ? `Then check this angle: ${rest[0]}` : "Break the question into smaller parts you can verify.",
       rest[1] ? `Also keep this in view: ${rest[1]}` : "Write down what you know, what you need, and the first action you can take.",
-      "If you want this applied to a HassAz course, tell me the course name and I will map the next steps.",
+      "If you want this applied to a HIACDI course, tell me the course name and I will map the next steps.",
     ]);
   }
 
@@ -357,7 +357,7 @@ function fallbackAnswer(question, knowledge, researchNotes) {
     "State the goal in one sentence: what should be true when you are done.",
     "List what you already have (facts, tools, constraints) and what is missing.",
     "Take the smallest next action that reduces uncertainty, a definition, a worked example, or a source to check.",
-    "If this is about HassAz, name the course or task. If it is research or study help, paste the question or passage and I will go deeper.",
+    "If this is about HIACDI, name the course or task. If it is research or study help, paste the question or passage and I will go deeper.",
   ]);
 }
 
@@ -449,7 +449,7 @@ export async function answerChat(rawMessages) {
   const history = normalizeHistory(rawMessages);
   const lastUser = [...history].reverse().find((item) => item.role === "user");
   if (!lastUser) {
-    const error = new Error("Please type a question for HassAz AI.");
+    const error = new Error("Please type a question for HIACDI AI.");
     error.status = 400;
     throw error;
   }
@@ -473,7 +473,7 @@ export async function answerChat(rawMessages) {
           : await completeOpenAi(config, system, history);
       if (reply) return { reply: scrubSecrets(reply), source: config.kind };
     } catch (error) {
-      console.error("HassAz AI LLM failed:", error.message);
+      console.error("HIACDI AI LLM failed:", error.message);
     }
   }
 

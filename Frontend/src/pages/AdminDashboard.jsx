@@ -14,7 +14,9 @@ export default function AdminDashboard() {
 
   const refreshWindow = useCallback(() => {
     return fetchApplicationWindow()
-      .then(setWin)
+      .then((data) => {
+        if (data) setWin(data);
+      })
       .catch(() => {
         // keep showing the last known window on a transient network error
       });
@@ -49,7 +51,7 @@ export default function AdminDashboard() {
       <p className="text-sm font-semibold text-gold">Overview</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Welcome back</h1>
       <p className="mt-2 text-sm text-muted">
-        Here&apos;s what&apos;s happening across HassAz Tech Hub right now.
+        Here&apos;s what&apos;s happening across HIACDI Tech Hub right now.
       </p>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
 

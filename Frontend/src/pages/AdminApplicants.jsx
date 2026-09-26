@@ -480,6 +480,7 @@ export default function AdminApplicants() {
                   <Block title="Experience" data={app.experience} />
                   <Block title="Goals" data={app.goals} />
                   <Block title="Training preferences" data={app.trainingPreferences} />
+                  <Block title="Assessment" data={app.assessment} />
                   <Block title="Documents" data={app.documents} />
                   <p>
                     <span className="font-semibold text-navy">Heard about us: </span>
@@ -668,13 +669,14 @@ function flattenApplicant(app) {
     ["Experience", app.experience],
     ["Goals", app.goals],
     ["Training Preferences", app.trainingPreferences],
+    ["Assessment", app.assessment],
     ["Documents", app.documents],
   ];
 
   for (const [label, data] of sections) {
     if (!data || typeof data !== "object") continue;
     for (const [key, value] of Object.entries(data)) {
-      row[`${label} - ${key}`] = Array.isArray(value) ? value.join(", ") : value ?? "";
+      row[`${label} - ${key}`] = formatAdminValue(value);
     }
   }
 
@@ -875,6 +877,7 @@ function ApplicantRecord({
         <Block title="Experience" data={app.experience} />
         <Block title="Goals" data={app.goals} />
         <Block title="Training preferences" data={app.trainingPreferences} />
+        <Block title="Assessment" data={app.assessment} />
         <Block title="Documents" data={app.documents} />
         <p>
           <span className="font-semibold text-navy">Heard about us: </span>
@@ -919,6 +922,21 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
+function formatAdminValue(value) {
+  if (Array.isArray(value)) {
+    if (value.every((item) => item && typeof item === "object")) {
+      return value
+        .map((item) =>
+          item.id != null ? `${item.id}:${item.selected ?? item.chosen ?? ""}` : JSON.stringify(item)
+        )
+        .join(" · ");
+    }
+    return value.join(", ");
+  }
+  if (value && typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
 function Block({ title, data }) {
   const entries = Object.entries(data || {}).filter(([, value]) => {
     if (Array.isArray(value)) return value.length;
@@ -932,7 +950,7 @@ function Block({ title, data }) {
         {entries.map(([key, value]) => (
           <div key={key}>
             <dt className="text-xs uppercase tracking-wide text-muted">{key}</dt>
-            <dd className="text-navy">{Array.isArray(value) ? value.join(", ") : String(value)}</dd>
+            <dd className="text-navy">{formatAdminValue(value)}</dd>
           </div>
         ))}
       </dl>

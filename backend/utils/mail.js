@@ -3,10 +3,22 @@ import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 
 const storePath = join(dirname(fileURLToPath(import.meta.url)), "../data/verification-emails.json");
-const fromAddress = process.env.SMTP_USER || "hassaztechhub@gmail.com";
-const contactEmail = "hassaztechhub@gmail.com";
+const fromAddress = process.env.SMTP_USER || "hiacditechhub@gmail.com";
+const contactEmail = "hiacditechhub@gmail.com";
 const contactPhone = "0741 808 582";
-const DEFAULT_EMAIL_LOGO_URL = "https://files.catbox.moe/khxe1w.png";
+const DEFAULT_EMAIL_LOGO_URL = "https://hiacdi.org/brand/logo-email.png?v=4";
+const emailLogoPath = join(dirname(fileURLToPath(import.meta.url)), "../assets/logo-email.png");
+const EMAIL_LOGO_CID = "hiacdilogo";
+let cachedLogoContent = null;
+
+// The logo is embedded as an inline CID attachment so it always displays in the
+// recipient's mail client, even before the site is publicly hosted.
+function emailLogoContent() {
+  if (cachedLogoContent) return cachedLogoContent;
+  if (!existsSync(emailLogoPath)) return null;
+  cachedLogoContent = readFileSync(emailLogoPath);
+  return cachedLogoContent;
+}
 
 function hostedLogoUrl() {
   const explicit = String(process.env.EMAIL_LOGO_URL || "").trim();
@@ -14,8 +26,19 @@ function hostedLogoUrl() {
   const backend = String(process.env.BACKEND_URL || "").replace(/\/$/, "");
   if (/^https:\/\//i.test(backend)) return `${backend}/api/public/email-logo.png`;
   const site = String(process.env.FRONTEND_URL || "").replace(/\/$/, "");
-  if (/^https:\/\//i.test(site)) return `${site}/brand/logo-email.png?v=3`;
+  if (/^https:\/\//i.test(site)) return `${site}/brand/logo-email.png?v=4`;
   return DEFAULT_EMAIL_LOGO_URL;
+}
+
+// A hosted logo URL is always preferred when configured: the email then has no
+// attachment part at all, so no mail client can show an attachment chip below the
+// message. The CID-embedded copy is only a fallback for local development before
+// any public URL exists.
+function useEmbeddedLogo() {
+  if (String(process.env.EMAIL_LOGO_URL || "").trim()) return false;
+  if (/^https:\/\//i.test(String(process.env.BACKEND_URL || ""))) return false;
+  if (/^https:\/\//i.test(String(process.env.FRONTEND_URL || ""))) return false;
+  return Boolean(emailLogoContent());
 }
 
 export function escapeHtml(value) {
@@ -49,7 +72,7 @@ function paragraphs(lines) {
 
 function wrapHtml({ bodyHtml }) {
   const year = new Date().getFullYear();
-  const logoSrc = hostedLogoUrl();
+  const logoSrc = useEmbeddedLogo() ? `cid:${EMAIL_LOGO_CID}` : hostedLogoUrl();
   const preheader = String(bodyHtml || "")
     .replace(/<[^>]+>/g, " ")
     .replace(/&nbsp;/gi, " ")
@@ -68,84 +91,112 @@ function wrapHtml({ bodyHtml }) {
       <div style="background:#f4efe4; padding:28px 24px; text-align:center;">
         ${logoImg}
         <p style="margin:10px 0 0; font-weight:700; font-size:16px; color:#0a2e6d;">
-          HassAz <span style="color:#d4af37;">TECH</span> HUB
+          HIACDI <span style="color:#d4af37;">TECH</span> HUB
         </p>
       </div>
       <div style="padding:28px 24px;">
         ${bodyHtml}
       </div>
       <div style="border-top:1px solid #eef0f3; padding:16px 24px; text-align:center; font-size:12px; color:#6b7280;">
-        © Copyright ${year} by HassAz Tech Hub. All rights reserved.
+        © Copyright ${year} by HIACDI Tech Hub. All rights reserved.
       </div>
     </div>
   </body>
 </html>`;
 }
 
-export function verifiedResultLetter() {
-  const subject = "Certificate Verification Result";
+export function verifiedResultLetter({ fullName, holderName, program, certificateId }) {
+  const subject = "Certificate Verified: HIACDI Tech Hub";
   const text = [
-    "Dear Student,",
+    `Dear ${fullName},`,
     "",
-    "We are pleased to confirm that, following verification by the Academic Director, the certificate/details presented have been officially verified and authenticated by HassAz Tech Hub.",
+    `This is to confirm the authenticity and validity of the certificate issued by HIACDI Tech Hub. The certificate presented was awarded to ${holderName} upon successful completion of ${program}.`,
     "",
-    "The certificate is therefore recognized as a valid record issued by HassAz Tech Hub.",
+    `We are committed to maintaining the integrity and credibility of our certificates. We are pleased to confirm that the certificate with verification number ${certificateId} is genuine and valid according to our official records.`,
     "",
-    "Thank you for your cooperation and patience throughout the verification process.",
+    "This verification confirms that the certificate was officially issued by HIACDI Tech Hub and belongs to the individual named above.",
     "",
-    "Kind regards,",
-    "HassAz Tech Hub",
+    "If you require any further information or clarification regarding this certificate, please contact us at hiacditechhub@gmail.com. We will be happy to assist you.",
+    "",
+    "Thank you for taking the time to verify this certificate.",
+    "",
+    "Best regards,",
+    "HIACDI Tech Hub",
+    "Humanity, Inclusion & Advancement Community Development Initiative",
+    "https://hiacdi.org",
+    "hiacditechhub@gmail.com",
   ].join("\n");
 
   const html = wrapHtml({
-    bodyHtml: paragraphs([
-      "Dear Student,",
-      "We are pleased to confirm that, following verification by the <strong>Academic Director</strong>, the certificate/details presented have been <strong>officially verified and authenticated by HassAz Tech Hub</strong>.",
-      "The certificate is therefore recognized as a valid record issued by HassAz Tech Hub.",
-      "Thank you for your cooperation and patience throughout the verification process.",
-      "Kind regards,<br/><strong>HassAz Tech Hub</strong>",
-    ]),
+    bodyHtml: [
+      `<p style="margin:0 0 18px; font-size:18px; font-weight:700; color:#166534;">Certificate Verified Successfully ✅</p>`,
+      paragraphs([
+        `Dear <strong>${fullName}</strong>,`,
+        `This is to confirm the authenticity and validity of the certificate issued by <strong>HIACDI Tech Hub</strong>. The certificate presented was awarded to <strong>${holderName}</strong> upon successful completion of <strong>${program}</strong>.`,
+        `We are committed to maintaining the integrity and credibility of our certificates. We are pleased to confirm that the certificate with verification number <strong>${certificateId}</strong> is <strong>genuine and valid</strong> according to our official records.`,
+        "This verification confirms that the certificate was officially issued by <strong>HIACDI Tech Hub</strong> and belongs to the individual named above.",
+        "If you require any further information or clarification regarding this certificate, please contact us at <strong>hiacditechhub@gmail.com</strong>. We will be happy to assist you.",
+        "Thank you for taking the time to verify this certificate.",
+        "Best regards,<br/><strong>HIACDI Tech Hub</strong><br/>Humanity, Inclusion &amp; Advancement Community Development Initiative<br/>https://hiacdi.org<br/>hiacditechhub@gmail.com",
+      ]),
+    ].join(""),
   });
 
   return { subject, text, html };
 }
 
-export function notVerifiedResultLetter() {
-  const subject = "Certificate Verification Result";
+export function notVerifiedResultLetter({ fullName }) {
+  const subject = "Certificate Not Verified: HIACDI Tech Hub";
   const text = [
-    "Dear Student,",
+    "Certificate Not Verified",
     "",
-    "Please be informed that the certificate/details presented have not been verified or authenticated by HassAz Tech Hub and are not recognized as an officially verified record by our institution.",
+    `Dear ${fullName},`,
     "",
-    "HassAz Tech Hub takes the authenticity and integrity of its academic certificates and records very seriously. Any certificate or document presented as having been issued by the institution must be verified through the appropriate official channels.",
+    "We regret to inform you that the certificate details provided could not be verified against our official records.",
     "",
-    "Kindly contact our Academic Director for official verification and further assistance. Until verification is completed, the authenticity of the document cannot be confirmed or recognized by HassAz Tech Hub.",
+    "The certificate number or information submitted does not match any valid certificate issued by HIACDI Tech Hub.",
     "",
-    "Thank you for your cooperation.",
+    "Please check the certificate number and other details entered and try again. If you believe this certificate is genuine, kindly contact us at hiacditechhub@gmail.com for further assistance.",
+    "",
+    "Thank you for using our certificate verification service.",
+    "",
+    "Best regards,",
+    "HIACDI Tech Hub",
+    "Humanity, Inclusion & Advancement Community Development Initiative",
+    "https://hiacdi.org",
+    "hiacditechhub@gmail.com",
   ].join("\n");
 
   const html = wrapHtml({
-    bodyHtml: paragraphs([
-      "Dear Student,",
-      "Please be informed that the certificate/details presented have <strong>not been verified or authenticated by HassAz Tech Hub</strong> and are not recognized as an officially verified record by our institution.",
-      "HassAz Tech Hub takes the authenticity and integrity of its academic certificates and records very seriously. Any certificate or document presented as having been issued by the institution must be verified through the appropriate official channels.",
-      "Kindly contact our <strong>Academic Director</strong> for official verification and further assistance. Until verification is completed, the authenticity of the document cannot be confirmed or recognized by HassAz Tech Hub.",
-      "Thank you for your cooperation.",
-    ]),
+    bodyHtml: [
+      `<p style="margin:0 0 18px; font-size:18px; font-weight:700; color:#b91c1c;">Certificate Not Verified ❌</p>`,
+      paragraphs([
+        `Dear <strong>${fullName}</strong>,`,
+        "We regret to inform you that the certificate details provided <strong>could not be verified</strong> against our official records.",
+        "The certificate number or information submitted does not match any valid certificate issued by <strong>HIACDI Tech Hub</strong>.",
+        "Please check the certificate number and other details entered and try again. If you believe this certificate is genuine, kindly contact us at <strong>hiacditechhub@gmail.com</strong> for further assistance.",
+        "<strong>Thank you for using our certificate verification service.</strong>",
+        "Best regards,<br/><strong>HIACDI Tech Hub</strong><br/>Humanity, Inclusion &amp; Advancement Community Development Initiative<br/>https://hiacdi.org<br/>hiacditechhub@gmail.com",
+      ]),
+    ].join(""),
   });
 
   return { subject, text, html };
 }
 
 function saveCopy(record) {
-  const dir = dirname(storePath);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
-  const current = existsSync(storePath) ? JSON.parse(readFileSync(storePath, "utf8") || "[]") : [];
-  current.push({ ...record, sentAt: new Date().toISOString() });
-  writeFileSync(storePath, JSON.stringify(current, null, 2));
+  try {
+    const dir = dirname(storePath);
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    const current = existsSync(storePath) ? JSON.parse(readFileSync(storePath, "utf8") || "[]") : [];
+    current.push({ ...record, sentAt: new Date().toISOString() });
+    writeFileSync(storePath, JSON.stringify(current, null, 2));
+  } catch (error) {
+    console.error("Could not save verification email copy:", error.message);
+  }
 }
 
-export async function sendMail({ to, subject, text, html, attachments }) {
+export async function sendMail({ to, subject, text, html, attachments, fromName }) {
   const host = process.env.SMTP_HOST;
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
@@ -164,15 +215,24 @@ export async function sendMail({ to, subject, text, html, attachments }) {
       disableFileAccess: true,
       disableUrlAccess: true,
     });
+    const logoContent = useEmbeddedLogo() ? emailLogoContent() : null;
+    const allAttachments = [
+      // filename:false on purpose: a named inline part makes Gmail show an
+      // attachment chip below the message even though the image is embedded.
+      ...(logoContent
+        ? [{ content: logoContent, contentType: "image/png", filename: false, cid: EMAIL_LOGO_CID, contentDisposition: "inline" }]
+        : []),
+      ...(attachments || []),
+    ];
     await transporter.sendMail({
-      from: `HassAz Tech Hub <${fromAddress}>`,
+      from: `${fromName || "HIACDI Tech Hub"} <${fromAddress}>`,
       to,
       subject,
       text,
       ...(html ? { html } : {}),
-      ...(attachments?.length
+      ...(allAttachments.length
         ? {
-            attachments: attachments.map((item) => ({
+            attachments: allAttachments.map((item) => ({
               ...item,
               contentDisposition: item.contentDisposition || "attachment",
             })),
@@ -186,34 +246,61 @@ export async function sendMail({ to, subject, text, html, attachments }) {
   }
 }
 
-export function applicationReceivedLetter({ fullName, program, applicationNumber }) {
-  const subject = `We've received your application for ${program}: HassAz Tech Hub`;
+function bookingPageUrl() {
+  const configured = String(process.env.PUBLIC_URL || process.env.FRONTEND_URL || "").replace(/\/$/, "");
+  const base = configured || "https://hiacdi.org";
+  return `${base}/?book=1`;
+}
+
+export function applicationReceivedLetter({ fullName, program, applicationNumber, bookUrl }) {
+  const first = firstName(fullName);
+  const course = program || "your selected program";
+  const link = bookUrl || bookingPageUrl();
+  const subject = `[HIACDI]: Next Steps in Your ${course} Application`;
   const text = [
-    `Dear ${firstName(fullName)},`,
+    `Hello ${first},`,
     "",
-    `Thank you for applying to HassAz Tech Hub! We're glad to confirm we have received your application for the ${program}.`,
+    `Thank you for applying to the ${course} at HIACDI Tech Hub — we’re thrilled to have you take the first step toward an exciting future in technology!`,
     "",
     `Application number: ${applicationNumber}`,
     "",
-    "Our admissions team will review your application and get back to you soon with the outcome.",
+    "The next stage in your application process is an online discovery call with our Admissions Team. This is an opportunity for us to learn more about your learning goals, your background, and how you fit into the program.",
     "",
-    `If you have any questions, feel free to reach us at ${contactEmail} or ${contactPhone}.`,
+    "Please go through the details below and book your discovery call:",
     "",
-    "Warm regards,",
-    "HassAz Tech Hub Team",
+    "Duration: 45 minutes",
+    "Platform: Online (Google Meet link provided upon booking)",
+    "Time Zone: East African Time (EAT) — be sure to set your calendar to the correct time zone to avoid confusion.",
+    `Book your session here: ${link}`,
+    "",
+    "Pro Tip: Arrive on time and find a quiet space with a stable internet connection so we can have a smooth conversation!",
+    "",
+    `For any questions or concerns about your admissions status, please send an email to ${contactEmail} or call / WhatsApp us at ${contactPhone}. We’re here to help!`,
+    "",
+    "Warmly,",
+    "HIACDI Admissions Team",
   ].join("\n");
 
   const html = wrapHtml({
-    bodyHtml: paragraphs([
-      `Dear <strong>${firstName(fullName)}</strong>,`,
-      "Thank you for applying to HassAz Tech Hub! We're glad to confirm we have received your application for the <strong>" +
-        program +
-        "</strong>.",
-      `<strong>Application number:</strong> ${applicationNumber}`,
-      "Our admissions team will review your application and get back to you soon with the outcome.",
-      `If you have any questions, feel free to reach us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
-      "Warm regards,<br/>HassAz Tech Hub Team",
-    ]),
+    bodyHtml: [
+      paragraphs([
+        `Hello <strong>${first}</strong>,`,
+        `Thank you for applying to the <strong>${course}</strong> at HIACDI Tech Hub — we’re thrilled to have you take the first step toward an exciting future in technology!`,
+        `<strong>Application number:</strong> ${applicationNumber}`,
+        "The next stage in your application process is an online discovery call with our Admissions Team. This is an opportunity for us to learn more about your learning goals, your background, and how you fit into the program.",
+        "Please go through the details below and book your discovery call:",
+        "<strong>Duration:</strong> 45 minutes<br/><strong>Platform:</strong> Online (Google Meet link provided upon booking)<br/><strong>Time Zone:</strong> East African Time (EAT) — be sure to set your calendar to the correct time zone to avoid confusion.",
+      ]),
+      `<p style="margin:22px 0 18px; text-align:center;">
+        <a href="${escapeHtml(link)}" style="display:inline-block; background:#0a2e6d; color:#ffffff; font-size:14px; font-weight:700; padding:13px 28px; border-radius:999px; text-decoration:none;">Book your session here</a>
+      </p>`,
+      `<p style="margin:0 0 14px; word-break:break-all; font-size:12px; line-height:1.6; color:#4b5563;">If the button does not open, use this link: <a href="${escapeHtml(link)}" style="color:#0a2e6d;">${escapeHtml(link)}</a></p>`,
+      paragraphs([
+        "Pro Tip: Arrive on time and find a quiet space with a stable internet connection so we can have a smooth conversation!",
+        `For any questions or concerns about your admissions status, please send an email to <strong>${contactEmail}</strong> or call / WhatsApp us at <strong>${contactPhone}</strong>. We’re here to help!`,
+        "Warmly,<br/>HIACDI Admissions Team",
+      ]),
+    ].join(""),
   });
 
   return { subject, text, html };
@@ -226,7 +313,7 @@ export function applicationApprovedLetter({ fullName, email, program, appliedAt 
     "",
     "We hope this email finds you in good spirits.",
     "",
-    `Congratulations on being selected for the HassAz Tech Hub ${program}! We are thrilled to have you join us.`,
+    `Congratulations on being selected for the HIACDI Tech Hub ${program}! We are thrilled to have you join us.`,
     "",
     "Account Details:",
     `Full Name: ${fullName}`,
@@ -238,18 +325,18 @@ export function applicationApprovedLetter({ fullName, email, program, appliedAt 
     "We are excited to have you on board and look forward to your participation!",
     "",
     "Warm regards,",
-    "HassAz Tech Hub Team",
+    "HIACDI Tech Hub Team",
   ].join("\n");
 
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${firstName(fullName)}</strong>,`,
       "We hope this email finds you in good spirits.",
-      `Congratulations on being selected for the HassAz Tech Hub <strong>${program}</strong>! We are thrilled to have you join us.`,
+      `Congratulations on being selected for the HIACDI Tech Hub <strong>${program}</strong>! We are thrilled to have you join us.`,
       `<strong>Account Details:</strong><br/>Full Name: ${fullName}<br/>Email: ${email}<br/>Date applied: ${formatDate(appliedAt)}`,
       `Our admissions team will be in touch shortly with the next steps to complete your enrollment. If you have any questions or need further assistance, please do not hesitate to contact us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
       "We are excited to have you on board and look forward to your participation!",
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
 
@@ -257,36 +344,36 @@ export function applicationApprovedLetter({ fullName, email, program, appliedAt 
 }
 
 export function applicationRejectedLetter({ fullName, program }) {
-  const subject = `Update on your HassAz Tech Hub application: ${program}`;
+  const subject = `Update on your HIACDI Tech Hub application: ${program}`;
   const text = [
     `Dear ${firstName(fullName)},`,
     "",
-    `Thank you for applying for the ${program} at HassAz Tech Hub and for taking the time to share your goals with us.`,
+    `Thank you for applying for the ${program} at HIACDI Tech Hub and for taking the time to share your goals with us.`,
     "",
     "After careful review, we regret to inform you that we are unable to offer you a place in this intake. This decision does not reflect your potential, and we encourage you to apply again in a future intake.",
     "",
     `If you have any questions, please reach out to us at ${contactEmail} or ${contactPhone}.`,
     "",
     "Warm regards,",
-    "HassAz Tech Hub Team",
+    "HIACDI Tech Hub Team",
   ].join("\n");
 
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${firstName(fullName)}</strong>,`,
-      `Thank you for applying for the <strong>${program}</strong> at HassAz Tech Hub and for taking the time to share your goals with us.`,
+      `Thank you for applying for the <strong>${program}</strong> at HIACDI Tech Hub and for taking the time to share your goals with us.`,
       "After careful review, we regret to inform you that we are unable to offer you a place in this intake. This decision does not reflect your potential, and we encourage you to apply again in a future intake.",
       `If you have any questions, please reach out to us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
 
   return { subject, text, html };
 }
 
-export async function sendApplicationReceivedEmail({ to, fullName, program, applicationNumber }) {
-  const letter = applicationReceivedLetter({ fullName, program, applicationNumber });
-  const outcome = await sendMail({ to, ...letter });
+export async function sendApplicationReceivedEmail({ to, fullName, program, applicationNumber, bookUrl }) {
+  const letter = applicationReceivedLetter({ fullName, program, applicationNumber, bookUrl });
+  const outcome = await sendMail({ to, fromName: "HIACDI Admissions", ...letter });
   return { emailed: outcome.emailed, letter };
 }
 
@@ -322,29 +409,29 @@ function addDaysToBookingDate(dateStr, days) {
 export function bookingConfirmedLetter({ name, date, time, timezone }) {
   const formattedDate = formatBookingDate(date);
   const nextWeekDate = addDaysToBookingDate(date, 7);
-  const subject = "Your call with HassAz Tech Hub is booked";
+  const subject = "Your call with HIACDI Tech Hub is booked";
   const text = [
     `Dear ${firstName(name)},`,
     "",
-    `This confirms your call with HassAz Tech Hub is booked for ${formattedDate} at ${time} (${timezone || "Africa/Nairobi"}).`,
+    `This confirms your call with HIACDI Tech Hub is booked for ${formattedDate} at ${time} (${timezone || "Africa/Nairobi"}).`,
     "",
     `Please make sure you are available at this exact day and time. This is a recurring weekly slot, so kindly also keep ${nextWeekDate} at ${time} free for the following session.`,
     "",
     `If you need to reschedule, contact us at ${contactEmail} or ${contactPhone}.`,
     "",
     "Warm regards,",
-    "HassAz Tech Hub Team",
+    "HIACDI Tech Hub Team",
   ].join("\n");
 
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${firstName(name)}</strong>,`,
-      `This confirms your call with HassAz Tech Hub is booked for <strong>${formattedDate} at ${time} (${
+      `This confirms your call with HIACDI Tech Hub is booked for <strong>${formattedDate} at ${time} (${
         timezone || "Africa/Nairobi"
       })</strong>.`,
       `Please make sure you are available at this exact day and time. This is a recurring weekly slot, so kindly also keep <strong>${nextWeekDate} at ${time}</strong> free for the following session.`,
       `If you need to reschedule, contact us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
 
@@ -359,11 +446,11 @@ export async function sendBookingConfirmationEmail({ to, name, date, time, timez
 
 export function bookingApprovedLetter({ name, date, time, timezone }) {
   const formattedDate = formatBookingDate(date);
-  const subject = "Your call with HassAz Tech Hub is approved!";
+  const subject = "Your call with HIACDI Tech Hub is approved!";
   const text = [
     `Dear ${firstName(name)},`,
     "",
-    `Congratulations! Your call with HassAz Tech Hub on ${formattedDate} at ${time} (${
+    `Congratulations! Your call with HIACDI Tech Hub on ${formattedDate} at ${time} (${
       timezone || "Africa/Nairobi"
     }) has been approved and confirmed.`,
     "",
@@ -372,18 +459,18 @@ export function bookingApprovedLetter({ name, date, time, timezone }) {
     `If you have any questions, contact us at ${contactEmail} or ${contactPhone}.`,
     "",
     "Warm regards,",
-    "HassAz Tech Hub Team",
+    "HIACDI Tech Hub Team",
   ].join("\n");
 
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${firstName(name)}</strong>,`,
-      `Congratulations! Your call with HassAz Tech Hub on <strong>${formattedDate} at ${time} (${
+      `Congratulations! Your call with HIACDI Tech Hub on <strong>${formattedDate} at ${time} (${
         timezone || "Africa/Nairobi"
       })</strong> has been approved and confirmed.`,
       "We look forward to speaking with you. Please be online and ready a few minutes before the scheduled time.",
       `If you have any questions, contact us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
 
@@ -392,7 +479,7 @@ export function bookingApprovedLetter({ name, date, time, timezone }) {
 
 export function bookingRejectedLetter({ name, date, time, timezone }) {
   const formattedDate = formatBookingDate(date);
-  const subject = "Update on your HassAz Tech Hub call booking";
+  const subject = "Update on your HIACDI Tech Hub call booking";
   const text = [
     `Dear ${firstName(name)},`,
     "",
@@ -405,7 +492,7 @@ export function bookingRejectedLetter({ name, date, time, timezone }) {
     `If you have any questions, contact us at ${contactEmail} or ${contactPhone}.`,
     "",
     "Warm regards,",
-    "HassAz Tech Hub Team",
+    "HIACDI Tech Hub Team",
   ].join("\n");
 
   const html = wrapHtml({
@@ -416,7 +503,7 @@ export function bookingRejectedLetter({ name, date, time, timezone }) {
       })</strong> at this time.`,
       "Please book another time that works for you, and our team will be happy to speak with you then.",
       `If you have any questions, contact us at <a href="mailto:${contactEmail}" style="color:#0a2e6d;">${contactEmail}</a> or ${contactPhone}.`,
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
 
@@ -435,25 +522,123 @@ export async function sendBookingRejectedEmail({ to, name, date, time, timezone 
   return { emailed: outcome.emailed, letter };
 }
 
-export async function sendVerificationResultEmail({ to, verified, fullName, program }) {
-  const letter = verified ? verifiedResultLetter() : notVerifiedResultLetter();
+export async function sendVerificationResultEmail({ to, verified, fullName, holderName, program, certificateId }) {
+  const letter = verified
+    ? verifiedResultLetter({ fullName, holderName, program, certificateId })
+    : notVerifiedResultLetter({ fullName });
   const outcome = await sendMail({
     to,
     subject: letter.subject,
     text: letter.text,
     html: letter.html,
   });
-  saveCopy({ to, ...letter, fullName, program, verified });
+  saveCopy({ to, ...letter, fullName, program, verified, kind: "verification-result" });
+  return { emailed: outcome.emailed, letter };
+}
+
+// Verification emails are sent one at a time in the background. This keeps the
+// verification response instant, avoids opening many parallel SMTP connections
+// when several certificates are verified at once, and serializes the saved-copy
+// file writes. Failures are logged, never thrown back to the visitor.
+let verificationEmailQueue = Promise.resolve();
+
+export function queueVerificationResultEmail(payload) {
+  verificationEmailQueue = verificationEmailQueue
+    .then(() => sendVerificationResultEmail(payload))
+    .catch((error) => {
+      console.error("Queued verification email failed:", error?.message || error);
+    });
+  return { emailed: true };
+}
+
+export async function sendVerificationAdminEmail({ fullName, email, certificateId, verified, program }) {
+  const to = String(process.env.CONTACT_NOTIFY_EMAIL || contactEmail).trim();
+  if (!to) return { emailed: false };
+  const outcomeLabel = verified ? "VERIFIED" : "NOT VERIFIED";
+  const when = new Date().toLocaleString();
+  const subject = `Certificate verification: ${outcomeLabel} - ${fullName || email}`;
+  const text = [
+    "A certificate verification was just submitted on the website.",
+    "",
+    `Outcome: ${outcomeLabel}`,
+    `Name entered: ${fullName || "-"}`,
+    `Email entered: ${email || "-"}`,
+    certificateId ? `Certificate ID entered: ${certificateId}` : "",
+    verified && program ? `Matched program: ${program}` : "",
+    `Time: ${when}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  const html = wrapHtml({
+    bodyHtml: paragraphs([
+      "A certificate verification was just submitted on the website.",
+      `<strong>Outcome:</strong> ${outcomeLabel}`,
+      `<strong>Name entered:</strong> ${fullName || "-"}`,
+      `<strong>Email entered:</strong> ${email || "-"}`,
+      ...(certificateId ? [`<strong>Certificate ID entered:</strong> ${certificateId}`] : []),
+      ...(verified && program ? [`<strong>Matched program:</strong> ${program}`] : []),
+      `<strong>Time:</strong> ${when}`,
+    ]),
+  });
+  const result = await sendMail({ to, subject, text, html });
+  return { emailed: result.emailed };
+}
+
+export function verificationLinkLetter({ fullName, verifyUrl }) {
+  const subject = "Verify your certificate: HIACDI Tech Hub";
+  const text = [
+    `Dear ${firstName(fullName)},`,
+    "",
+    "We received a request to verify a HIACDI Tech Hub certificate using this email address.",
+    "",
+    "To view the verification result, open this secure link (it expires in 24 hours):",
+    verifyUrl,
+    "",
+    "If you did not request this, you can safely ignore this email.",
+    "",
+    "Kind regards,",
+    "HIACDI Tech Hub",
+    "Humanity, Inclusion & Advancement Community Development Initiative",
+  ].join("\n");
+
+  const html = wrapHtml({
+    bodyHtml: [
+      paragraphs([
+        `Dear <strong>${firstName(fullName)}</strong>,`,
+        "We received a request to verify a <strong>HIACDI Tech Hub</strong> certificate using this email address.",
+        "To view the verification result, open the secure link below. It expires in <strong>24 hours</strong>.",
+      ]),
+      `<p style="margin:22px 0; text-align:center;">
+        <a href="${escapeHtml(verifyUrl)}" style="display:inline-block; background:#0a2e6d; color:#ffffff; font-size:14px; font-weight:700; padding:13px 28px; border-radius:999px; text-decoration:none;">View verification result</a>
+      </p>`,
+      paragraphs([
+        "If the button does not work, copy and paste this link into your browser:",
+      ]),
+      `<p style="margin:0 0 14px; word-break:break-all; font-size:12px; line-height:1.6;"><a href="${escapeHtml(verifyUrl)}" style="color:#0a2e6d;">${escapeHtml(verifyUrl)}</a></p>`,
+      paragraphs([
+        "If you did not request this, you can safely ignore this email.",
+        "Kind regards,<br/><strong>HIACDI Tech Hub</strong><br/>Humanity, Inclusion &amp; Advancement Community Development Initiative",
+      ]),
+    ].join(""),
+  });
+
+  return { subject, text, html };
+}
+
+export async function sendVerificationLinkEmail({ to, fullName, verifyUrl }) {
+  const letter = verificationLinkLetter({ fullName, verifyUrl });
+  const outcome = await sendMail({ to, ...letter });
+  saveCopy({ to, ...letter, fullName, kind: "verification-link" });
   return { emailed: outcome.emailed, letter };
 }
 
 function brandedLetter({ subject, greeting, lines }) {
-  const text = [`Dear ${greeting},`, "", ...lines, "", "Warm regards,", "HassAz Tech Hub Team"].join("\n");
+  const text = [`Dear ${greeting},`, "", ...lines, "", "Warm regards,", "HIACDI Tech Hub Team"].join("\n");
   const html = wrapHtml({
     bodyHtml: paragraphs([
       `Dear <strong>${greeting}</strong>,`,
       ...lines,
-      "Warm regards,<br/>HassAz Tech Hub Team",
+      "Warm regards,<br/>HIACDI Tech Hub Team",
     ]),
   });
   return { subject, text, html };
@@ -461,10 +646,10 @@ function brandedLetter({ subject, greeting, lines }) {
 
 export async function sendWelcomeEmail({ to, fullName }) {
   const letter = brandedLetter({
-    subject: "Welcome to HassAz Tech Hub",
+    subject: "Welcome to HIACDI Tech Hub",
     greeting: firstName(fullName),
     lines: [
-      "Your HassAz Tech Hub account has been created successfully.",
+      "Your HIACDI Tech Hub account has been created successfully.",
       "You can now log in, browse courses, and register when an intake is open.",
       `If you need help, write to ${contactEmail} or call ${contactPhone}.`,
     ],
@@ -475,10 +660,10 @@ export async function sendWelcomeEmail({ to, fullName }) {
 
 export async function sendDuplicateApplicationEmail({ to, fullName, applicationNumber, status }) {
   const letter = brandedLetter({
-    subject: "Application already exists: HassAz Tech Hub",
+    subject: "Application already exists: HIACDI Tech Hub",
     greeting: firstName(fullName) || "Student",
     lines: [
-      "We found a previous HassAz Tech Hub application linked to this email address or phone number.",
+      "We found a previous HIACDI Tech Hub application linked to this email address or phone number.",
       applicationNumber ? `Your existing application number is ${applicationNumber}.` : "Your previous application is still on file.",
       status ? `Current status: ${status}.` : "",
       "A new application was not created.",
@@ -492,10 +677,10 @@ export async function sendDuplicateApplicationEmail({ to, fullName, applicationN
 
 export async function sendPasswordResetEmail({ to, fullName, resetUrl }) {
   const letter = brandedLetter({
-    subject: "Reset your HassAz Tech Hub password",
+    subject: "Reset your HIACDI Tech Hub password",
     greeting: firstName(fullName) || "Student",
     lines: [
-      "We received a request to reset the password for this HassAz Tech Hub account.",
+      "We received a request to reset the password for this HIACDI Tech Hub account.",
       `Open this link to choose a new password (it expires in 1 hour): ${resetUrl}`,
       "If you did not ask for this, you can ignore this email. Your current password will stay the same.",
     ],
@@ -506,7 +691,7 @@ export async function sendPasswordResetEmail({ to, fullName, resetUrl }) {
 
 export async function sendPasswordChangedEmail({ to, fullName }) {
   const letter = brandedLetter({
-    subject: "Your HassAz Tech Hub password was updated",
+    subject: "Your HIACDI Tech Hub password was updated",
     greeting: firstName(fullName) || "Student",
     lines: [
       "Your password has been updated successfully.",
@@ -520,11 +705,11 @@ export async function sendPasswordChangedEmail({ to, fullName }) {
 
 export async function sendEnrollmentEmail({ to, fullName, programTitle }) {
   const letter = brandedLetter({
-    subject: `You are registered for ${programTitle}: HassAz Tech Hub`,
+    subject: `You are registered for ${programTitle}: HIACDI Tech Hub`,
     greeting: firstName(fullName),
     lines: [
       `You have successfully registered for ${programTitle}.`,
-      "A confirmation is on file with HassAz Tech Hub. Our team will share the next steps for this course.",
+      "A confirmation is on file with HIACDI Tech Hub. Our team will share the next steps for this course.",
       `Questions? ${contactEmail} · ${contactPhone}`,
     ],
   });
@@ -534,10 +719,10 @@ export async function sendEnrollmentEmail({ to, fullName, programTitle }) {
 
 export async function sendContactAcknowledgementEmail({ to, fullName, subject }) {
   const letter = brandedLetter({
-    subject: "We received your message: HassAz Tech Hub",
+    subject: "We received your message: HIACDI Tech Hub",
     greeting: firstName(fullName) || "there",
     lines: [
-      "Thank you for contacting HassAz Tech Hub. We have received your message and will reply as soon as we can.",
+      "Thank you for contacting HIACDI Tech Hub. We have received your message and will reply as soon as we can.",
       subject ? `Subject: ${subject}` : "",
       `You can also reach us at ${contactEmail} or ${contactPhone}.`,
     ].filter(Boolean),
@@ -549,18 +734,18 @@ export async function sendContactAcknowledgementEmail({ to, fullName, subject })
 export async function sendContactDecisionEmail({ to, fullName, subject, approved }) {
   const letter = brandedLetter({
     subject: approved
-      ? "Your message has been approved: HassAz Tech Hub"
-      : "Update on your HassAz Tech Hub enquiry",
+      ? "Your message has been approved: HIACDI Tech Hub"
+      : "Update on your HIACDI Tech Hub enquiry",
     greeting: firstName(fullName) || "there",
     lines: approved
       ? [
-          "Thank you for contacting HassAz Tech Hub. Your message has been reviewed and approved.",
+          "Thank you for contacting HIACDI Tech Hub. Your message has been reviewed and approved.",
           subject ? `Subject: ${subject}` : "",
           "Our team will follow up with you shortly.",
           `If you need anything else, write to ${contactEmail} or call ${contactPhone}.`,
         ].filter(Boolean)
       : [
-          "Thank you for contacting HassAz Tech Hub. We have reviewed your message.",
+          "Thank you for contacting HIACDI Tech Hub. We have reviewed your message.",
           subject ? `Subject: ${subject}` : "",
           "After review, we are unable to proceed with this enquiry at this time.",
           `If you have questions, contact us at ${contactEmail} or ${contactPhone}.`,
@@ -577,13 +762,13 @@ export async function sendBroadcastEmail({ to, fullName, subject, message, flyer
     String(value || "")
       .replace(/\{\{\s*fullName\s*\}\}/gi, name)
       .replace(/\{\{\s*firstName\s*\}\}/gi, first);
-  const safeSubject = fill(subject).trim() || "Message from HassAz Tech Hub";
+  const safeSubject = fill(subject).trim() || "Message from HIACDI Tech Hub";
   const safeText = fill(message).trim();
   const alreadyGreeted = /^\s*dear\s/i.test(safeText);
   const greetingLine = alreadyGreeted ? "" : `Dear ${name},`;
   const courseLine = programTitle ? `This update is for students registered on ${programTitle}.` : "";
   const kindMeta = broadcastKind(kind);
-  const text = [kindMeta.label, greetingLine, safeText, courseLine, "Warm regards,", "HassAz Tech Hub Academic Team"]
+  const text = [kindMeta.label, greetingLine, safeText, courseLine, "Warm regards,", "HIACDI Tech Hub Academic Team"]
     .filter(Boolean)
     .join("\n\n");
   const flyerHtml = flyer?.cid
@@ -606,12 +791,12 @@ export async function sendBroadcastEmail({ to, fullName, subject, message, flyer
             programTitle
           )}</strong>.</p>`
         : "",
-      paragraphs(["Warm regards,<br/><strong>HassAz Tech Hub Academic Team</strong>"]),
+      paragraphs(["Warm regards,<br/><strong>HIACDI Tech Hub Academic Team</strong>"]),
     ].join(""),
   });
   return sendMail({
     to,
-    subject: `${safeSubject}: HassAz Tech Hub`,
+    subject: `${safeSubject}: HIACDI Tech Hub`,
     text,
     html,
     attachments: flyer?.content ? [flyer] : undefined,

@@ -26,6 +26,7 @@ const applicationSchema = new mongoose.Schema(
     documents: { type: Object, default: {} },
     source: { type: String, default: "" },
     consent: { type: Object, default: {} },
+    assessment: { type: Object, default: {} },
     reviewedAt: { type: Date, default: null },
     userId: { type: String, default: "" },
     emailKey: { type: String, default: "" },

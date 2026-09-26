@@ -77,7 +77,7 @@ export default function Login() {
       />
       {error ? <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p> : null}
       <p className="mt-5 text-center text-sm text-muted">
-        New to HassAz Tech Hub?{" "}
+        New to HIACDI Tech Hub?{" "}
         <Link to={`/register?next=${encodeURIComponent(next)}`} className="font-semibold text-gold">
           Sign Up
         </Link>

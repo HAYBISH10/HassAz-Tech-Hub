@@ -51,7 +51,7 @@ export default function Contact() {
     <div>
       <PageHero
         eyebrow="Get in touch"
-        title="Contact HassAz Tech Hub"
+        title="Contact HIACDI Tech Hub"
         text="Questions about a course, a partnership, or anything else? Send us a message and the team will get back to you."
       />
 
@@ -81,6 +81,7 @@ export default function Contact() {
                 <span className="mb-1 block text-sm font-semibold text-navy">Full name</span>
                 <input
                   className={inputClass}
+                  placeholder="Enter your full name"
                   value={form.fullName}
                   onChange={(e) => set("fullName", e.target.value)}
                   autoComplete="name"
@@ -92,6 +93,7 @@ export default function Contact() {
                 <input
                   type="email"
                   className={inputClass}
+                  placeholder="Enter your email address"
                   value={form.email}
                   onChange={(e) => set("email", e.target.value)}
                   autoComplete="email"
@@ -102,6 +104,7 @@ export default function Contact() {
                 <span className="mb-1 block text-sm font-semibold text-navy">Phone number</span>
                 <input
                   className={inputClass}
+                  placeholder="Enter your phone number"
                   value={form.phone}
                   onChange={(e) => set("phone", e.target.value)}
                   autoComplete="tel"
@@ -110,17 +113,27 @@ export default function Contact() {
               </label>
               <label className="block">
                 <span className="mb-1 block text-sm font-semibold text-navy">Subject</span>
-                <input
+                <select
                   className={inputClass}
                   value={form.subject}
                   onChange={(e) => set("subject", e.target.value)}
                   required
-                />
+                >
+                  <option value="">Select a subject</option>
+                  <option>Admissions / application</option>
+                  <option>Courses and fees</option>
+                  <option>Certificate verification</option>
+                  <option>Partnership / corporate</option>
+                  <option>Careers</option>
+                  <option>Technical support</option>
+                  <option>Other</option>
+                </select>
               </label>
               <label className="block">
                 <span className="mb-1 block text-sm font-semibold text-navy">Message</span>
                 <textarea
                   className={`${inputClass} min-h-32`}
+                  placeholder="Enter your message"
                   value={form.message}
                   onChange={(e) => set("message", e.target.value)}
                   required

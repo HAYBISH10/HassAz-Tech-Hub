@@ -339,7 +339,7 @@ function TabButton({ active, onClick, children }) {
 function GraduateCard({ item, onAskDelete }) {
   const verifyUrl = useMemo(() => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
-    return `${origin}/verify?cert=${encodeURIComponent(item.certificateId)}`;
+    return `${origin}/verify/${encodeURIComponent(item.certificateId)}`;
   }, [item.certificateId]);
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(verifyUrl)}`;
 

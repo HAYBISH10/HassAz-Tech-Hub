@@ -45,7 +45,7 @@ router.post("/", requireUser, async (req, res) => {
   const windowStatus = resolveCourseWindow(await getWindowValue(), categorySlug, programSlug);
   if (!windowStatus.isOpen) {
     return res.status(403).json({
-      message: "This course is not open for registration. Kindly contact the Academic Director for HassAz Tech Hub.",
+      message: "This course is not open for registration. Kindly contact the Academic Director for HIACDI Tech Hub.",
       window: { isOpen: false, reason: windowStatus.reason || "" },
     });
   }

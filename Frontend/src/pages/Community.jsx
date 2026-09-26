@@ -8,7 +8,7 @@ const items = [
   },
   {
     title: "Talks and workshops",
-    text: "Short sessions on software, data, security, AI, and careers, open to learners and the wider HassAz circle.",
+    text: "Short sessions on software, data, security, AI, and careers, open to learners and the wider HIACDI circle.",
   },
   {
     title: "Career studio",
@@ -20,9 +20,9 @@ export default function Community() {
   return (
     <div>
       <PageHero
-        eyebrow="HassAz Community"
+        eyebrow="HIACDI Community"
         title="A hub for people who learn, build, and stay in the craft"
-        text="Stay close to bootcamps, workshops, talks, and career events. HassAz is a place to practise with other digital innovators, not only a classroom you leave at the end of a module."
+        text="Stay close to bootcamps, workshops, talks, and career events. HIACDI is a place to practise with other digital innovators, not only a classroom you leave at the end of a module."
       />
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
         <div className="grid gap-5 md:grid-cols-3">

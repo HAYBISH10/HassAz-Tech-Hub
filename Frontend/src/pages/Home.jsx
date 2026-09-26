@@ -170,7 +170,7 @@ function CommunityBanner() {
   return (
     <section className="bg-soft px-4 py-12 text-center sm:px-6 sm:py-20">
       <h2 className="font-heading mx-auto max-w-4xl text-2xl font-bold text-navy sm:text-3xl md:text-4xl">
-        Join #HassAz Community of Innovators and Tech Leaders
+        Join #HIACDI Community of Innovators and Tech Leaders
       </h2>
       <p className="mx-auto mt-4 max-w-2xl text-sm text-navy/80 sm:mt-5 sm:text-base">
         Stay up to date with upcoming events, free learning materials, news and
@@ -180,7 +180,7 @@ function CommunityBanner() {
         to="/community"
         className="mt-6 inline-flex rounded-full bg-gold px-6 py-3 font-semibold text-white sm:mt-8 sm:px-8"
       >
-        HassAz Community
+        HIACDI Community
       </Link>
     </section>
   );
@@ -196,7 +196,7 @@ function Testimonials() {
         <article className="flex flex-col items-center gap-5 rounded-2xl bg-navy-dark p-5 text-white sm:p-8 md:flex-row md:items-center md:gap-6">
           <div className="flex-1">
             <p className="text-sm leading-7 text-white/90 sm:text-base sm:leading-8">
-              HassAz Tech Hub is built so learners do not only attend class.
+              HIACDI Tech Hub is built so learners do not only attend class.
               They practise, build, and leave with work they can show. That is
               the standard we hold for every program.
             </p>
@@ -204,7 +204,7 @@ function Testimonials() {
             <p className="text-sm text-white/70">Learn. Build. Innovate.</p>
           </div>
           <img
-            src="/brand/logo-mark.png?v=2"
+            src="/brand/logo-mark.png?v=3"
             alt=""
             className="h-20 w-20 rounded-full object-contain sm:h-28 sm:w-28"
           />
@@ -295,7 +295,7 @@ function StayUpdated() {
           ))}
         </div>
         <form onSubmit={handleSubmit} className="rounded-2xl bg-navy-dark p-5 text-white sm:p-8">
-          <h2 className="font-heading text-2xl font-bold sm:text-3xl">Stay Updated with HassAz</h2>
+          <h2 className="font-heading text-2xl font-bold sm:text-3xl">Stay Updated with HIACDI</h2>
           <p className="mt-2 text-sm text-white/80">
             Get learning resources, event invites, and important updates.
           </p>
@@ -327,8 +327,11 @@ function StayUpdated() {
               className="w-full rounded-md bg-white px-4 py-3 text-ink"
             >
               <option value="">Which of these best describes you?</option>
-              <option>Student</option>
+              <option>Primary school learner</option>
+              <option>Secondary school learner</option>
+              <option>Graduate</option>
               <option>Working professional</option>
+              <option>Anyone with a passion to learn tech</option>
               <option>Organization / partner</option>
             </select>
             <fieldset>

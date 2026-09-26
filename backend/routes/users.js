@@ -6,7 +6,7 @@ const router = Router();
 
 function learnerAccountsClosed(_req, res) {
   return res.status(410).json({
-    message: "HassAz Tech Hub does not use public learner accounts. Apply for a bootcamp from the Apply page.",
+    message: "HIACDI Tech Hub does not use public learner accounts. Apply for a bootcamp from the Apply page.",
   });
 }
 

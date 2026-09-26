@@ -43,7 +43,21 @@ export default function Hero({ onBook }) {
       />
       <div className="relative z-10 mx-auto w-full max-w-4xl px-4 pt-12 pb-20 text-center sm:px-6 sm:pt-20 sm:pb-16">
         <p className="min-h-[1.6em] font-heading text-lg font-bold text-gold sm:text-2xl">
-          <Typewriter text="Welcome to HassAz Tech Hub" />
+          <span className="text-navy">Welcome</span> To:{" "}
+          <Typewriter
+            segments={[
+              { text: "HIA", className: "text-navy" },
+              { text: " Community ", className: "" },
+              { text: "Development", className: "text-navy" },
+              { text: " Initiative ", className: "" },
+              { text: "Tech", className: "text-navy" },
+              { text: " Hub", className: "" },
+            ]}
+            typingSpeed={100}
+            deletingSpeed={50}
+            pauseAfterType={1000}
+            pauseAfterDelete={600}
+          />
         </p>
         <h1 className="mt-2 font-heading text-[1.7rem] leading-tight font-bold text-navy sm:text-4xl md:text-5xl">
           {hero.title}

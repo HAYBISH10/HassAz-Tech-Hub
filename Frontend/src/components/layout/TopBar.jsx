@@ -3,9 +3,9 @@ import Countdown from "../ui/Countdown";
 import ApplyCta from "../ui/ApplyCta";
 import { useApplicationWindow } from "../../context/ApplicationWindowContext";
 
-const openMessage = "New intake alert! HassAz Tech Hub bootcamps are now open";
+const openMessage = "New intake alert! HIACDI Tech Hub bootcamps are now open";
 const closedMessage =
-  "New intake alert! HassAz Tech Hub bootcamps are now closed for Application Kindly Keep your eye on our Site";
+  "New intake alert! HIACDI Tech Hub bootcamps are now closed for Application Kindly Keep your eye on our Site";
 
 export default function TopBar() {
   const { isOpen, globalOpen, openAt, closeAt, reason, refresh, openSummary } = useApplicationWindow();

@@ -8,12 +8,12 @@ export default function Footer() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 sm:py-16 md:grid-cols-2 lg:grid-cols-3 lg:gap-10">
         <div>
           <img
-            src="/brand/logo-mark.png?v=2"
+            src="/brand/logo-mark.png?v=3"
             alt={site.name}
-            className="h-14 w-auto object-contain sm:h-16"
+            className="h-14 w-auto rounded-full bg-white object-contain p-1 sm:h-16"
           />
           <p className="mt-4 font-heading text-lg font-bold">
-            HassAz <span className="text-gold">TECH</span> HUB
+            HIACDI <span className="text-gold">TECH</span> HUB
           </p>
           <div className="mt-6 flex gap-3">
             {["Facebook", "LinkedIn", "X", "YouTube"].map((label) => (
@@ -69,7 +69,7 @@ export default function Footer() {
         <div className="md:col-span-2 lg:col-span-1">
           <div className="h-48 overflow-hidden rounded-md border border-white/10 bg-navy sm:h-56">
             <iframe
-              title="HassAz Tech Hub location"
+              title="HIACDI Tech Hub location"
               className="h-full w-full"
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"

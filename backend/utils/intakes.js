@@ -152,7 +152,7 @@ export function installmentOptions(offer) {
       {
         name: "Tuition payment",
         total: offer.fee || DEFAULT_FEE,
-        note: "Tuition is confirmed during admissions. Contact HassAz Tech Hub for the current intake plan.",
+        note: "Tuition is confirmed during admissions. Contact HIACDI Tech Hub for the current intake plan.",
         rows: [],
       },
     ];

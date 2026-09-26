@@ -1,4 +1,4 @@
-# HassAz Tech Hub
+# HIACDI Tech Hub
 
 MERN website: React + Tailwind CSS frontend, Node.js + Express + MongoDB backend.
 

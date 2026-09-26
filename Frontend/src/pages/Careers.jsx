@@ -29,7 +29,7 @@ export default function Careers() {
             Roles we welcome interest for
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
-            These are the kinds of people HassAz needs as we grow. Send a CV and a short note about
+            These are the kinds of people HIACDI needs as we grow. Send a CV and a short note about
             the craft you teach. We will reply when a seat is open.
           </p>
           <div className="mt-8 grid gap-4 md:grid-cols-2">
@@ -42,7 +42,7 @@ export default function Careers() {
             ))}
           </div>
           <a
-            href={`mailto:${site.email}?subject=HassAz Tech Hub career interest`}
+            href={`mailto:${site.email}?subject=HIACDI Tech Hub career interest`}
             className="mt-8 inline-flex rounded-full bg-navy px-6 py-3 text-sm font-semibold text-white hover:bg-navy-mid"
           >
             Write to {site.email}

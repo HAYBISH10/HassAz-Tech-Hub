@@ -1,3 +1,4 @@
+import "dotenv/config";
 import cors from "cors";
 import compression from "compression";
 import dotenv from "dotenv";
@@ -131,7 +132,7 @@ app.use("/api", (req, res, next) => {
 app.use("/api", rateLimit({ max: 400, windowMs: 15 * 60 * 1000, message: "Too many requests. Please wait a moment." }));
 
 app.get("/api/health", (_req, res) => {
-  res.json({ ok: true, name: "HassAz Tech Hub API" });
+  res.json({ ok: true, name: "HIACDI Tech Hub API" });
 });
 
 app.get("/api/public/email-logo.png", (_req, res) => {
@@ -166,7 +167,14 @@ if (existsSync(join(frontendDist, "index.html"))) {
       index: false,
       redirect: false,
       setHeaders(res, filePath) {
-        if (filePath.endsWith(".html")) res.setHeader("Cache-Control", "no-cache");
+        if (filePath.endsWith(".html")) {
+          res.setHeader("Cache-Control", "no-cache");
+          return;
+        }
+        // Vite emits content-hashed files under /assets — safe to cache forever.
+        if (/[\\/]assets[\\/]/.test(filePath) && isProduction()) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        }
       },
     })
   );
@@ -186,7 +194,7 @@ app.use((err, _req, res, _next) => {
 });
 
 app.listen(port, "0.0.0.0", () => {
-  console.log(`HassAz backend running on http://localhost:${port}`);
+  console.log(`HIACDI backend running on http://localhost:${port}`);
   connectDb().catch((error) => {
     if (isProduction()) {
       console.error("MongoDB connection failed:", error.message);

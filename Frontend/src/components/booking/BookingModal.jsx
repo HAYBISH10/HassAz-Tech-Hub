@@ -126,7 +126,7 @@ export default function BookingModal({ open, onClose }) {
               </span>
               <h3 className="font-heading mt-4 text-xl font-bold text-navy sm:text-2xl">Your call is booked!</h3>
               <p className="mt-3 text-sm leading-6 text-navy/80">
-                Thanks{confirmed.name ? `, ${confirmed.name.split(" ")[0]}` : ""}! Your call with HassAz Tech Hub is
+                Thanks{confirmed.name ? `, ${confirmed.name.split(" ")[0]}` : ""}! Your call with HIACDI Tech Hub is
                 confirmed for{" "}
                 <span className="font-semibold text-navy">
                   {formatFullDate(confirmed.date)} at {confirmed.time}

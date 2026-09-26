@@ -3,6 +3,14 @@ import { verifyToken } from "./sessions.js";
 
 const buckets = new Map();
 
+// Periodically drop stale buckets so the map never grows without bound.
+setInterval(() => {
+  const cutoff = Date.now() - 60 * 60 * 1000;
+  for (const [key, stamps] of buckets) {
+    if (!stamps.length || stamps[stamps.length - 1] < cutoff) buckets.delete(key);
+  }
+}, 10 * 60 * 1000).unref();
+
 export function rateLimit({ windowMs = 15 * 60 * 1000, max = 8, message } = {}) {
   return (req, res, next) => {
     if (verifyToken(extractToken(req), "admin")) return next();

@@ -39,7 +39,7 @@ export function ApplicationWindowProvider({ children }) {
   const load = useCallback(() => {
     fetchApplicationWindow()
       .then((data) => {
-        if (!activeRef.current) return;
+        if (!activeRef.current || !data) return;
         setState({
           isOpen: Boolean(data.displayDeadline?.isOpen ?? (data.anyOpen !== false && data.isOpen !== false)),
           anyOpen: data.anyOpen !== false,

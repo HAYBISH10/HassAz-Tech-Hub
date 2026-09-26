@@ -4,13 +4,13 @@ import { isProduction } from "./env.js";
 import { ADMIN_COOKIE, USER_COOKIE, clearAuthCookie, readCookie } from "./cookies.js";
 import { revokeToken, signToken, verifyToken } from "./sessions.js";
 
-const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "HassAz Tech Hub";
+const ADMIN_USERNAME = process.env.ADMIN_USERNAME || "HIACDI Tech Hub";
 const rawAdminPassword = String(process.env.ADMIN_PASSWORD || "").trim();
 const ADMIN_PASSWORD_HASH = rawAdminPassword
   ? bcrypt.hashSync(rawAdminPassword, 12)
   : isProduction()
     ? ""
-    : bcrypt.hashSync("HassAziHUb@008", 12);
+    : bcrypt.hashSync("HIACDIiHUb@008", 12);
 
 function timingEqual(left, right) {
   const a = Buffer.from(String(left));

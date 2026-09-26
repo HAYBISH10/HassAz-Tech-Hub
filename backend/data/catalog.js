@@ -29,14 +29,14 @@ function careerProgram(slug, title, summary, intro, careers, items) {
     details: [
       {
         title: "Who is this course for?",
-        body: "Beginners and career switchers who want practical, job-ready skills with guided practice at HassAz Tech Hub.",
+        body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
       },
       {
         title: "What are the course prerequisites?",
         body: "A laptop, basic computer use, and commitment to attend classes and complete assignments. No degree is required.",
       },
       {
-        title: "Why study at HassAz Tech Hub?",
+        title: "Why study at HIACDI Tech Hub?",
         body: "Live mentoring, hands-on labs, and a learning culture focused on building, not watching slides.",
       },
     ],
@@ -63,7 +63,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Career switchers, recent graduates, and working professionals who want a structured path into software engineering.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -74,7 +74,7 @@ const catalogData = [
             body: "Teams need people who can turn requirements into working software. This path is built around that craft.",
           },
           {
-            title: "Why study at HassAz Tech Hub?",
+            title: "Why study at HIACDI Tech Hub?",
             body: "Live mentoring, project reviews, and a learning culture focused on building, not watching slides.",
           },
         ],
@@ -109,7 +109,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Beginners, high-school leavers, and professionals testing whether software engineering is the right path.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -139,7 +139,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Developers, IT practitioners, and career starters who want to work on delivery and infrastructure.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -169,7 +169,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "IT, software, and operations learners targeting cloud and DevOps roles.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -199,7 +199,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Beginners, IT support staff, and entrepreneurs who want practical skills in repairing and maintaining computers.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -210,7 +210,7 @@ const catalogData = [
             body: "Every home, school, and office relies on working computers. Technicians who can diagnose and fix hardware and software issues are always in demand.",
           },
           {
-            title: "Why study at HassAz Tech Hub?",
+            title: "Why study at HIACDI Tech Hub?",
             body: "Hands-on lab practice with real components and machines, mentor-led troubleshooting sessions, and practical assessments, not theory alone.",
           },
         ],
@@ -277,7 +277,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Graduates and professionals who want a career in data, analytics, or applied ML.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -306,7 +306,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Beginners exploring data careers and professionals who need literacy in data workflows.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -327,7 +327,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Office professionals, graduates, and entrepreneurs who need to report and decide with data.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -348,7 +348,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Analysts and managers who own reporting, KPIs, or departmental dashboards.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -381,7 +381,7 @@ const catalogData = [
           },
           {
             title: "Who is this course for?",
-            body: "Beginners, IT support staff, and professionals who need a solid security foundation.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -392,7 +392,7 @@ const catalogData = [
             body: "Every organisation that uses digital systems needs people who can reduce risk and respond when something goes wrong.",
           },
           {
-            title: "Why study at HassAz Tech Hub?",
+            title: "Why study at HIACDI Tech Hub?",
             body: "Hands-on labs, mentor feedback, and a pathway from this introduction into the full Cybersecurity Bootcamp.",
           },
         ],
@@ -423,7 +423,7 @@ const catalogData = [
           },
           {
             title: "Who is this course for?",
-            body: "Committed beginners and IT professionals ready for an intensive, lab-heavy bootcamp.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -434,7 +434,7 @@ const catalogData = [
             body: "Demand continues for people who can protect organisations in Kenya and globally, from analysis to hands-on defence.",
           },
           {
-            title: "Why study at HassAz Tech Hub?",
+            title: "Why study at HIACDI Tech Hub?",
             body: "Project-based labs, mentor-led classes, and career studio time for resumes, portfolios, and interview practice.",
           },
         ],
@@ -505,7 +505,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Students, teachers, and professionals who want structured, ethical AI use in learning and work.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -526,7 +526,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Professionals and graduates who will use generative AI in daily work.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -547,7 +547,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Operators, founders, and analysts who want automation without a full engineering bootcamp.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -568,7 +568,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Marketers, entrepreneurs, and communicators who want practical AI in their toolkit.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -590,7 +590,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Developers and technical professionals ready to implement AI inside products.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -615,7 +615,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Practitioners who completed Applied AI Engineering or equivalent experience.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
         ],
         curriculum: [
@@ -645,7 +645,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "Compliance, legal, IT, and HR professionals who will own or support data protection.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",
@@ -691,7 +691,7 @@ const catalogData = [
         details: [
           {
             title: "Who is this course for?",
-            body: "High school students who want a serious but age-appropriate introduction to building with code.",
+            body: "This course is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
           },
           {
             title: "What are the course prerequisites?",

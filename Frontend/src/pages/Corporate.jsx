@@ -13,7 +13,7 @@ const offers = [
   },
   {
     title: "Talent pipelines",
-    text: "Hire from HassAz graduates who have been reviewed on real projects, or run a sponsored cohort for your organisation. You see the work, not only a CV.",
+    text: "Hire from HIACDI graduates who have been reviewed on real projects, or run a sponsored cohort for your organisation. You see the work, not only a CV.",
   },
   {
     title: "Digital solutions",
@@ -27,7 +27,7 @@ const pillars = [
     accent: "text-gold",
     image:
       "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
-    text: "HassAz trains people who can write software, analyse data, and ship work under review. Hire graduates, sponsor a cohort, or bring a team in for a focused upskilling block.",
+    text: "HIACDI trains people who can write software, analyse data, and ship work under review. Hire graduates, sponsor a cohort, or bring a team in for a focused upskilling block.",
   },
   {
     title: "Quality",
@@ -78,7 +78,7 @@ const steps = [
 const audiences = [
   {
     title: "Companies",
-    text: "Upskill engineers and analysts, reskill career-switchers already on payroll, or recruit from a HassAz cohort that has already been through project review.",
+    text: "Upskill engineers and analysts, reskill career-switchers already on payroll, or recruit from a HIACDI cohort that has already been through project review.",
   },
   {
     title: "Universities and colleges",
@@ -116,8 +116,8 @@ export default function Corporate() {
     <div>
       <PageHero
         eyebrow="Corporate & partners"
-        title="Train your people. Build a pipeline. Work with HassAz."
-        text="HassAz Tech Hub is the technology partner for organisations that need skilled people, not a brochure. We train corporate teams, help institutions stand up lasting labs, and connect employers to graduates who have already been reviewed on real projects."
+        title="Train your people. Build a pipeline. Work with HIACDI."
+        text="HIACDI Tech Hub is the technology partner for organisations that need skilled people, not a brochure. We train corporate teams, help institutions stand up lasting labs, and connect employers to graduates who have already been reviewed on real projects."
       />
 
       <section className="bg-white px-4 py-14 sm:px-6 sm:py-20">
@@ -127,7 +127,7 @@ export default function Corporate() {
             Close the skills gap with training that shows up in the work.
           </h2>
           <p className="mt-5 max-w-3xl text-sm leading-7 text-muted sm:text-base sm:leading-8">
-            HassAz bridges classroom practice and workplace delivery. Organisations come to us to upskill staff,
+            HIACDI bridges classroom practice and workplace delivery. Organisations come to us to upskill staff,
             reskill teams moving into software or data, hire from a known training standard, or run a sponsored
             cohort against a live problem. Learners build. Mentors review. You see the output.
           </p>
@@ -141,7 +141,7 @@ export default function Corporate() {
 
       <section className="bg-navy px-4 py-14 text-white sm:px-6 sm:py-20">
         <div className="mx-auto max-w-6xl">
-          <h2 className="font-heading text-center text-2xl font-bold sm:text-3xl">#WeAreHassAz</h2>
+          <h2 className="font-heading text-center text-2xl font-bold sm:text-3xl">#WeAreHIACDI</h2>
           <p className="mx-auto mt-3 max-w-2xl text-center text-sm leading-7 text-white/80">
             We train the next generation of builders through project-based learning, and we work with organisations
             that want the same standard for their people.
@@ -241,7 +241,7 @@ export default function Corporate() {
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
             <a
-              href={`mailto:${site.email}?subject=HassAz Tech Hub partnership`}
+              href={`mailto:${site.email}?subject=HIACDI Tech Hub partnership`}
               className="rounded-full bg-gold px-6 py-3 text-sm font-semibold text-navy hover:bg-gold-dark hover:text-white"
             >
               Write to {site.email}

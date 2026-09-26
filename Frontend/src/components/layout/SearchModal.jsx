@@ -40,7 +40,7 @@ export default function SearchModal({ open, onClose }) {
         />
         <div className="mt-4 max-h-72 space-y-2 overflow-auto text-sm">
           {!query.trim() ? (
-            <p className="text-muted">Type to search HassAz Tech Hub.</p>
+            <p className="text-muted">Type to search HIACDI Tech Hub.</p>
           ) : (
             <>
               {results.pages.map((page) => (

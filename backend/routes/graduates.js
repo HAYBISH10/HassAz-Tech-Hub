@@ -1,17 +1,22 @@
 import { Router } from "express";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
 import Graduate from "../models/Graduate.js";
 import { seedGraduates } from "../data/graduates.js";
-import { sendVerificationResultEmail } from "../utils/mail.js";
+import { queueVerificationResultEmail, sendVerificationAdminEmail } from "../utils/mail.js";
 import { certificateId, normalizeEmail, normalizeName } from "../utils/names.js";
+import { readVerification } from "../utils/verificationTokens.js";
 import { requireAdmin } from "../utils/auth.js";
 import { rateLimit } from "../utils/rateLimit.js";
 
 const storePath = join(dirname(fileURLToPath(import.meta.url)), "../data/graduates-store.json");
 const router = Router();
+
+// The graduate register is cached in memory and only re-read when the file
+// changes on disk, so verification requests stay fast even back to back.
+let localCache = { mtimeMs: 0, rows: null };
 
 function readLocal() {
   if (!existsSync(storePath)) {
@@ -19,8 +24,12 @@ function readLocal() {
     return seedGraduates;
   }
   try {
+    const { mtimeMs } = statSync(storePath);
+    if (localCache.rows && localCache.mtimeMs === mtimeMs) return localCache.rows;
     const rows = JSON.parse(readFileSync(storePath, "utf8") || "[]");
-    return rows.length ? rows : seedGraduates;
+    const result = rows.length ? rows : seedGraduates;
+    localCache = { mtimeMs, rows: result };
+    return result;
   } catch {
     return seedGraduates;
   }
@@ -30,6 +39,11 @@ function writeLocal(list) {
   const dir = dirname(storePath);
   if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
   writeFileSync(storePath, JSON.stringify(list, null, 2));
+  try {
+    localCache = { mtimeMs: statSync(storePath).mtimeMs, rows: list };
+  } catch {
+    localCache = { mtimeMs: 0, rows: list };
+  }
 }
 
 async function allGraduates() {
@@ -113,38 +127,86 @@ router.post("/", requireAdmin, async (req, res) => {
   }
 });
 
-router.post("/verify", rateLimit({ max: 8 }), async (req, res) => {
+router.post("/verify", rateLimit({ max: 80, windowMs: 15 * 60 * 1000 }), async (req, res) => {
   const fullName = String(req.body.fullName || "").trim();
   const email = String(req.body.email || "").trim();
   const cert = String(req.body.certificateId || "").trim();
 
   if (!fullName || !email) {
-    return res.status(400).json({ message: "Full name and email are required.", ok: false });
+    return res.status(400).json({ message: "Full name and email are required.", verified: false });
   }
 
   try {
     const list = await allGraduates();
     const match = findMatch(list, fullName, email, cert);
 
-    if (!match) {
-      // No matching graduate record: notify whoever submitted the form that this could not be
-      // verified, without exposing any graduate/certificate details.
-      const mail = await sendVerificationResultEmail({ to: email, verified: false });
-      return res.json({ ok: false, emailed: mail.emailed, message: mail.letter.text });
-    }
-
-    // Match found: notify the registered graduate email that verification succeeded, again,
-    // without echoing certificate/program details back in the response or the email body.
-    const mail = await sendVerificationResultEmail({
-      to: match.email,
-      verified: true,
-      fullName: match.fullName,
-      program: match.program,
+    // The student receives the result by email as well. It is queued in the
+    // background so the on-page answer stays instant even when many certificates
+    // are verified one after another. Staff get a separate notification.
+    queueVerificationResultEmail({
+      to: email,
+      verified: Boolean(match),
+      fullName,
+      holderName: match?.fullName,
+      program: match?.program,
+      certificateId: match?.certificateId || cert,
     });
+    sendVerificationAdminEmail({
+      fullName,
+      email,
+      certificateId: cert,
+      verified: Boolean(match),
+      program: match?.program,
+    }).catch(() => {});
 
-    return res.json({ ok: true, emailed: mail.emailed, message: mail.letter.text });
+    if (!match) {
+      return res.json({ verified: false, message: "Certificate Verification Failed.", emailed: true });
+    }
+    return res.json({
+      verified: true,
+      message: "Certificate Verified Successfully",
+      emailed: true,
+      certificate: {
+        fullName: match.fullName,
+        program: match.program,
+        details: match.details || "",
+        certificateId: match.certificateId,
+      },
+    });
   } catch (error) {
-    return res.status(400).json({ message: "Could not complete verification. Please try again.", ok: false });
+    console.error("Verification error:", error);
+    return res.status(400).json({ message: "Could not complete verification. Please try again.", verified: false });
+  }
+});
+
+router.get("/verify/confirm/:token", rateLimit({ max: 60 }), async (req, res) => {
+  const data = readVerification(req.params.token);
+  if (!data) {
+    return res.status(400).json({ verified: false, message: "This verification link is invalid." });
+  }
+  if (data.expired) {
+    return res.json({ verified: false, expired: true, message: "This verification link has expired. Please submit the verification form again to receive a new link." });
+  }
+
+  try {
+    const list = await allGraduates();
+    const match = findMatch(list, data.fullName, data.email, data.certificateId);
+    if (!match) {
+      return res.json({ verified: false, message: "Certificate Verification Failed." });
+    }
+    return res.json({
+      verified: true,
+      message: "Certificate Verified Successfully",
+      certificate: {
+        fullName: match.fullName,
+        program: match.program,
+        details: match.details || "",
+        certificateId: match.certificateId,
+      },
+    });
+  } catch (error) {
+    console.error("Verification confirm error:", error);
+    return res.status(400).json({ verified: false, message: "Could not complete verification. Please try again." });
   }
 });
 

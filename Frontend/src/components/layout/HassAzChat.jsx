@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { sendChat } from "../../services/api";
 
 const WELCOME =
-  "Hello, I am HassAz AI.\n\nAsk me anything: HassAz courses, applying, study help, research, writing, or a problem to solve. I will think it through and answer step by step.";
+  "Hello, I am HIACDI AI.\n\nAsk me anything: HIACDI courses, applying, study help, research, writing, or a problem to solve. I will think it through and answer step by step.";
 
 const THINKING_LABELS = ["Thinking…", "Searching…", "Working through this step by step…"];
 
@@ -69,16 +69,16 @@ export default function HassAzChat() {
       {open ? (
         <div className="mb-3 flex h-[min(72vh,560px)] w-[min(calc(100vw-1.5rem),400px)] flex-col overflow-hidden rounded-2xl border border-navy/15 bg-white shadow-2xl">
           <div className="flex items-center gap-2 bg-navy px-3 py-2.5 text-white">
-            <img src="/brand/logo-icon.png?v=4" alt="" className="h-8 w-8 rounded-full bg-white object-contain p-0.5" />
+            <img src="/brand/logo-icon.png?v=5" alt="" className="h-8 w-8 rounded-full bg-white object-contain p-0.5" />
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold leading-tight">HassAz AI</p>
+              <p className="text-sm font-semibold leading-tight">HIACDI AI</p>
               <p className="text-[11px] text-white/70">Thinks, searches, and answers step by step</p>
             </div>
             <button
               type="button"
               onClick={() => setOpen(false)}
               className="rounded-full px-2 py-1 text-lg leading-none text-white/80 hover:bg-white/10"
-              aria-label="Close HassAz AI"
+              aria-label="Close HIACDI AI"
             >
               ×
             </button>
@@ -110,7 +110,7 @@ export default function HassAzChat() {
                 }
               }}
               maxLength={4000}
-              placeholder="Ask HassAz AI…"
+              placeholder="Ask HIACDI AI…"
               rows={1}
               className="min-h-10 max-h-24 min-w-0 flex-1 resize-none rounded-2xl border border-navy/15 px-3 py-2 text-sm text-ink outline-none focus:border-gold"
             />
@@ -130,10 +130,10 @@ export default function HassAzChat() {
         onClick={() => setOpen((current) => !current)}
         className="ml-auto flex items-center gap-2 rounded-full bg-navy px-3 py-2 text-xs font-semibold text-white shadow-lg sm:px-4 sm:py-2.5 sm:text-sm"
         aria-expanded={open}
-        aria-label={open ? "Close HassAz AI" : "Open HassAz AI"}
+        aria-label={open ? "Close HIACDI AI" : "Open HIACDI AI"}
       >
-        <img src="/brand/logo-icon.png?v=4" alt="" className="h-6 w-6 rounded-full bg-white object-contain p-0.5" />
-        HassAz AI
+        <img src="/brand/logo-icon.png?v=5" alt="" className="h-6 w-6 rounded-full bg-white object-contain p-0.5" />
+        HIACDI AI
       </button>
     </div>
   );

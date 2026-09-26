@@ -23,7 +23,7 @@ export default function About() {
           Three standards, not three slogans
         </h2>
         <p className="mt-4 max-w-3xl text-sm leading-7 text-muted sm:text-base">
-          Learn. Build. Innovate. is how HassAz is run. Each word has a job in the classroom and in
+          Learn. Build. Innovate. is how HIACDI is run. Each word has a job in the classroom and in
           the lab.
         </p>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
@@ -48,7 +48,7 @@ export default function About() {
             The people who teach and hold the standard
           </h2>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-muted sm:text-base">
-            HassAz is led by practitioners. The same people who design the programs review learner
+            HIACDI is led by practitioners. The same people who design the programs review learner
             work and stay accountable for quality.
           </p>
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -108,7 +108,7 @@ export default function About() {
       </section>
 
       <section className="bg-navy px-4 py-14 text-center text-white sm:px-6 sm:py-16">
-        <h2 className="font-heading text-2xl font-bold sm:text-3xl">Ready to train with HassAz?</h2>
+        <h2 className="font-heading text-2xl font-bold sm:text-3xl">Ready to train with HIACDI?</h2>
         <p className="mx-auto mt-3 max-w-2xl text-sm text-white/80">
           Choose a program, or speak with the academic team about the right mode for your schedule.
         </p>

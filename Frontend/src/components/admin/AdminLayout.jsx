@@ -55,10 +55,10 @@ export default function AdminLayout() {
       >
         <div className="flex h-full flex-col px-5 py-6">
           <div className="flex items-center gap-3">
-            <img src="/brand/logo-mark.png?v=2" alt="HassAz Tech Hub" className="h-10 w-auto object-contain" />
+            <img src="/brand/logo-mark.png?v=3" alt="HIACDI Tech Hub" className="h-10 w-auto object-contain" />
             <div>
               <p className="font-heading text-sm font-bold leading-tight">
-                HassAz <span className="text-gold">TECH</span> HUB
+                HIACDI <span className="text-gold">TECH</span> HUB
               </p>
               <p className="text-xs text-white/60">Admin Panel</p>
             </div>
@@ -118,7 +118,7 @@ export default function AdminLayout() {
           </button>
           <p className="font-heading hidden text-lg font-bold text-navy lg:block">Admin Dashboard</p>
           <p className="truncate text-sm text-muted">
-            Signed in as <span className="font-semibold text-navy">HassAz Tech Hub</span>
+            Signed in as <span className="font-semibold text-navy">HIACDI Tech Hub</span>
           </p>
         </header>
         <main className="flex-1 px-4 py-8 sm:px-6 lg:px-8">

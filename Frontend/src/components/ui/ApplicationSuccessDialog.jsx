@@ -15,7 +15,7 @@ export default function ApplicationSuccessDialog({ open, onOk }) {
         <h2 id="application-success-title" className="font-heading mt-5 text-2xl font-bold text-navy">
           Application Submitted Successfully!
         </h2>
-        <p className="mt-4 text-sm leading-7 text-muted">Thank you for applying to HassAz Tech Hub.</p>
+        <p className="mt-4 text-sm leading-7 text-muted">Thank you for applying to HIACDI Tech Hub.</p>
         <p className="mt-3 text-sm leading-7 text-muted">
           Your application has been received successfully. Our team will review all applications, and qualified
           students will be contacted via email with the next steps.
@@ -24,7 +24,7 @@ export default function ApplicationSuccessDialog({ open, onOk }) {
           📩 Please keep checking your email, including your spam or junk folder.
         </p>
         <p className="mt-3 text-sm leading-7 text-muted">
-          Thank you for choosing HassAz Tech Hub. We wish you the best of luck!
+          Thank you for choosing HIACDI Tech Hub. We wish you the best of luck!
         </p>
         <button
           type="button"

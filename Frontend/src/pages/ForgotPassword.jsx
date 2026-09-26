@@ -34,7 +34,7 @@ export default function ForgotPassword() {
         </p>
       ) : (
         <form onSubmit={onSubmit} className="space-y-3">
-          <p className="text-sm text-muted">Enter the email on your HassAz Tech Hub account. We will send a reset link if it exists.</p>
+          <p className="text-sm text-muted">Enter the email on your HIACDI Tech Hub account. We will send a reset link if it exists.</p>
           <label className="block">
             <span className="mb-1 block text-sm font-semibold text-navy">Email address</span>
             <input type="email" className={authInputClass} value={email} onChange={(e) => setEmail(e.target.value)} required />

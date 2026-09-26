@@ -42,7 +42,7 @@ export async function buildApplicationsWorkbook(
 ) {
   const ExcelJS = (await import("exceljs")).default;
   const workbook = new ExcelJS.Workbook();
-  workbook.creator = "HassAz Tech Hub";
+  workbook.creator = "HIACDI Tech Hub";
   workbook.created = new Date();
 
   const groups = new Map();
@@ -140,7 +140,7 @@ export async function streamApplicationsPdf(applications, res) {
   const doc = new PDFDocument({ margin: 40, size: "A4" });
   doc.pipe(res);
 
-  doc.fontSize(18).fillColor("#0a2e6d").text("HassAz Tech Hub", { align: "center" });
+  doc.fontSize(18).fillColor("#0a2e6d").text("HIACDI Tech Hub", { align: "center" });
   doc.fontSize(12).fillColor("#4b5563").text("Course Applications Register", { align: "center" });
   doc.fontSize(9).fillColor("#9ca3af").text(`Generated on ${new Date().toLocaleString()}`, { align: "center" });
   doc.moveDown(1);

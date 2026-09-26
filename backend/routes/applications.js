@@ -26,6 +26,8 @@ import { catalog } from "../data/catalog.js";
 import { isProduction } from "../utils/env.js";
 import { publicFail } from "../utils/httpErrors.js";
 import { isEmail, sanitizeObject } from "../utils/sanitize.js";
+import { gradeAssessment } from "../data/applicationQuizzes.js";
+import { publicBaseUrl } from "../utils/env.js";
 
 function applicationMatchesFilters(app, categorySlug, programSlug, intakeKey) {
   const cat = String(categorySlug || "").trim();
@@ -69,7 +71,7 @@ const router = Router();
 function applicationNumber() {
   const stamp = Date.now().toString(36).toUpperCase();
   const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `HAZ-${stamp}-${rand}`;
+  return `HIACDI-${stamp}-${rand}`;
 }
 
 function readLocal() {
@@ -173,7 +175,7 @@ router.get("/export/excel", requireAdmin, async (req, res) => {
       "Content-Type",
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
-    res.setHeader("Content-Disposition", `attachment; filename="hassaz-applications-${Date.now()}.xlsx"`);
+    res.setHeader("Content-Disposition", `attachment; filename="hiacdi-applications-${Date.now()}.xlsx"`);
     await workbook.xlsx.write(res);
     res.end();
   } catch (error) {
@@ -190,7 +192,7 @@ router.get("/export/pdf", requireAdmin, async (req, res) => {
       applicationMatchesFilters(app, categorySlug, programSlug, intakeKey)
     );
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="hassaz-applications-${Date.now()}.pdf"`);
+    res.setHeader("Content-Disposition", `attachment; filename="hiacdi-applications-${Date.now()}.pdf"`);
     await streamApplicationsPdf(apps, res);
   } catch (error) {
     res.status(400).json({ message: "Could not complete this request." });
@@ -213,7 +215,7 @@ router.get("/:applicationNumber/export/excel", requireAdmin, async (req, res) =>
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="hassaz-applicant-${safeName || found.applicationNumber}.xlsx"`
+      `attachment; filename="hiacdi-applicant-${safeName || found.applicationNumber}.xlsx"`
     );
     await workbook.xlsx.write(res);
     res.end();
@@ -344,18 +346,20 @@ async function notifyApplicationReceived(application) {
   const fullName = application.personalInformation?.fullName || "Applicant";
   const program = application.program?.program || "your selected program";
   try {
+    const site = publicBaseUrl() || "https://hiacdi.org";
     await sendApplicationReceivedEmail({
       to: email,
       fullName,
       program,
       applicationNumber: application.applicationNumber,
+      bookUrl: `${site}/?book=1`,
     });
   } catch (error) {
     console.error("Application received email failed:", error.message);
   }
 }
 
-router.post("/", optionalUser, rateLimit({ max: 5, message: "Too many application attempts. Please wait a few minutes." }), async (req, res) => {
+router.post("/", optionalUser, rateLimit({ max: 12, message: "Too many application attempts. Please wait a few minutes." }), async (req, res) => {
   const user = req.userId ? await findUserById(req.userId) : null;
   const body = req.body || {};
   const email = normalizeEmail(body.contactInformation?.email || user?.email);
@@ -378,6 +382,12 @@ router.post("/", optionalUser, rateLimit({ max: 5, message: "Too many applicatio
     documents: sanitizeObject(body.documents),
     source: String(body.source || "").slice(0, 120),
     consent: sanitizeObject(body.consent),
+    assessment: gradeAssessment({
+      categorySlug: String(body.program?.categorySlug || body.categorySlug || "").trim(),
+      programSlug: String(body.program?.programSlug || body.programSlug || "").trim(),
+      answers: body.assessment?.answers,
+      attempts: body.assessment?.attempts,
+    }),
   };
   incoming.personalInformation = { ...incoming.personalInformation, fullName };
   incoming.contactInformation = {
@@ -395,7 +405,7 @@ router.post("/", optionalUser, rateLimit({ max: 5, message: "Too many applicatio
     windowStatus = resolveCourseWindow(rules, categorySlug, programSlug);
     if (!windowStatus.isOpen) {
       return res.status(403).json({
-        message: "No application windows that are open, Kindly Contact Academic Director For HassAz Tech Hub",
+        message: "No application windows that are open, Kindly Contact Academic Director For HIACDI Tech Hub",
       });
     }
   } catch {

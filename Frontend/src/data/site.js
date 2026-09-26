@@ -1,17 +1,17 @@
 export const site = {
-  name: "HassAz Tech Hub",
+  name: "HIACDI Tech Hub",
   motto: "Learn. Build. Innovate.",
   tagline: "Technology Education + Innovation + Digital Solutions",
   announcement:
-    "New intake alert! HassAz Tech Hub bootcamps are now open. Apply now",
-  email: "hassaztechhub@gmail.com",
-  admissionsEmail: "hassaztechhub@gmail.com",
+    "New intake alert! HIACDI Tech Hub bootcamps are now open. Apply now",
+  email: "hiacditechhub@gmail.com",
+  admissionsEmail: "hiacditechhub@gmail.com",
   location: "Kenya",
   whatsapp: "0741808582",
   hero: {
     title: "Empowering the Next Generation of Digital Innovators",
-    text: "Whether you are a high school graduate, a university student or a working professional looking to upskill or switch to tech, HassAz Tech Hub offers practical training tailored to your journey. We meet you where you are and guide you to where you want to go in the tech world.",
-    logoSrc: "/brand/logo-wordmark.png?v=2",
+    text: "This is for everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
+    logoSrc: "/brand/logo-wordmark.png?v=3",
   },
   learningModes: [
     { id: "full-time", label: "Full-time Classes" },
@@ -20,13 +20,13 @@ export const site = {
     { id: "in-person", label: "In-person Learning" },
   ],
   booking: {
-    host: "HassAz Tech Hub Contact",
+    host: "HIACDI Tech Hub Contact",
     title: "Admissions Open Hours",
     durationMinutes: 45,
     location: "Web conferencing details provided upon confirmation.",
     greeting: "Hello!",
     intro:
-      "We're looking forward to talking to you. This is a group info session with HassAz Academic Advisors.",
+      "We're looking forward to talking to you. This is a group info session with HIACDI Academic Advisors.",
     expect: [
       "Lots of friendly chats and one-on-one interactions",
       "Talk to our Academic Advisors and find out more about courses, learning models, payment options, etc",
@@ -62,7 +62,7 @@ export { catalog, courses } from "./catalog.js";
 export const features = [
   {
     title: "Accelerated Project-Based Learning",
-    text: "Learn by building. Every HassAz program is anchored in labs, reviews, and working projects, not slides alone.",
+    text: "Learn by building. Every HIACDI program is anchored in labs, reviews, and working projects, not slides alone.",
     color: "bg-gold",
     image:
       "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
@@ -76,7 +76,7 @@ export const features = [
   },
   {
     title: "From Learning to Building",
-    text: "Move from classroom practice to real solutions, portfolios, and opportunity through the HassAz technology ecosystem.",
+    text: "Move from classroom practice to real solutions, portfolios, and opportunity through the HIACDI technology ecosystem.",
     color: "bg-navy-dark",
     image:
       "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",

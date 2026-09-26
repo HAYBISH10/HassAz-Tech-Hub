@@ -88,6 +88,7 @@ function ApplicationWindowPanel() {
   useEffect(() => {
     fetchApplicationWindow()
       .then((data) => {
+        if (!data) return;
         setWin(data);
         setAllowRejectedReapply(data.allowRejectedReapply !== false);
       })

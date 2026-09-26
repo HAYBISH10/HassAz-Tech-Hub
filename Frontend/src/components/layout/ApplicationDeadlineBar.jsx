@@ -23,7 +23,7 @@ export default function ApplicationDeadlineBar() {
         <div className="flex flex-col items-center justify-center gap-1 sm:gap-1.5">
           {closeAt ? (
             <>
-              <p>HassAz Tech Hub Application deadline in:</p>
+              <p>HIACDI Tech Hub Application deadline in:</p>
               <Countdown target={closeAt} size="md" warnAtDays={5} className="text-gold" onReached={refresh} />
             </>
           ) : (

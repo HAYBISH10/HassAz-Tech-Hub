@@ -12,7 +12,7 @@ import { clip, isEmail } from "../utils/sanitize.js";
 
 const storePath = join(dirname(fileURLToPath(import.meta.url)), "../data/contact-store.json");
 const router = Router();
-const notifyTo = process.env.CONTACT_NOTIFY_EMAIL || "hassaztechhub@gmail.com";
+const notifyTo = process.env.CONTACT_NOTIFY_EMAIL || "hiacditechhub@gmail.com";
 const STATUSES = ["unread", "read", "resolved", "approved", "rejected"];
 
 function withId(row) {

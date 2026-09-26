@@ -2,7 +2,7 @@ import { normalizeEmail, normalizeName } from "../utils/names.js";
 
 export const seedGraduates = [
   {
-    certificateId: "HAZ-CERT-2026-0001",
+    certificateId: "HIACDI-CERT-2026-0001",
     fullName: "Hassan Issack Mohamed",
     email: "hassanhaybish@gmail.com",
     nameKey: normalizeName("Hassan Issack Mohamed"),

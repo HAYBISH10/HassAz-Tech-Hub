@@ -36,19 +36,19 @@ If you will miss this session, message your trainer before class.`,
   },
   event: {
     label: "Event",
-    subject: "You're invited: HassAz Tech Hub event",
-    message: `You are invited to an upcoming HassAz Tech Hub event.
+    subject: "You're invited: HIACDI Tech Hub event",
+    message: `You are invited to an upcoming HIACDI Tech Hub event.
 
 Event: Career and project showcase
 Date: Friday
 Time: 2:00 PM – 5:00 PM
-Venue: HassAz Tech Hub / live online link to follow
+Venue: HIACDI Tech Hub / live online link to follow
 
 Please confirm attendance by replying to this email. We look forward to seeing you there.`,
   },
   reminder: {
     label: "Reminder",
-    subject: "Reminder from HassAz Tech Hub",
+    subject: "Reminder from HIACDI Tech Hub",
     message: `This is a reminder about your upcoming session and LMS work.
 
 Please complete pending assignments before the next class and arrive on time.
@@ -57,7 +57,7 @@ If you need help, write back to the Academic Team.`,
   },
   general: {
     label: "Other",
-    subject: "Message from HassAz Tech Hub",
+    subject: "Message from HIACDI Tech Hub",
     message: "",
   },
 };
@@ -324,7 +324,7 @@ export default function AdminBroadcast() {
       <div className="mt-6 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="overflow-hidden rounded-2xl border border-navy/10 bg-white">
           <div className="bg-navy px-4 py-3 text-white">
-            <p className="text-xs font-semibold uppercase tracking-wide text-gold">HassAz intakes</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gold">HIACDI intakes</p>
             <p className="font-heading mt-1 text-lg font-bold">{preview.year || new Date().getFullYear()} intake register</p>
           </div>
           <div className="max-h-[70vh] overflow-y-auto p-3">

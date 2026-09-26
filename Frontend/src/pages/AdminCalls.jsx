@@ -57,7 +57,7 @@ export default function AdminCalls() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Booked calls</h1>
       <p className="mt-2 text-sm text-muted">
-        Everyone who has booked a call with HassAz Tech Hub. Approve or reject a booking to notify the student by
+        Everyone who has booked a call with HIACDI Tech Hub. Approve or reject a booking to notify the student by
         email. Approved bookers get a congratulations message; rejected bookers are asked to book another time.
       </p>
 

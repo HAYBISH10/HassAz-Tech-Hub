@@ -21,7 +21,7 @@ export default function CourseCategory() {
   return (
     <section className="bg-gradient-to-b from-[#f7f3e8] to-white">
       <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
-        <p className="text-sm font-semibold text-gold">HassAz Tech Hub</p>
+        <p className="text-sm font-semibold text-gold">HIACDI Tech Hub</p>
         <h1 className="font-heading mt-2 text-3xl font-bold text-navy sm:text-5xl">{category.title}</h1>
         {category.image ? (
           <img

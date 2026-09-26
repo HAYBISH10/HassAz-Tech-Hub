@@ -25,7 +25,7 @@ export default function AdminDatabase() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Database</h1>
       <p className="mt-2 text-sm text-muted">
-        Records stored for HassAz Tech Hub, shown as tables. Source: {data?.source || "loading…"}.
+        Records stored for HIACDI Tech Hub, shown as tables. Source: {data?.source || "loading…"}.
       </p>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
 

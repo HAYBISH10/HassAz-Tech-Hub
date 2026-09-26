@@ -28,7 +28,7 @@ function drawHeader(doc, subtitle) {
       // continue without logo if the file cannot be embedded
     }
   }
-  doc.fillColor(NAVY).font("Helvetica-Bold").fontSize(14).text("HassAz TECH HUB", logo ? 100 : 50, 42, { width: 400 });
+  doc.fillColor(NAVY).font("Helvetica-Bold").fontSize(14).text("HIACDI TECH HUB", logo ? 100 : 50, 42, { width: 400 });
   doc.fillColor(GOLD).font("Helvetica").fontSize(9).text("Learn. Build. Innovate.", logo ? 100 : 50, 60, { width: 400 });
   if (subtitle) {
     doc.fillColor(MUTED).fontSize(9).text(subtitle, 50, 78, { width: 500 });
@@ -40,7 +40,7 @@ function drawFooter(doc) {
   const y = 780;
   doc.moveTo(50, y).lineTo(545, y).strokeColor("#e5e7eb").lineWidth(0.6).stroke();
   doc.fillColor(MUTED).font("Helvetica").fontSize(8).text(
-    "HassAz Tech Hub  ·  Kenya  ·  hassaztechhub@gmail.com  ·  WhatsApp 0741808582",
+    "HIACDI Tech Hub  ·  Kenya  ·  hiacditechhub@gmail.com  ·  WhatsApp 0741808582",
     50,
     y + 8,
     { width: 500, align: "center" }
@@ -87,7 +87,7 @@ function bullets(doc, items) {
 }
 
 export function streamBrochurePdf({ program, categoryTitle, offer, year }, res) {
-  const filename = `${program.slug || "course"}-hassaz-brochure.pdf`;
+  const filename = `${program.slug || "course"}-hiacdi-brochure.pdf`;
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
 
@@ -101,7 +101,7 @@ export function streamBrochurePdf({ program, categoryTitle, offer, year }, res) 
   doc.moveDown(0.2);
   doc.fillColor(NAVY).font("Helvetica-Bold").fontSize(22).text(program.title || offer.label, { width: 500 });
   doc.moveDown(0.3);
-  body(doc, program.intro || program.summary || "Practical, mentor-led training at HassAz Tech Hub.");
+  body(doc, program.intro || program.summary || "Practical, mentor-led training at HIACDI Tech Hub.");
 
   if (program.careers?.length) {
     sectionTitle(doc, "Career paths");
@@ -132,7 +132,7 @@ export function streamBrochurePdf({ program, categoryTitle, offer, year }, res) 
     }
   }
 
-  sectionTitle(doc, "Why HassAz Tech Hub");
+  sectionTitle(doc, "Why HIACDI Tech Hub");
   bullets(doc, [
     "Live mentoring and instructor-led classes",
     "Project-based labs you can put in a portfolio",
@@ -143,14 +143,14 @@ export function streamBrochurePdf({ program, categoryTitle, offer, year }, res) 
   sectionTitle(doc, "How to apply");
   body(
     doc,
-    "Open Apply on the HassAz Tech Hub website, choose this programme and learning mode, and complete the application. For questions write to hassaztechhub@gmail.com or use Chat with us on Contact Us."
+    "Open Apply on the HIACDI Tech Hub website, choose this programme and learning mode, and complete the application. For questions write to hiacditechhub@gmail.com or use Chat with us on Contact Us."
   );
 
   doc.end();
 }
 
 export function streamInstallmentsPdf({ program, offer }, res) {
-  const filename = `${program.slug || "course"}-hassaz-tuition-plan.pdf`;
+  const filename = `${program.slug || "course"}-hiacdi-tuition-plan.pdf`;
   res.setHeader("Content-Type", "application/pdf");
   res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
 
@@ -164,7 +164,7 @@ export function streamInstallmentsPdf({ program, offer }, res) {
   doc.moveDown(0.3);
   body(
     doc,
-    "This guide shows how to pay HassAz Tech Hub tuition in full or in monthly installments. Amounts follow the total fee and monthly installment set for this intake."
+    "This guide shows how to pay HIACDI Tech Hub tuition in full or in monthly installments. Amounts follow the total fee and monthly installment set for this intake."
   );
 
   sectionTitle(doc, "Key information");
@@ -187,10 +187,10 @@ export function streamInstallmentsPdf({ program, offer }, res) {
 
   sectionTitle(doc, "Payment terms");
   bullets(doc, [
-    "Your place is confirmed when HassAz receives the full tuition or the first monthly installment.",
+    "Your place is confirmed when HIACDI receives the full tuition or the first monthly installment.",
     "Pay on or before each due date. Late payment may pause access to class materials until the balance is cleared.",
     "Tuition terms for the active intake are confirmed in writing by admissions.",
-    "Pay via the instructions sent after your application is accepted, or ask hassaztechhub@gmail.com / WhatsApp 0741808582.",
+    "Pay via the instructions sent after your application is accepted, or ask hiacditechhub@gmail.com / WhatsApp 0741808582.",
   ]);
 
   doc.end();

@@ -1,5 +1,5 @@
 /**
- * Certificate program title and details for each HassAz course,
+ * Certificate program title and details for each HIACDI course,
  * filled from the catalog when staff choose a program area and course.
  */
 export function certificateWording(program, categoryTitle) {
@@ -19,7 +19,7 @@ export function certificateWording(program, categoryTitle) {
   const durationBit = duration ? `a ${duration} programme` : "the published programme";
   return {
     program: program.title,
-    details: `Successfully completed ${durationBit} in ${program.title} (${categoryTitle}) at HassAz Tech Hub, covering ${covering}, with live instruction, laboratory practice, mentor reviews, and applied project work.`,
+    details: `Successfully completed ${durationBit} in ${program.title} (${categoryTitle}) at HIACDI Tech Hub, covering ${covering}, with live instruction, laboratory practice, mentor reviews, and applied project work.`,
   };
 }
 

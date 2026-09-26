@@ -38,12 +38,12 @@ export default function AdminLogin() {
         {busy ? <PageLoader overlay label="Signing in..." /> : null}
         <div className="flex flex-col items-center text-center">
           <img
-            src="/brand/logo-mark.png?v=2"
-            alt="HassAz Tech Hub"
+            src="/brand/logo-mark.png?v=3"
+            alt="HIACDI Tech Hub"
             className="h-16 w-auto object-contain"
           />
           <p className="font-heading mt-3 text-lg font-bold text-navy">
-            HassAz <span className="text-gold">TECH</span> HUB
+            HIACDI <span className="text-gold">TECH</span> HUB
           </p>
           <p className="mt-1 text-sm font-semibold uppercase tracking-[0.12em] text-gold">
             Admin Access
@@ -83,7 +83,7 @@ export default function AdminLogin() {
           ) : null}
         </form>
         <p className="mt-6 text-center text-xs text-muted">
-          Restricted access. HassAz Tech Hub staff only.
+          Restricted access. HIACDI Tech Hub staff only.
         </p>
       </div>
     </section>

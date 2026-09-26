@@ -17,7 +17,7 @@ export default function ApplyCta({
     return (
       <span
         aria-disabled="true"
-        title="HassAz Tech Hub applications are currently closed."
+        title="HIACDI Tech Hub applications are currently closed."
         className={`${className} pointer-events-none cursor-not-allowed opacity-50`}
       >
         {closedLabel}

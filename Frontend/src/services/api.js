@@ -195,12 +195,12 @@ export async function downloadApplicationsFile(kind, applicationNumber, filters 
   link.href = url;
   const filterName = [filters.programSlug, filters.categorySlug].filter(Boolean).join("-");
   link.download = applicationNumber
-    ? `hassaz-applicant-${applicationNumber}.xlsx`
+    ? `hiacdi-applicant-${applicationNumber}.xlsx`
     : kind === "pdf"
-      ? "hassaz-applications.pdf"
+      ? "hiacdi-applications.pdf"
       : filterName
-        ? `hassaz-applications-${filterName}.xlsx`
-        : "hassaz-applications.xlsx";
+        ? `hiacdi-applications-${filterName}.xlsx`
+        : "hiacdi-applications.xlsx";
   document.body.appendChild(link);
   link.click();
   link.remove();
@@ -257,6 +257,15 @@ export async function verifyCertificate(payload) {
   return data;
 }
 
+export async function confirmCertificateVerification(token) {
+  const response = await apiFetch(`/api/graduates/verify/confirm/${encodeURIComponent(token)}`);
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "This verification link is invalid.");
+  }
+  return data;
+}
+
 export async function fetchApplicationWindow(params = {}) {
   try {
     const query = new URLSearchParams();
@@ -265,7 +274,7 @@ export async function fetchApplicationWindow(params = {}) {
     const suffix = query.toString() ? `?${query}` : "";
     return await getJson(`/api/settings/applications${suffix}`);
   } catch {
-    return { openAt: null, closeAt: null, isOpen: false, anyOpen: false, globalOpen: false, reason: "", now: new Date().toISOString() };
+    return null;
   }
 }
 
@@ -317,6 +326,7 @@ export async function submitApplication(payload) {
     const error = new Error(data.message || "Could not submit the application.");
     error.title = data.title || "";
     error.status = response.status;
+    error.applicationNumber = data.applicationNumber || "";
     throw error;
   }
   return data;
@@ -436,7 +446,7 @@ export async function sendChat(messages) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || "HassAz AI could not reply. Please try again.");
+    throw new Error(data.message || "HIACDI AI could not reply. Please try again.");
   }
   return data;
 }

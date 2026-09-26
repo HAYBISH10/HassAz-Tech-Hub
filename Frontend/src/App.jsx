@@ -16,6 +16,7 @@ import CourseProgram from "./pages/CourseProgram";
 import Courses from "./pages/Courses";
 import Home from "./pages/Home";
 import Verify from "./pages/Verify";
+import VerifyConfirm from "./pages/VerifyConfirm";
 
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
 const AdminLogin = lazy(() => import("./pages/AdminLogin"));
@@ -52,6 +53,8 @@ export default function App() {
             <Route path="/auth/callback" element={<Navigate to="/apply" replace />} />
             <Route path="/account" element={<Navigate to="/apply" replace />} />
             <Route path="/verify" element={<Verify />} />
+            <Route path="/verify/confirm/:token" element={<VerifyConfirm />} />
+            <Route path="/verify/:certificateId" element={<Verify />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/about/careers" element={<Careers />} />
@@ -84,12 +87,12 @@ function NotFound() {
   return (
     <section className="px-5 py-20 text-center">
       <h1 className="font-heading text-3xl font-bold text-navy">Page not found</h1>
-      <p className="mt-3 text-muted">That address does not exist on HassAz Tech Hub.</p>
+      <p className="mt-3 text-muted">That address does not exist on HIACDI Tech Hub.</p>
       <div className="mt-6 flex flex-wrap justify-center gap-4">
         <Link to="/" className="font-semibold text-gold">
           Home
         </Link>
-      </div>
-    </section>
+        </div>
+      </section>
   );
 }
