@@ -1,3 +1,5 @@
+import { apiUrl } from "./apiBase";
+
 const TOKEN_KEY = "hiacdiUserToken";
 const EXPIRES_KEY = "hiacdiUserTokenExpiresAt";
 const USER_KEY = "hiacdiUserProfile";
@@ -38,7 +40,7 @@ export function userHeaders() {
 }
 
 export async function registerUser(payload) {
-  const response = await fetch("/api/users/register", {
+  const response = await fetch(apiUrl("/api/users/register"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -55,7 +57,7 @@ export async function registerUser(payload) {
 }
 
 export async function loginUser(payload) {
-  const response = await fetch("/api/users/login", {
+  const response = await fetch(apiUrl("/api/users/login"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -73,7 +75,7 @@ export async function loginUser(payload) {
 }
 
 export async function loginWithGoogle(credential) {
-  const response = await fetch("/api/users/google", {
+  const response = await fetch(apiUrl("/api/users/google"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -88,7 +90,7 @@ export async function loginWithGoogle(credential) {
 }
 
 export async function fetchCurrentUser() {
-  const response = await fetch("/api/users/me", { credentials: "include", headers: userHeaders() });
+  const response = await fetch(apiUrl("/api/users/me"), { credentials: "include", headers: userHeaders() });
   if (!response.ok) {
     clearUserSession();
     return null;
@@ -102,7 +104,7 @@ export async function logoutUser() {
   const token = getUserToken();
   clearUserSession();
   try {
-    await fetch("/api/users/logout", {
+    await fetch(apiUrl("/api/users/logout"), {
       method: "POST",
       credentials: "include",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -113,7 +115,7 @@ export async function logoutUser() {
 }
 
 export async function requestPasswordReset(email) {
-  const response = await fetch("/api/users/forgot-password", {
+  const response = await fetch(apiUrl("/api/users/forgot-password"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -125,7 +127,7 @@ export async function requestPasswordReset(email) {
 }
 
 export async function resetPassword(payload) {
-  const response = await fetch("/api/users/reset-password", {
+  const response = await fetch(apiUrl("/api/users/reset-password"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -138,7 +140,7 @@ export async function resetPassword(payload) {
 
 export async function fetchGoogleConfig() {
   try {
-    const response = await fetch("/api/users/google/config", { credentials: "include" });
+    const response = await fetch(apiUrl("/api/users/google/config"), { credentials: "include" });
     if (!response.ok) return { enabled: false, clientId: "" };
     return response.json();
   } catch {

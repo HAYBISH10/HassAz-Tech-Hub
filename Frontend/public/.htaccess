@@ -1,0 +1,13 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Send API calls to the Node backend. Replace 3000 with the port Hostinger shows.
+  RewriteCond %{REQUEST_URI} ^/api/
+  RewriteRule ^api/(.*)$ http://127.0.0.1:3000/api/$1 [P,L]
+
+  # React routes such as /apply and /HassAz-i-HUb@
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>

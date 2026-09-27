@@ -1,3 +1,5 @@
+import { apiUrl } from "./apiBase";
+
 const TOKEN_KEY = "hiacdiAdminToken";
 const EXPIRES_KEY = "hiacdiAdminTokenExpiresAt";
 
@@ -42,7 +44,7 @@ export function isAuthenticated() {
 }
 
 export async function adminLogin(username, password) {
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch(apiUrl("/api/auth/login"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -59,13 +61,13 @@ export async function adminLogin(username, password) {
 }
 
 export async function fetchAdminLockStatus() {
-  const response = await fetch("/api/auth/lock-status", { credentials: "include" });
+  const response = await fetch(apiUrl("/api/auth/lock-status"), { credentials: "include" });
   const data = await response.json().catch(() => ({}));
   return Boolean(data.locked);
 }
 
 export async function unlockAdminWithToken(token) {
-  const response = await fetch("/api/auth/unlock", {
+  const response = await fetch(apiUrl("/api/auth/unlock"), {
     method: "POST",
     credentials: "include",
     headers: { "Content-Type": "application/json" },
@@ -82,7 +84,7 @@ export async function adminLogout() {
   const token = getToken();
   clearSession();
   try {
-    await fetch("/api/auth/logout", {
+    await fetch(apiUrl("/api/auth/logout"), {
       method: "POST",
       credentials: "include",
       headers: token ? { Authorization: `Bearer ${token}` } : {},

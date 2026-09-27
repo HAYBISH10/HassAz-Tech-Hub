@@ -3,6 +3,7 @@ import { Link, useOutletContext } from "react-router-dom";
 import Hero from "../components/home/Hero";
 import { useCatalog } from "../hooks/useContent";
 import { features, graduateEmployers, site } from "../data/site";
+import { apiUrl } from "../services/apiBase";
 
 export default function Home() {
   const { onBook } = useOutletContext();
@@ -251,7 +252,7 @@ function StayUpdated() {
     event.preventDefault();
     setStatus("Sending...");
     try {
-      const response = await fetch("/api/inquiries", {
+      const response = await fetch(apiUrl("/api/inquiries"), {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },

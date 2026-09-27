@@ -3,8 +3,10 @@ import { site as fallbackSite } from "../data/site";
 import { clearSession, getToken } from "./auth";
 import { userHeaders } from "./userAuth";
 
+import { apiUrl } from "./apiBase";
+
 function apiFetch(path, options = {}) {
-  return fetch(path, { credentials: "include", ...options });
+  return fetch(apiUrl(path), { credentials: "include", ...options });
 }
 
 async function getJson(path) {
