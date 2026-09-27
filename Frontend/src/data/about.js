@@ -44,6 +44,7 @@ export const about = {
       title: "Academic Director and Lead Organizer",
       role: "Senior Software Engineer",
       image: "/about/academic-director.png",
+      cover: true,
       bio: "Abdiaziz is Academic Director and Lead Organizer. He owns academic quality — curriculum, teaching standards, and how progress is measured — and organises program delivery. As a Senior Software Engineer he grounds programs in how software is actually designed, reviewed, and shipped.",
     },
     {

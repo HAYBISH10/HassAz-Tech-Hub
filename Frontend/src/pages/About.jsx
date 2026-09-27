@@ -51,25 +51,26 @@ export default function About() {
             HIACDI is led by practitioners. The same people who design the programs review learner
             work and stay accountable for quality.
           </p>
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {about.team.map((person) => (
-              <article key={`${person.title}-${person.image}`} className="overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(10,46,109,0.08)]">
-                <div className="bg-white">
+              <article
+                key={`${person.title}-${person.image}`}
+                className="flex h-full flex-col overflow-hidden rounded-2xl bg-white shadow-[0_12px_40px_rgba(10,46,109,0.08)]"
+              >
+                <div className="aspect-[4/5] shrink-0 overflow-hidden bg-[#eef2f7]">
                   <img
                     src={person.image}
                     alt={`${person.name}, ${person.title}`}
                     loading="lazy"
                     decoding="async"
-                    className={`mx-auto h-80 w-full sm:h-[22rem] ${
-                      person.cover ? "object-cover object-[center_18%]" : "object-contain object-top"
-                    }`}
+                    className="h-full w-full object-cover object-[center_12%]"
                   />
                 </div>
-                <div className="border-t border-gold/40 p-6">
-                  <h3 className="font-heading text-lg font-bold text-navy">{person.name}</h3>
-                  <p className="mt-1 text-sm font-semibold text-gold">{person.title}</p>
-                  {person.role ? <p className="mt-1 text-sm text-navy/80">{person.role}</p> : null}
-                  <p className="mt-3 text-sm leading-6 text-muted">{person.bio}</p>
+                <div className="flex flex-1 flex-col border-t border-gold/40 p-5">
+                  <h3 className="font-heading text-lg font-bold leading-6 text-navy">{person.name}</h3>
+                  <p className="mt-1 min-h-[2.5rem] text-sm font-semibold leading-5 text-gold">{person.title}</p>
+                  <p className="mt-1 text-sm text-navy/80">{person.role || "\u00a0"}</p>
+                  <p className="mt-3 flex-1 text-sm leading-6 text-muted">{person.bio}</p>
                 </div>
               </article>
             ))}
