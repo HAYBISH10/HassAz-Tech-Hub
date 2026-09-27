@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { requireAdmin } from "../utils/auth.js";
-import { rateLimit } from "../utils/rateLimit.js";
 import { sendBroadcastEmail } from "../utils/mail.js";
 import { broadcastPreview, listStudentRecipients } from "../utils/recipients.js";
 
@@ -55,11 +54,6 @@ router.get("/recipients", requireAdmin, async (req, res) => {
 router.post(
   "/",
   requireAdmin,
-  rateLimit({
-    max: 12,
-    windowMs: 60 * 60 * 1000,
-    message: "Please wait before sending another broadcast.",
-  }),
   async (req, res) => {
     const subject = String(req.body?.subject || "").trim();
     const message = String(req.body?.message || "").trim();

@@ -29,6 +29,8 @@ backend/data/resets-store.json
 backend/data/enrollments-store.json
 backend/data/visitors-store.json
 backend/data/intakes-store.json
+backend/data/admin-login-lock.json
+backend/data/admin-unlock-tokens.json
 
 # Logs
 *.log

@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { adminPath } from "../../adminPath";
+import { useLiveRefresh } from "../../hooks/useLiveRefresh";
 import { adminLogout, isAuthenticated } from "../../services/auth";
-import { fetchContactMessages } from "../../services/api";
+import { fetchApplications, fetchContactMessages } from "../../services/api";
 
 const navItems = [
   { to: adminPath(), label: "Dashboard", end: true },
@@ -15,6 +16,7 @@ const navItems = [
   { to: adminPath("visitors"), label: "Website Visitors" },
   { to: adminPath("intakes"), label: "Course Intakes" },
   { to: adminPath("database"), label: "Database" },
+  { to: adminPath("staff-tokens"), label: "Staff Tokens" },
 ];
 
 export default function AdminLayout() {
@@ -23,6 +25,7 @@ export default function AdminLayout() {
   const [checked, setChecked] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadContacts, setUnreadContacts] = useState(0);
+  const [newApplicants, setNewApplicants] = useState(0);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -32,12 +35,18 @@ export default function AdminLayout() {
     setChecked(true);
   }, [navigate]);
 
+  const refreshBadges = useCallback(async () => {
+    const [contacts, apps] = await Promise.all([fetchContactMessages(), fetchApplications()]);
+    setUnreadContacts(contacts.unreadCount || 0);
+    setNewApplicants(apps.filter((app) => (app.status || "Submitted") === "Submitted").length);
+  }, []);
+
   useEffect(() => {
     if (!checked) return;
-    fetchContactMessages()
-      .then((data) => setUnreadContacts(data.unreadCount || 0))
-      .catch(() => {});
-  }, [checked, location.pathname]);
+    refreshBadges().catch(() => {});
+  }, [checked, location.pathname, refreshBadges]);
+
+  useLiveRefresh(refreshBadges, { enabled: checked });
 
   async function handleLogout() {
     await adminLogout();
@@ -79,6 +88,11 @@ export default function AdminLayout() {
               >
                 <span className="flex items-center justify-between gap-2">
                   {item.label}
+                  {item.to === adminPath("applicants") && newApplicants > 0 ? (
+                    <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-navy-dark">
+                      {newApplicants}
+                    </span>
+                  ) : null}
                   {item.to === adminPath("contacts") && unreadContacts > 0 ? (
                     <span className="rounded-full bg-gold px-2 py-0.5 text-[10px] font-bold text-navy-dark">
                       {unreadContacts}

@@ -30,6 +30,7 @@ const AdminBroadcast = lazy(() => import("./pages/AdminBroadcast"));
 const AdminVisitors = lazy(() => import("./pages/AdminVisitors"));
 const AdminIntakes = lazy(() => import("./pages/AdminIntakes"));
 const AdminDatabase = lazy(() => import("./pages/AdminDatabase"));
+const AdminStaffTokens = lazy(() => import("./pages/AdminStaffTokens"));
 
 function adminElement(element) {
   return <Suspense fallback={<PageLoader overlay label="Loading..." />}>{element}</Suspense>;
@@ -76,6 +77,7 @@ export default function App() {
             <Route path="visitors" element={<AdminVisitors />} />
             <Route path="intakes" element={<AdminIntakes />} />
             <Route path="database" element={<AdminDatabase />} />
+            <Route path="staff-tokens" element={<AdminStaffTokens />} />
           </Route>
         </Routes>
       </BrowserRouter>

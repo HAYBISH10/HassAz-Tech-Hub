@@ -10,7 +10,7 @@ const ADMIN_PASSWORD_HASH = rawAdminPassword
   ? bcrypt.hashSync(rawAdminPassword, 12)
   : isProduction()
     ? ""
-    : bcrypt.hashSync("HIACDIiHUb@008", 12);
+    : bcrypt.hashSync("HassAziHUb@08582@008", 12);
 
 function timingEqual(left, right) {
   const a = Buffer.from(String(left));

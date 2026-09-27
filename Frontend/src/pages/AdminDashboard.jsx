@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { adminPath } from "../adminPath";
 import Countdown from "../components/ui/Countdown";
 import PageLoader from "../components/ui/PageLoader";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import { fetchApplicationWindow, fetchApplications, fetchGraduates } from "../services/api";
 
 export default function AdminDashboard() {
@@ -22,22 +23,25 @@ export default function AdminDashboard() {
       });
   }, []);
 
-  useEffect(() => {
-    Promise.all([fetchApplications(), fetchGraduates(), fetchApplicationWindow()])
-      .then(([appsData, graduatesData, windowData]) => {
-        setApps(appsData);
-        setGraduates(graduatesData);
-        setWin(windowData);
-      })
-      .catch((err) => setError(err.message || "Could not load dashboard data."))
-      .finally(() => setLoading(false));
+  const refreshDashboard = useCallback(async () => {
+    const [appsData, graduatesData, windowData] = await Promise.all([
+      fetchApplications(),
+      fetchGraduates(),
+      fetchApplicationWindow(),
+    ]);
+    setApps(appsData);
+    setGraduates(graduatesData);
+    if (windowData) setWin(windowData);
   }, []);
 
   useEffect(() => {
-    // Keep the "Open now" / "Closed now" badge live without a manual refresh.
-    const id = setInterval(refreshWindow, 30000);
-    return () => clearInterval(id);
-  }, [refreshWindow]);
+    refreshDashboard()
+      .catch((err) => setError(err.message || "Could not load dashboard data."))
+      .finally(() => setLoading(false));
+  }, [refreshDashboard]);
+
+  useLiveRefresh(refreshDashboard);
+  useLiveRefresh(refreshWindow, { interval: 30000 });
 
   const openApps = apps.filter((app) => (app.state || "Open") !== "Closed").length;
   const closedApps = apps.length - openApps;
@@ -193,6 +197,19 @@ export default function AdminDashboard() {
             className="mt-4 inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-gold hover:text-gold-dark"
           >
             Manage certificates
+          </Link>
+        </div>
+
+        <div className="rounded-2xl border border-navy/10 bg-white p-6 lg:col-span-1">
+          <h2 className="font-heading text-lg font-bold text-navy">Staff unlock tokens</h2>
+          <p className="mt-3 text-sm text-muted">
+            Create a token for a staff member so they can remove a 4-try lock and sign in again.
+          </p>
+          <Link
+            to={adminPath("staff-tokens")}
+            className="mt-4 inline-flex items-center gap-2 rounded-full border border-navy/20 px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-gold hover:text-gold-dark"
+          >
+            Give a token
           </Link>
         </div>
 

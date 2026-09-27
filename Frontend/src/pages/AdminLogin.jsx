@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { adminPath } from "../adminPath";
 import PageLoader from "../components/ui/PageLoader";
-import { adminLogin, clearSession } from "../services/auth";
+import { adminLogin, clearSession, fetchAdminLockStatus, unlockAdminWithToken } from "../services/auth";
 
 const inputClass =
   "w-full rounded-md border border-navy/15 px-4 py-3 text-ink outline-none focus:border-gold";
@@ -11,22 +11,48 @@ export default function AdminLogin() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [unlockToken, setUnlockToken] = useState("");
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [locked, setLocked] = useState(false);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     clearSession();
+    fetchAdminLockStatus()
+      .then(setLocked)
+      .catch(() => {});
   }, []);
 
   async function onSubmit(event) {
     event.preventDefault();
+    if (locked) return;
     setBusy(true);
     setError("");
+    setNotice("");
     try {
       await adminLogin(username.trim(), password);
       navigate(adminPath(), { replace: true });
     } catch (err) {
+      if (err.locked) setLocked(true);
       setError(err.message || "Incorrect username or password.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function onUnlock(event) {
+    event.preventDefault();
+    setBusy(true);
+    setError("");
+    setNotice("");
+    try {
+      const result = await unlockAdminWithToken(unlockToken.trim());
+      setLocked(false);
+      setUnlockToken("");
+      setNotice(result.message || "Restriction removed. You can sign in now.");
+    } catch (err) {
+      setError(err.message || "That unlock token is not valid.");
     } finally {
       setBusy(false);
     }
@@ -35,7 +61,7 @@ export default function AdminLogin() {
   return (
     <section className="flex min-h-screen items-center justify-center bg-navy-dark px-4 py-10">
       <div className="relative w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl sm:p-10">
-        {busy ? <PageLoader overlay label="Signing in..." /> : null}
+        {busy ? <PageLoader overlay label={locked ? "Checking token..." : "Signing in..."} /> : null}
         <div className="flex flex-col items-center text-center">
           <img
             src="/brand/logo-mark.png?v=3"
@@ -57,6 +83,7 @@ export default function AdminLogin() {
               value={username}
               onChange={(event) => setUsername(event.target.value)}
               autoComplete="off"
+              disabled={locked}
               required
             />
           </label>
@@ -68,20 +95,47 @@ export default function AdminLogin() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               autoComplete="off"
+              disabled={locked}
               required
             />
           </label>
           <button
             type="submit"
-            disabled={busy}
+            disabled={busy || locked}
             className="w-full rounded-full bg-navy px-5 py-3 text-sm font-semibold text-white transition hover:bg-navy-mid disabled:opacity-50"
           >
-            {busy ? "Signing in…" : "Sign in"}
+            {busy && !locked ? "Signing in…" : locked ? "Rejected" : "Sign in"}
           </button>
-          {error ? (
-            <p className="rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p>
-          ) : null}
         </form>
+
+        {locked ? (
+          <form onSubmit={onUnlock} className="mt-6 space-y-3 rounded-xl border border-red-200 bg-red-50 p-4">
+            <p className="text-sm font-semibold text-red-700">
+              Sign-in rejected after 4 wrong passwords. Enter the unlock token given to you by senior staff.
+            </p>
+            <label className="block">
+              <span className="mb-1 block text-sm font-semibold text-navy">Unlock token</span>
+              <input
+                className={`${inputClass} bg-white`}
+                value={unlockToken}
+                onChange={(event) => setUnlockToken(event.target.value)}
+                placeholder="HIACDI-XXXX-XXXX-XXXX"
+                autoComplete="off"
+                required
+              />
+            </label>
+            <button
+              type="submit"
+              disabled={busy || !unlockToken.trim()}
+              className="w-full rounded-full bg-green-700 px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+            >
+              Remove restriction
+            </button>
+          </form>
+        ) : null}
+
+        {notice ? <p className="mt-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p> : null}
+        {error ? <p className="mt-4 rounded-md bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">{error}</p> : null}
         <p className="mt-6 text-center text-xs text-muted">
           Restricted access. HIACDI Tech Hub staff only.
         </p>

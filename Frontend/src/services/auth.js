@@ -50,9 +50,31 @@ export async function adminLogin(username, password) {
   });
   const data = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(data.message || "Incorrect username or password.");
+    const error = new Error(data.message || "Incorrect username or password.");
+    error.locked = Boolean(data.locked);
+    throw error;
   }
   saveSession(data);
+  return data;
+}
+
+export async function fetchAdminLockStatus() {
+  const response = await fetch("/api/auth/lock-status", { credentials: "include" });
+  const data = await response.json().catch(() => ({}));
+  return Boolean(data.locked);
+}
+
+export async function unlockAdminWithToken(token) {
+  const response = await fetch("/api/auth/unlock", {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token }),
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "That unlock token is not valid.");
+  }
   return data;
 }
 

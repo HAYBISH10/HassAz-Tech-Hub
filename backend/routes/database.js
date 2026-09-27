@@ -1,7 +1,6 @@
 import { Router } from "express";
 import mongoose from "mongoose";
 import { requireAdmin } from "../utils/auth.js";
-import { rateLimit } from "../utils/rateLimit.js";
 import { readJson } from "../utils/localJson.js";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
@@ -76,7 +75,6 @@ async function loadTable(table) {
 router.get(
   "/",
   requireAdmin,
-  rateLimit({ max: 20, windowMs: 15 * 60 * 1000, message: "Too many database requests. Please wait a few minutes." }),
   async (_req, res) => {
   try {
     const tables = [];

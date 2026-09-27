@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLiveRefresh } from "../hooks/useLiveRefresh";
 import ConfirmDeleteDialog from "../components/ui/ConfirmDeleteDialog";
 import PageLoader from "../components/ui/PageLoader";
 import SelectOrCustom from "../components/ui/SelectOrCustom";
@@ -32,12 +33,19 @@ export default function AdminApplicants() {
   const [view, setView] = useState("table");
   const [query, setQuery] = useState("");
 
+  const refreshApps = useCallback(async () => {
+    const data = await fetchApplications();
+    setApps(data);
+    setError("");
+  }, []);
+
   useEffect(() => {
-    fetchApplications()
-      .then(setApps)
+    refreshApps()
       .catch(() => setError("Could not load applicants. Start the backend in WSL, then refresh."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [refreshApps]);
+
+  useLiveRefresh(refreshApps, { paused: Boolean(saving || deleting || confirmDelete) });
 
   const openApps = apps.filter((app) => (app.state || "Open") !== "Closed");
   const closedApps = apps.filter((app) => app.state === "Closed");
@@ -178,8 +186,8 @@ export default function AdminApplicants() {
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Applicants</h1>
       <p className="mt-2 text-sm text-muted">
-        Choose cohort, year, course area, and specific course from the dropdowns, or type your own. Students stay
-        in their own list, for example Cohort 1 · December 2026 · Data Science Bootcamp.
+        Choose cohort, year, course area, and specific course from the dropdowns, or type your own. New
+        applications appear here automatically — you can still refresh if you want.
       </p>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-3">

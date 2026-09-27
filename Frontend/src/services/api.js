@@ -523,3 +523,40 @@ export async function deleteVisitor(id) {
   }
   return response.json();
 }
+
+export async function fetchUnlockTokens() {
+  return getJsonAuthed("/api/auth/unlock-tokens");
+}
+
+export async function createUnlockToken(label) {
+  const response = await apiFetch("/api/auth/unlock-tokens", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...authHeaders() },
+    body: JSON.stringify({ label }),
+  });
+  if (response.status === 401) {
+    clearSession();
+    throw new Error(SESSION_EXPIRED);
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "Could not create an unlock token.");
+  }
+  return data;
+}
+
+export async function deleteUnlockToken(id) {
+  const response = await apiFetch(`/api/auth/unlock-tokens/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+    headers: authHeaders(),
+  });
+  if (response.status === 401) {
+    clearSession();
+    throw new Error(SESSION_EXPIRED);
+  }
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    throw new Error(data.message || "Could not delete that token.");
+  }
+  return data;
+}
