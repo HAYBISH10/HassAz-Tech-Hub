@@ -5,7 +5,7 @@ import { sendBroadcastEmail } from "../utils/mail.js";
 import { broadcastPreview, listStudentRecipients } from "../utils/recipients.js";
 
 const router = Router();
-const FLYER_CID = "hassazflyer";
+const FLYER_CID = "hiacdiflyer";
 
 function parseFlyer(value) {
   const text = String(value || "").trim();
@@ -96,6 +96,9 @@ router.post(
         flyer,
         programTitle: student.programTitle,
         kind: filters.kind,
+        imagePlacement: ["top", "afterGreeting", "inline", "bottom"].includes(String(req.body?.imagePlacement || ""))
+          ? String(req.body.imagePlacement)
+          : "bottom",
       });
       if (result.emailed) sent += 1;
       else failed += 1;
@@ -107,11 +110,16 @@ router.post(
         ? `student${recipients.length === 1 ? "" : "s"} in this cohort`
         : `student${recipients.length === 1 ? "" : "s"}`;
     return res.json({
-      ok: true,
+      ok: failed === 0,
       count: recipients.length,
       sent,
       failed,
-      message: `Announcement sent to ${recipients.length} ${who}.`,
+      message:
+        failed === 0
+          ? `Successfully sent to ${recipients.length} ${who}.`
+          : sent === 0
+            ? `Could not send this email. ${failed} ${failed === 1 ? "delivery" : "deliveries"} failed.`
+            : `Sent to ${sent} of ${recipients.length}. ${failed} could not be delivered.`,
     });
   }
 );

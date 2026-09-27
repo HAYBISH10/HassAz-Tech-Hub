@@ -12,9 +12,19 @@ import { findUserById, listUsers } from "./usersRepo.js";
 
 const dataDir = join(dirname(fileURLToPath(import.meta.url)), "../data");
 
+function isPlaceholderEmail(email) {
+  const value = normalizeEmail(email);
+  return (
+    value === "apply.draft.test@hiacdi.org" ||
+    value.endsWith(".test@hiacdi.org") ||
+    value.endsWith("@example.com") ||
+    value.endsWith("@example.org")
+  );
+}
+
 function addRecipient(map, row) {
   const email = normalizeEmail(row.email);
-  if (!email || !email.includes("@")) return;
+  if (!email || !email.includes("@") || isPlaceholderEmail(email)) return;
   const current = map.get(email);
   const next = {
     email,

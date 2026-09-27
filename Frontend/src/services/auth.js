@@ -1,5 +1,5 @@
-const TOKEN_KEY = "hassazAdminToken";
-const EXPIRES_KEY = "hassazAdminTokenExpiresAt";
+const TOKEN_KEY = "hiacdiAdminToken";
+const EXPIRES_KEY = "hiacdiAdminTokenExpiresAt";
 
 let liveToken = "";
 let liveExpiresAt = 0;

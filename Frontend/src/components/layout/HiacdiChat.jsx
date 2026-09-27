@@ -27,7 +27,7 @@ function ThinkingStatus() {
   );
 }
 
-export default function HassAzChat() {
+export default function HiacdiChat() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);

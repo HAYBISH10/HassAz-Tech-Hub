@@ -8,7 +8,7 @@ import Navbar from "./Navbar";
 import SearchModal from "./SearchModal";
 import TopBar from "./TopBar";
 import VisitTracker from "./VisitTracker";
-import HassAzChat from "./HassAzChat";
+import HiacdiChat from "./HiacdiChat";
 
 export default function Layout() {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -40,7 +40,7 @@ export default function Layout() {
       </main>
       <VisitTracker />
       {applyMode ? null : <Footer />}
-      <HassAzChat />
+      <HiacdiChat />
       {applyMode ? null : <ApplicationDeadlineBar />}
       <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
       <BookingModal open={bookingOpen} onClose={() => setBookingOpen(false)} />

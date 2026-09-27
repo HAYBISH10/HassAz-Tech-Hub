@@ -371,7 +371,7 @@ export default function AdminApplicants() {
       {view === "cards" ? (
       <div className="relative mt-8 min-h-16 space-y-3">
         {loading ? <PageLoader overlay label="Loading applicants..." /> : null}
-        {visible.map((app) => {
+        {visible.map((app, index) => {
           const name = app.personalInformation?.fullName || "Unnamed applicant";
           const email = app.contactInformation?.email || "-";
           const phone = app.contactInformation?.phone || "-";
@@ -390,7 +390,9 @@ export default function AdminApplicants() {
                   onClick={() => setOpen(active ? "" : app.applicationNumber)}
                 >
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-heading text-lg font-bold text-navy">{name}</p>
+                    <p className="font-heading text-lg font-bold text-navy">
+                      {index + 1}. {name}
+                    </p>
                     <StatusBadge status={status} />
                   </div>
                   <p className="mt-1 text-sm text-muted">
@@ -708,6 +710,9 @@ function ApplicantsTable({ apps, selected, downloading, onView, onDownload, onAs
         <thead>
           <tr>
             <th className="sticky top-0 left-0 z-20 whitespace-nowrap border border-navy/10 bg-navy px-3 py-2 text-left font-semibold text-white">
+              No
+            </th>
+            <th className="sticky top-0 z-20 whitespace-nowrap border border-navy/10 bg-navy px-3 py-2 text-left font-semibold text-white">
               Actions
             </th>
             {columns.map((col) => (
@@ -729,7 +734,10 @@ function ApplicantsTable({ apps, selected, downloading, onView, onDownload, onAs
                 key={id || index}
                 className={isSelected ? "bg-gold/10" : index % 2 ? "bg-soft/40" : "bg-white"}
               >
-                <td className="sticky left-0 z-10 whitespace-nowrap border border-navy/10 bg-inherit px-3 py-1.5">
+                <td className="sticky left-0 z-10 whitespace-nowrap border border-navy/10 bg-inherit px-3 py-1.5 font-semibold text-navy">
+                  {index + 1}
+                </td>
+                <td className="sticky z-10 whitespace-nowrap border border-navy/10 bg-inherit px-3 py-1.5">
                   <div className="flex gap-2">
                     <button
                       type="button"

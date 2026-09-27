@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import ConfirmDeleteDialog from "../components/ui/ConfirmDeleteDialog";
 import PageLoader from "../components/ui/PageLoader";
-import { graduateAreaTitle, graduateMatchesCourse, certificateWording } from "../data/certificateCopy";
+import { graduateMatchesCourse, certificateWording } from "../data/certificateCopy";
 import { useCatalog } from "../hooks/useContent";
 import { createGraduate, deleteGraduate, fetchGraduates } from "../services/api";
 
@@ -117,31 +117,8 @@ export default function AdminGraduates() {
     [list, filterAreaSlug, filterProgramSlug, catalog]
   );
 
-  const grouped = useMemo(() => {
-    if (filterProgramSlug) {
-      const label = filterProgram?.title || "This course";
-      return visibleList.length ? [[label, visibleList]] : [];
-    }
-    if (filterAreaSlug) {
-      const map = new Map();
-      for (const item of visibleList) {
-        const key = item.program || "Other";
-        if (!map.has(key)) map.set(key, []);
-        map.get(key).push(item);
-      }
-      return [...map.entries()];
-    }
-    const map = new Map();
-    for (const item of visibleList) {
-      const key = graduateAreaTitle(item, catalog);
-      if (!map.has(key)) map.set(key, []);
-      map.get(key).push(item);
-    }
-    return [...map.entries()];
-  }, [visibleList, filterProgramSlug, filterProgram, filterAreaSlug, catalog]);
-
   return (
-    <section className="mx-auto max-w-5xl">
+    <section className="mx-auto max-w-7xl">
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Awarded certificates</h1>
       <p className="mt-2 text-sm leading-6 text-muted">
@@ -295,20 +272,33 @@ export default function AdminGraduates() {
             student above.
           </p>
         ) : null}
-        {grouped.map(([area, items]) => (
-          <div key={area}>
-            {filterProgramSlug ? null : <h4 className="font-heading text-lg font-bold text-navy">{area}</h4>}
-            <div className={filterProgramSlug ? "space-y-4" : "mt-3 space-y-4"}>
-              {items.map((item) => (
-                <GraduateCard
-                  key={item.certificateId}
-                  item={item}
-                  onAskDelete={() => setConfirmDelete(item.certificateId)}
-                />
-              ))}
-            </div>
+        {visibleList.length ? (
+          <div className="overflow-auto rounded-2xl border border-navy/10 bg-white">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-navy text-white">
+                <tr>
+                  <th className="px-3 py-2 font-semibold">No</th>
+                  <th className="px-3 py-2 font-semibold">Name</th>
+                  <th className="px-3 py-2 font-semibold">Email</th>
+                  <th className="px-3 py-2 font-semibold">Program</th>
+                  <th className="px-3 py-2 font-semibold">Certificate ID</th>
+                  <th className="px-3 py-2 font-semibold">QR</th>
+                  <th className="px-3 py-2 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {visibleList.map((item, index) => (
+                  <GraduateRow
+                    key={item.certificateId}
+                    item={item}
+                    index={index}
+                    onAskDelete={() => setConfirmDelete(item.certificateId)}
+                  />
+                ))}
+              </tbody>
+            </table>
           </div>
-        ))}
+        ) : null}
       </div>
 
       <ConfirmDeleteDialog
@@ -336,12 +326,12 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
-function GraduateCard({ item, onAskDelete }) {
+function GraduateRow({ item, index, onAskDelete }) {
   const verifyUrl = useMemo(() => {
     const origin = typeof window !== "undefined" ? window.location.origin : "";
     return `${origin}/verify/${encodeURIComponent(item.certificateId)}`;
   }, [item.certificateId]);
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(verifyUrl)}`;
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=${encodeURIComponent(verifyUrl)}`;
 
   async function copyLink() {
     try {
@@ -352,44 +342,39 @@ function GraduateCard({ item, onAskDelete }) {
   }
 
   return (
-    <article className="rounded-2xl border border-navy/10 bg-white p-5">
-      <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
-        <img src={qrSrc} alt={`QR for ${item.fullName}`} className="h-[140px] w-[140px] rounded-md border border-navy/10 bg-white p-2" />
-        <div className="min-w-0 flex-1">
-          <p className="font-heading text-lg font-bold text-navy">{item.fullName}</p>
-          <p className="mt-1 text-sm text-muted">{item.email}</p>
-          <p className="mt-1 text-sm text-navy">{item.program}</p>
-          {item.details ? <p className="mt-2 text-xs leading-5 text-muted">{item.details}</p> : null}
-          <p className="mt-2 text-xs font-semibold text-gold">{item.certificateId}</p>
-          <p className="mt-3 break-all text-xs text-muted">{verifyUrl}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={copyLink}
-              className="rounded-full bg-navy px-4 py-2 text-sm font-semibold text-white"
-            >
-              Copy scan link
-            </button>
-            <a
-              href={verifyUrl}
-              className="rounded-full border border-navy/15 px-4 py-2 text-sm font-semibold text-navy"
-            >
-              Open form
-            </a>
-            <button
-              type="button"
-              className="rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-700"
-              onClick={onAskDelete}
-            >
-              Delete
-            </button>
-          </div>
-          <p className="mt-3 text-xs leading-5 text-muted">
-            In Canva, add a QR code and paste this scan link. Put the QR in the space between the
-            signatures or in a bottom corner so it does not cover the name.
-          </p>
+    <tr className="border-t border-navy/10 align-top">
+      <td className="px-3 py-2 font-semibold text-navy">{index + 1}</td>
+      <td className="px-3 py-2 font-semibold text-navy">{item.fullName}</td>
+      <td className="px-3 py-2 text-muted">{item.email || "-"}</td>
+      <td className="px-3 py-2 text-navy">{item.program || "-"}</td>
+      <td className="px-3 py-2 text-xs font-semibold text-gold">{item.certificateId}</td>
+      <td className="px-3 py-2">
+        <img src={qrSrc} alt="" className="h-16 w-16 rounded-md border border-navy/10 bg-white p-1" />
+      </td>
+      <td className="px-3 py-2">
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={copyLink}
+            className="rounded-full bg-navy px-3 py-1 text-xs font-semibold text-white"
+          >
+            Copy link
+          </button>
+          <a
+            href={verifyUrl}
+            className="rounded-full border border-navy/15 px-3 py-1 text-xs font-semibold text-navy"
+          >
+            Open
+          </a>
+          <button
+            type="button"
+            className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold text-red-700"
+            onClick={onAskDelete}
+          >
+            Delete
+          </button>
         </div>
-      </div>
-    </article>
+      </td>
+    </tr>
   );
 }

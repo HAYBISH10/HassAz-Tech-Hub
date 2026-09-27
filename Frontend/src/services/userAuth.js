@@ -1,6 +1,6 @@
-const TOKEN_KEY = "hassazUserToken";
-const EXPIRES_KEY = "hassazUserTokenExpiresAt";
-const USER_KEY = "hassazUserProfile";
+const TOKEN_KEY = "hiacdiUserToken";
+const EXPIRES_KEY = "hiacdiUserTokenExpiresAt";
+const USER_KEY = "hiacdiUserProfile";
 
 export function saveUserSession({ token, expiresAt, user }) {
   localStorage.setItem(TOKEN_KEY, token);

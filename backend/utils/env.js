@@ -44,7 +44,7 @@ export function sessionSecret() {
   }
   cachedSecret = crypto
     .createHash("sha256")
-    .update(`hassaz-dev|${process.env.ADMIN_PASSWORD || "dev"}`)
+    .update(`hiacdi-dev|${process.env.ADMIN_PASSWORD || "dev"}`)
     .digest("hex");
   return cachedSecret;
 }

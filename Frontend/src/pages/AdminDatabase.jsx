@@ -52,6 +52,9 @@ export default function AdminDatabase() {
               <table className="min-w-full border-collapse text-xs">
                 <thead>
                   <tr>
+                    <th className="sticky top-0 z-10 whitespace-nowrap border border-navy/10 bg-navy px-3 py-2 text-left font-semibold text-white">
+                      No
+                    </th>
                     {current.columns.map((col) => (
                       <th
                         key={col}
@@ -65,6 +68,9 @@ export default function AdminDatabase() {
                 <tbody>
                   {current.rows.map((row, index) => (
                     <tr key={row.id || index} className={index % 2 ? "bg-soft/40" : "bg-white"}>
+                      <td className="whitespace-nowrap border border-navy/10 px-3 py-1.5 font-semibold text-navy">
+                        {index + 1}
+                      </td>
                       {current.columns.map((col) => (
                         <td key={col} className="max-w-xs truncate whitespace-nowrap border border-navy/10 px-3 py-1.5 text-navy/90">
                           {row[col] === "" || row[col] == null ? "-" : String(row[col])}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import PageLoader from "../components/ui/PageLoader";
 import SelectOrCustom from "../components/ui/SelectOrCustom";
 import { COHORT_OPTIONS, INTAKE_OPTIONS, yearOptions } from "../data/cohorts";
@@ -63,6 +63,14 @@ If you need help, write back to the Academic Team.`,
 };
 
 const KIND_ORDER = ["announcement", "class", "event", "reminder", "general"];
+const IMAGE_MARKER = "[IMAGE]";
+const IMAGE_MARKER_RE = /\{\{\s*image\s*\}\}|\[\s*IMAGE\s*\]/gi;
+const IMAGE_PLACEMENTS = [
+  { id: "top", label: "Top of email" },
+  { id: "afterGreeting", label: "After greeting" },
+  { id: "inline", label: "Where I place it in the message" },
+  { id: "bottom", label: "Bottom of message" },
+];
 const inputClass = "w-full rounded-md border border-navy/15 px-4 py-3 text-ink outline-none focus:border-gold";
 
 export default function AdminBroadcast() {
@@ -81,10 +89,12 @@ export default function AdminBroadcast() {
   const [message, setMessage] = useState(KIND_TEMPLATES.announcement.message);
   const [flyerName, setFlyerName] = useState("");
   const [flyer, setFlyer] = useState("");
+  const [imagePlacement, setImagePlacement] = useState("bottom");
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [sendResult, setSendResult] = useState(null);
+  const messageRef = useRef(null);
 
   const filters = useMemo(() => {
     if (cohort || year || intakeName || areaSlug || courseSlug) {
@@ -142,7 +152,7 @@ export default function AdminBroadcast() {
   const count = preview.count || 0;
   const hasSelection = Boolean(cohort || year || intakeName || areaSlug || courseSlug || intakeId || audience === "all");
   const canSend = subject.trim() && message.trim() && count > 0 && hasSelection && !sending;
-  const previewName = students[0]?.fullName || preview.sampleNames?.[0] || "Hassan Issack Mohamed";
+  const previewName = students[0]?.fullName || preview.sampleNames?.[0] || "Student";
   const groupLabel = [cohort, intakeName, year].filter(Boolean).join(" · ")
     || (selected ? `${selected.programTitle} · ${selected.cohort} · ${selected.label}` : "")
     || (audience === "all" ? "all students and contacts" : "this group");
@@ -161,7 +171,6 @@ export default function AdminBroadcast() {
     setAreaSlug("");
     setCourseSlug("");
     setQuery("");
-    setNotice("");
   }
 
   function chooseAll() {
@@ -173,7 +182,6 @@ export default function AdminBroadcast() {
     setAreaSlug("");
     setCourseSlug("");
     setQuery("");
-    setNotice("");
   }
 
   function applyKind(next) {
@@ -182,6 +190,7 @@ export default function AdminBroadcast() {
     if (template) {
       setSubject(template.subject);
       setMessage(template.message);
+      if (imagePlacement === "inline") setImagePlacement("bottom");
     }
   }
 
@@ -201,6 +210,33 @@ export default function AdminBroadcast() {
     }
   }
 
+  function choosePlacement(next) {
+    setImagePlacement(next);
+    if (next !== "inline") {
+      setMessage((prev) => prev.replace(IMAGE_MARKER_RE, "").replace(/\n{3,}/g, "\n\n"));
+      return;
+    }
+    if (!/\{\{\s*image\s*\}\}|\[\s*IMAGE\s*\]/i.test(message)) {
+      insertImageAtCursor();
+    }
+  }
+
+  function insertImageAtCursor() {
+    const el = messageRef.current;
+    const current = message;
+    const start = el?.selectionStart ?? current.length;
+    const end = el?.selectionEnd ?? current.length;
+    const next = `${current.slice(0, start)}${IMAGE_MARKER}${current.slice(end)}`;
+    setMessage(next);
+    setImagePlacement("inline");
+    requestAnimationFrame(() => {
+      if (!messageRef.current) return;
+      const pos = start + IMAGE_MARKER.length;
+      messageRef.current.focus();
+      messageRef.current.setSelectionRange(pos, pos);
+    });
+  }
+
   async function onSubmit(event) {
     event.preventDefault();
     if (!canSend) return;
@@ -213,18 +249,27 @@ export default function AdminBroadcast() {
     }
     setSending(true);
     setError("");
-    setNotice("");
+    setSendResult(null);
     try {
       const result = await sendBroadcast({
         subject: subject.trim(),
         message: message.trim(),
         flyer,
         kind,
+        imagePlacement,
         ...filters,
       });
-      setNotice(result.message || "The message has been sent.");
+      const sent = Number(result.sent || 0);
+      const failed = Number(result.failed || 0);
+      setSendResult({
+        ok: failed === 0 && sent > 0,
+        message: result.message || (failed === 0 ? "Successfully sent." : "Could not send this email."),
+      });
     } catch (err) {
-      setError(err.message || "Could not send this message.");
+      setSendResult({
+        ok: false,
+        message: err.message || "Could not send this email.",
+      });
     } finally {
       setSending(false);
     }
@@ -240,7 +285,6 @@ export default function AdminBroadcast() {
         same message at once, each as <span className="font-semibold text-navy">Dear {previewName},</span>
       </p>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
-      {notice ? <p className="mt-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p> : null}
 
       <div className="mt-6 grid gap-3 rounded-2xl border border-navy/10 bg-white p-4 sm:grid-cols-2 lg:grid-cols-5">
         <SelectOrCustom
@@ -318,9 +362,6 @@ export default function AdminBroadcast() {
           </select>
         </label>
       </div>
-      {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
-      {notice ? <p className="mt-4 rounded-md bg-green-50 px-4 py-3 text-sm font-semibold text-green-800">{notice}</p> : null}
-
       <div className="mt-6 grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
         <aside className="overflow-hidden rounded-2xl border border-navy/10 bg-white">
           <div className="bg-navy px-4 py-3 text-white">
@@ -413,6 +454,7 @@ export default function AdminBroadcast() {
                 <table className="min-w-full text-left text-sm">
                   <thead className="bg-navy text-white">
                     <tr>
+                      <th className="px-3 py-2 font-semibold">No</th>
                       <th className="px-3 py-2 font-semibold">Name</th>
                       <th className="px-3 py-2 font-semibold">Email</th>
                       <th className="px-3 py-2 font-semibold">Course</th>
@@ -420,8 +462,9 @@ export default function AdminBroadcast() {
                     </tr>
                   </thead>
                   <tbody>
-                    {students.map((item) => (
+                    {students.map((item, index) => (
                       <tr key={`${item.email}-${item.fullName}`} className="border-t border-navy/10">
+                        <td className="px-3 py-2 font-semibold text-navy">{index + 1}</td>
                         <td className="px-3 py-2 font-semibold text-navy">{item.fullName}</td>
                         <td className="px-3 py-2 text-muted">{item.email}</td>
                         <td className="px-3 py-2 text-navy">{item.programTitle || "-"}</td>
@@ -468,13 +511,15 @@ export default function AdminBroadcast() {
             <label className="block">
               <span className="mb-1 block text-sm font-semibold text-navy">Message</span>
               <textarea
+                ref={messageRef}
                 className={`${inputClass} min-h-52 whitespace-pre-wrap`}
                 value={message}
                 onChange={(event) => setMessage(event.target.value)}
                 required
               />
               <span className="mt-1 block text-xs text-muted">
-                Do not type “Dear …”. Each email starts with that student’s registered name.
+                Do not type “Dear …”. Each email starts with that student’s registered name. Click in the message, then
+                use Insert image here to drop the flyer at that spot.
               </span>
             </label>
 
@@ -487,34 +532,62 @@ export default function AdminBroadcast() {
                 className="block w-full text-sm text-muted file:mr-3 file:rounded-full file:border-0 file:bg-navy file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
               />
               {flyer ? (
-                <div className="mt-3 flex items-start gap-3">
-                  <img src={flyer} alt="" className="h-24 w-auto rounded-lg border border-navy/10 object-cover" />
-                  <button
-                    type="button"
-                    className="text-xs font-semibold text-red-700"
-                    onClick={() => {
-                      setFlyer("");
-                      setFlyerName("");
-                    }}
-                  >
-                    Remove {flyerName || "image"}
-                  </button>
+                <div className="mt-3 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <img src={flyer} alt="" className="h-24 w-auto rounded-lg border border-navy/10 object-cover" />
+                    <button
+                      type="button"
+                      className="text-xs font-semibold text-red-700"
+                      onClick={() => {
+                        setFlyer("");
+                        setFlyerName("");
+                      }}
+                    >
+                      Remove {flyerName || "image"}
+                    </button>
+                  </div>
+                  <div>
+                    <span className="mb-2 block text-sm font-semibold text-navy">Image placement</span>
+                    <div className="flex flex-wrap gap-2">
+                      {IMAGE_PLACEMENTS.map((item) => (
+                        <button
+                          key={item.id}
+                          type="button"
+                          onClick={() => choosePlacement(item.id)}
+                          className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
+                            imagePlacement === item.id ? "bg-navy text-white" : "border border-navy/15 text-navy"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={insertImageAtCursor}
+                      className="mt-3 rounded-full border border-navy/15 px-4 py-2 text-xs font-semibold text-navy hover:bg-soft"
+                    >
+                      Insert image here
+                    </button>
+                    <p className="mt-2 text-xs text-muted">
+                      Click in the message where the flyer should appear, then press Insert image here. You can also
+                      choose top, after the greeting, or bottom.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 <p className="mt-1 text-xs text-muted">Optional poster, timetable, or event flyer.</p>
               )}
             </div>
 
-            <div className="rounded-2xl border border-navy/10 bg-[#fffaf3] p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Preview</p>
-              <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-navy">{KIND_TEMPLATES[kind].label}</p>
-              <p className="mt-1 font-heading text-lg font-bold text-navy">{subject || "Subject"}</p>
-              <p className="mt-3 text-sm text-navy">
-                Dear <strong>{previewName}</strong>,
-              </p>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-ink">{message || "Your message will appear here."}</p>
-              {flyer ? <img src={flyer} alt="" className="mt-4 max-h-40 rounded-lg border border-navy/10" /> : null}
-            </div>
+            <BroadcastMessagePreview
+              kindLabel={KIND_TEMPLATES[kind].label}
+              subject={subject}
+              previewName={previewName}
+              message={message}
+              flyer={flyer}
+              imagePlacement={imagePlacement}
+            />
 
             <button
               type="submit"
@@ -526,7 +599,83 @@ export default function AdminBroadcast() {
           </form>
         </div>
       </div>
+      <SendResultDialog result={sendResult} onClose={() => setSendResult(null)} />
     </section>
+  );
+}
+
+function BroadcastMessagePreview({ kindLabel, subject, previewName, message, flyer, imagePlacement }) {
+  const parts = String(message || "").split(/\{\{\s*image\s*\}\}|\[\s*IMAGE\s*\]/i);
+  const hasMarker = parts.length > 1;
+  const img = flyer ? (
+    <img src={flyer} alt="" className="my-4 max-h-48 w-full rounded-lg border border-navy/10 object-contain" />
+  ) : hasMarker ? (
+    <div className="my-4 rounded-lg border border-dashed border-navy/25 px-4 py-6 text-center text-xs font-semibold text-navy/60">
+      Image will appear here
+    </div>
+  ) : null;
+  const text = (value, fallback) => (
+    <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-ink">{value || fallback || null}</p>
+  );
+
+  return (
+    <div className="rounded-2xl border border-navy/10 bg-[#fffaf3] p-4">
+      <p className="text-xs font-semibold uppercase tracking-wide text-gold-dark">Preview</p>
+      <p className="mt-2 text-[11px] font-bold uppercase tracking-wide text-navy">{kindLabel}</p>
+      <p className="mt-1 font-heading text-lg font-bold text-navy">{subject || "Subject"}</p>
+      {imagePlacement === "top" && flyer && !hasMarker ? img : null}
+      <p className="mt-3 text-sm text-navy">
+        Dear <strong>{previewName}</strong>,
+      </p>
+      {imagePlacement === "afterGreeting" && flyer && !hasMarker ? img : null}
+      {hasMarker
+        ? parts.map((part, index) => (
+            <div key={`${index}-${part.slice(0, 16)}`}>
+              {part ? text(part) : null}
+              {index < parts.length - 1 ? img : null}
+            </div>
+          ))
+        : text(message, "Your message will appear here.")}
+      {imagePlacement === "bottom" && flyer && !hasMarker ? img : null}
+    </div>
+  );
+}
+
+function SendResultDialog({ result, onClose }) {
+  if (!result) return null;
+  const ok = Boolean(result.ok);
+
+  return (
+    <div
+      className="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="broadcast-send-result-title"
+    >
+      <div className="w-full max-w-md rounded-2xl bg-white p-6 text-center shadow-xl sm:p-8">
+        <div
+          className={`mx-auto flex h-16 w-16 items-center justify-center rounded-full text-3xl font-bold ${
+            ok ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+          }`}
+          aria-hidden="true"
+        >
+          {ok ? "✓" : "✕"}
+        </div>
+        <h2 id="broadcast-send-result-title" className="font-heading mt-5 text-2xl font-bold text-navy">
+          {ok ? "Successfully sent" : "Email failed"}
+        </h2>
+        <p className="mt-3 text-sm leading-7 text-muted">{result.message}</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className={`mt-6 rounded-full px-8 py-2.5 text-sm font-semibold text-white ${
+            ok ? "bg-green-700 hover:bg-green-800" : "bg-red-700 hover:bg-red-800"
+          }`}
+        >
+          OK
+        </button>
+      </div>
+    </div>
   );
 }
 

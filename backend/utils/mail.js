@@ -755,7 +755,7 @@ export async function sendContactDecisionEmail({ to, fullName, subject, approved
   return { emailed: outcome.emailed };
 }
 
-export async function sendBroadcastEmail({ to, fullName, subject, message, flyer, programTitle, kind }) {
+export async function sendBroadcastEmail({ to, fullName, subject, message, flyer, programTitle, kind, imagePlacement }) {
   const name = String(fullName || "").trim() || "Student";
   const first = firstName(name) === "there" ? "Student" : firstName(name);
   const fill = (value) =>
@@ -763,7 +763,10 @@ export async function sendBroadcastEmail({ to, fullName, subject, message, flyer
       .replace(/\{\{\s*fullName\s*\}\}/gi, name)
       .replace(/\{\{\s*firstName\s*\}\}/gi, first);
   const safeSubject = fill(subject).trim() || "Message from HIACDI Tech Hub";
-  const safeText = fill(message).trim();
+  const rawText = fill(message).trim();
+  const imageParts = rawText.split(/\{\{\s*image\s*\}\}|\[\s*IMAGE\s*\]/i);
+  const hasMarker = imageParts.length > 1;
+  const safeText = imageParts.join("").trim();
   const alreadyGreeted = /^\s*dear\s/i.test(safeText);
   const greetingLine = alreadyGreeted ? "" : `Dear ${name},`;
   const courseLine = programTitle ? `This update is for students registered on ${programTitle}.` : "";
@@ -774,18 +777,24 @@ export async function sendBroadcastEmail({ to, fullName, subject, message, flyer
   const flyerHtml = flyer?.cid
     ? `<img src="cid:${flyer.cid}" alt="" width="520" style="display:block; margin:18px auto 8px; max-width:100%; height:auto; border-radius:12px; border:0;" />`
     : "";
+  const placement = hasMarker && flyerHtml ? "inline" : String(imagePlacement || "bottom");
+  const bodyHtml = hasMarker && flyerHtml
+    ? imageParts.map((part, index) => `${formatAnnouncementHtml(part)}${index < imageParts.length - 1 ? flyerHtml : ""}`).join("")
+    : formatAnnouncementHtml(safeText);
   const html = wrapHtml({
     bodyHtml: [
       `<p style="margin:0 0 16px;"><span style="display:inline-block; background:${kindMeta.color}; color:#ffffff; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; font-weight:700; padding:6px 10px; border-radius:999px;">${escapeHtml(
         kindMeta.label
       )}</span></p>`,
+      placement === "top" && flyerHtml ? flyerHtml : "",
       greetingLine
         ? `<p style="margin:0 0 16px; color:#0a2e6d; font-size:16px; line-height:1.6;">Dear <strong>${escapeHtml(
             name
           )}</strong>,</p>`
         : "",
-      formatAnnouncementHtml(safeText),
-      flyerHtml,
+      placement === "afterGreeting" && flyerHtml ? flyerHtml : "",
+      bodyHtml,
+      placement === "bottom" && flyerHtml ? flyerHtml : "",
       programTitle
         ? `<p style="margin:18px 0 12px; color:#6b7280; font-size:12px; line-height:1.6;">Sent to students registered for <strong>${escapeHtml(
             programTitle

@@ -53,7 +53,7 @@ export default function AdminCalls() {
   const rejectedCount = bookings.filter((b) => b.status === "rejected").length;
 
   return (
-    <section className="mx-auto max-w-4xl">
+    <section className="mx-auto max-w-7xl">
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Booked calls</h1>
       <p className="mt-2 text-sm text-muted">
@@ -76,40 +76,26 @@ export default function AdminCalls() {
         {loading ? <PageLoader overlay label="Loading booked calls..." /> : null}
 
         {upcoming.length ? (
-          <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-navy/60">Upcoming</h2>
-            <div className="mt-3 space-y-3">
-              {upcoming.map((booking) => (
-                <BookingCard
-                  key={bookingKey(booking)}
-                  booking={booking}
-                  isBusy={saving === bookingKey(booking)}
-                  onApprove={() => decide(bookingKey(booking), "approved")}
-                  onReject={() => decide(bookingKey(booking), "rejected")}
-                  onAskDelete={() => setConfirmDelete(bookingKey(booking))}
-                />
-              ))}
-            </div>
-          </div>
+          <BookingsTable
+            title="Upcoming"
+            bookings={upcoming}
+            saving={saving}
+            onApprove={(id) => decide(id, "approved")}
+            onReject={(id) => decide(id, "rejected")}
+            onAskDelete={setConfirmDelete}
+          />
         ) : null}
 
         {past.length ? (
-          <div>
-            <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-navy/60">Past</h2>
-            <div className="mt-3 space-y-3">
-              {past.map((booking) => (
-                <BookingCard
-                  key={bookingKey(booking)}
-                  booking={booking}
-                  past
-                  isBusy={saving === bookingKey(booking)}
-                  onApprove={() => decide(bookingKey(booking), "approved")}
-                  onReject={() => decide(bookingKey(booking), "rejected")}
-                  onAskDelete={() => setConfirmDelete(bookingKey(booking))}
-                />
-              ))}
-            </div>
-          </div>
+          <BookingsTable
+            title="Past"
+            bookings={past}
+            past
+            saving={saving}
+            onApprove={(id) => decide(id, "approved")}
+            onReject={(id) => decide(id, "rejected")}
+            onAskDelete={setConfirmDelete}
+          />
         ) : null}
       </div>
 
@@ -166,61 +152,81 @@ function StatusBadge({ status }) {
   return <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${style}`}>{label}</span>;
 }
 
-function BookingCard({
-  booking,
-  past,
-  isBusy,
-  onApprove,
-  onReject,
-  onAskDelete,
-}) {
-  const status = booking.status || "pending";
+function BookingsTable({ title, bookings, past, saving, onApprove, onReject, onAskDelete }) {
   return (
-    <article className={`rounded-2xl border border-navy/10 bg-white px-5 py-4 ${past ? "opacity-70" : ""}`}>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
-          <p className="font-heading text-lg font-bold text-navy">{booking.name || "Unnamed"}</p>
-          <StatusBadge status={status} />
-        </div>
+    <div>
+      <h2 className="font-heading text-sm font-bold uppercase tracking-wide text-navy/60">{title}</h2>
+      <div className={`mt-3 overflow-auto rounded-2xl border border-navy/10 bg-white ${past ? "opacity-80" : ""}`}>
+        <table className="min-w-full text-left text-sm">
+          <thead className="bg-navy text-white">
+            <tr>
+              <th className="px-3 py-2 font-semibold">No</th>
+              <th className="px-3 py-2 font-semibold">Name</th>
+              <th className="px-3 py-2 font-semibold">Email</th>
+              <th className="px-3 py-2 font-semibold">Phone</th>
+              <th className="px-3 py-2 font-semibold">Date</th>
+              <th className="px-3 py-2 font-semibold">Time</th>
+              <th className="px-3 py-2 font-semibold">Status</th>
+              <th className="px-3 py-2 font-semibold">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking, index) => {
+              const id = bookingKey(booking);
+              const status = booking.status || "pending";
+              const isBusy = saving === id;
+              return (
+                <tr key={id} className="border-t border-navy/10">
+                  <td className="px-3 py-2 font-semibold text-navy">{index + 1}</td>
+                  <td className="px-3 py-2 font-semibold text-navy">{booking.name || "Unnamed"}</td>
+                  <td className="px-3 py-2 text-muted">{booking.email || "-"}</td>
+                  <td className="px-3 py-2 text-muted">{booking.phone || "-"}</td>
+                  <td className="px-3 py-2 text-navy">{formatDate(booking.date)}</td>
+                  <td className="px-3 py-2 text-navy">
+                    {booking.time} ({booking.timezone || "Africa/Nairobi"})
+                  </td>
+                  <td className="px-3 py-2">
+                    <StatusBadge status={status} />
+                  </td>
+                  <td className="px-3 py-2">
+                    <div className="flex flex-wrap gap-2">
+                      {status !== "approved" ? (
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          className="rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                          onClick={() => onApprove(id)}
+                        >
+                          {isBusy ? "Saving…" : "Approve"}
+                        </button>
+                      ) : null}
+                      {status !== "rejected" ? (
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white disabled:opacity-50"
+                          onClick={() => onReject(id)}
+                        >
+                          {isBusy ? "Saving…" : "Reject"}
+                        </button>
+                      ) : null}
+                      <button
+                        type="button"
+                        disabled={isBusy}
+                        className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 disabled:opacity-50"
+                        onClick={() => onAskDelete(id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
-      <p className="mt-1 text-sm text-navy/80">
-        {formatDate(booking.date)} at {booking.time} ({booking.timezone || "Africa/Nairobi"})
-      </p>
-      <p className="mt-1 text-sm text-muted">
-        {booking.email || "-"} · {booking.phone || "-"}
-      </p>
-
-      <div className="mt-4 flex flex-wrap gap-2">
-        {status !== "approved" ? (
-          <button
-            type="button"
-            disabled={isBusy}
-            className="rounded-full bg-green-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            onClick={onApprove}
-          >
-            {isBusy ? "Saving…" : "Approve"}
-          </button>
-        ) : null}
-        {status !== "rejected" ? (
-          <button
-            type="button"
-            disabled={isBusy}
-            className="rounded-full bg-red-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-            onClick={onReject}
-          >
-            {isBusy ? "Saving…" : "Reject"}
-          </button>
-        ) : null}
-        <button
-          type="button"
-          disabled={isBusy}
-          className="rounded-full border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 disabled:opacity-50"
-          onClick={onAskDelete}
-        >
-          Delete
-        </button>
-      </div>
-    </article>
+    </div>
   );
 }
 

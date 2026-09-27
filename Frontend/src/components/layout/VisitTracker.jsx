@@ -4,7 +4,7 @@ import { recordVisit } from "../../services/api";
 import { isAdminLocation } from "../../adminPath";
 
 function visitorId() {
-  const key = "hassazVisitorId";
+  const key = "hiacdiVisitorId";
   let id = localStorage.getItem(key);
   if (!id) {
     id =

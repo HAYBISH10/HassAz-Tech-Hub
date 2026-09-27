@@ -1,7 +1,7 @@
 import { usesHttps } from "./env.js";
 
-export const ADMIN_COOKIE = "hassaz_admin";
-export const USER_COOKIE = "hassaz_user";
+export const ADMIN_COOKIE = "hiacdi_admin";
+export const USER_COOKIE = "hiacdi_user";
 
 function parseCookies(header) {
   const out = {};

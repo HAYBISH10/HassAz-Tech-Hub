@@ -58,7 +58,7 @@ export default function AdminContacts() {
   }
 
   return (
-    <section className="mx-auto max-w-5xl">
+    <section className="mx-auto max-w-7xl">
       <p className="text-sm font-semibold text-gold">Staff only</p>
       <h1 className="font-heading mt-1 text-3xl font-bold text-navy">Contact messages</h1>
       <p className="mt-2 text-sm text-muted">
@@ -66,57 +66,80 @@ export default function AdminContacts() {
       </p>
       {error ? <p className="mt-4 text-sm font-semibold text-red-700">{error}</p> : null}
 
-      <div className="relative mt-8 min-h-16 space-y-3">
+      <div className="relative mt-8 min-h-16">
         {loading ? <PageLoader overlay label="Loading messages..." /> : null}
         {!loading && !messages.length ? <p className="text-sm text-muted">No contact messages yet.</p> : null}
-        {messages.map((item) => (
-          <article key={item.id} className="rounded-2xl border border-navy/10 bg-white p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="font-heading text-lg font-bold text-navy">{item.fullName}</p>
-                <p className="text-sm text-muted">
-                  {item.email} {item.phone ? `· ${item.phone}` : ""}
-                </p>
-                <p className="mt-1 text-sm font-semibold text-navy">{item.subject || "No subject"}</p>
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <StatusPill status={item.status} />
-                <span className="text-xs text-muted">{item.createdAt ? new Date(item.createdAt).toLocaleString() : ""}</span>
-              </div>
-            </div>
-            <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-navy/80">{item.message}</p>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {item.status !== "approved" ? (
-                <button
-                  type="button"
-                  disabled={saving === item.id}
-                  onClick={() => setStatus(item.id, "approved")}
-                  className="rounded-full bg-green-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
-                >
-                  Approve
-                </button>
-              ) : null}
-              {item.status !== "rejected" ? (
-                <button
-                  type="button"
-                  disabled={saving === item.id}
-                  onClick={() => setStatus(item.id, "rejected")}
-                  className="rounded-full bg-red-600 px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
-                >
-                  Reject
-                </button>
-              ) : null}
-              <button
-                type="button"
-                disabled={saving === item.id}
-                onClick={() => setPendingDelete(item.id)}
-                className="rounded-full border border-red-200 px-3 py-1.5 text-xs font-semibold text-red-700 disabled:opacity-40"
-              >
-                Delete
-              </button>
-            </div>
-          </article>
-        ))}
+        {messages.length ? (
+          <div className="overflow-auto rounded-2xl border border-navy/10 bg-white">
+            <table className="min-w-full text-left text-sm">
+              <thead className="bg-navy text-white">
+                <tr>
+                  <th className="px-3 py-2 font-semibold">No</th>
+                  <th className="px-3 py-2 font-semibold">Name</th>
+                  <th className="px-3 py-2 font-semibold">Email</th>
+                  <th className="px-3 py-2 font-semibold">Phone</th>
+                  <th className="px-3 py-2 font-semibold">Subject</th>
+                  <th className="px-3 py-2 font-semibold">Message</th>
+                  <th className="px-3 py-2 font-semibold">Status</th>
+                  <th className="px-3 py-2 font-semibold">Date</th>
+                  <th className="px-3 py-2 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {messages.map((item, index) => (
+                  <tr key={item.id} className="border-t border-navy/10 align-top">
+                    <td className="px-3 py-2 font-semibold text-navy">{index + 1}</td>
+                    <td className="px-3 py-2 font-semibold text-navy">{item.fullName}</td>
+                    <td className="px-3 py-2 text-muted">{item.email}</td>
+                    <td className="px-3 py-2 text-muted">{item.phone || "-"}</td>
+                    <td className="px-3 py-2 text-navy">{item.subject || "No subject"}</td>
+                    <td className="max-w-xs px-3 py-2 text-navy/80">
+                      <p className="line-clamp-3 whitespace-pre-wrap">{item.message}</p>
+                    </td>
+                    <td className="px-3 py-2">
+                      <StatusPill status={item.status} />
+                    </td>
+                    <td className="px-3 py-2 text-xs text-muted">
+                      {item.createdAt ? new Date(item.createdAt).toLocaleString() : "-"}
+                    </td>
+                    <td className="px-3 py-2">
+                      <div className="flex flex-wrap gap-2">
+                        {item.status !== "approved" ? (
+                          <button
+                            type="button"
+                            disabled={saving === item.id}
+                            onClick={() => setStatus(item.id, "approved")}
+                            className="rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
+                          >
+                            Approve
+                          </button>
+                        ) : null}
+                        {item.status !== "rejected" ? (
+                          <button
+                            type="button"
+                            disabled={saving === item.id}
+                            onClick={() => setStatus(item.id, "rejected")}
+                            className="rounded-full bg-red-600 px-3 py-1 text-xs font-semibold text-white disabled:opacity-40"
+                          >
+                            Reject
+                          </button>
+                        ) : null}
+                        <button
+                          type="button"
+                          disabled={saving === item.id}
+                          onClick={() => setPendingDelete(item.id)}
+                          className="rounded-full border border-red-200 px-3 py-1 text-xs font-semibold text-red-700 disabled:opacity-40"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : null}
       </div>
 
       <ConfirmDeleteDialog
