@@ -31,11 +31,6 @@
     <loc>https://hiacdi.org/apply</loc>
   </url>
 
-  <!-- Certificate verification -->
-  <url>
-    <loc>https://hiacdi.org/verify</loc>
-  </url>
-
   <!-- Community -->
   <url>
     <loc>https://hiacdi.org/community</loc>
