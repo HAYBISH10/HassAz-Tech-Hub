@@ -1,4 +1,4 @@
-import { Suspense, lazy } from "react";
+import { Suspense, lazy, useEffect } from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import { ADMIN_BASE } from "./adminPath";
 import Layout from "./components/layout/Layout";
@@ -33,10 +33,98 @@ const AdminDatabase = lazy(() => import("./pages/AdminDatabase"));
 const AdminStaffTokens = lazy(() => import("./pages/AdminStaffTokens"));
 
 function adminElement(element) {
-  return <Suspense fallback={<PageLoader overlay label="Loading..." />}>{element}</Suspense>;
+  return (
+    <Suspense fallback={<PageLoader overlay label="Loading..." />}>
+      {element}
+    </Suspense>
+  );
 }
 
 export default function App() {
+  useEffect(() => {
+    const path = window.location.pathname;
+
+    const seo = {
+      "/": {
+        title: "HIACDI | Humanity, Inclusion and Advancement",
+        description:
+          "HIACDI | Humanity, Inclusion and Advancement Community Development Initiative."
+      },
+
+      "/about": {
+        title: "About HIACDI | Humanity, Inclusion and Advancement",
+        description:
+          "Learn about HIACDI, its mission, vision and commitment to community development, inclusion and advancement."
+      },
+
+      "/about/careers": {
+        title: "Careers | HIACDI",
+        description:
+          "Explore career and opportunity information at HIACDI."
+      },
+
+      "/about/faqs": {
+        title: "FAQs | HIACDI",
+        description:
+          "Find answers to frequently asked questions about HIACDI, its programs and services."
+      },
+
+      "/courses": {
+        title: "Courses | HIACDI",
+        description:
+          "Explore courses and training programs offered through HIACDI."
+      },
+
+      "/apply": {
+        title: "Apply | HIACDI",
+        description:
+          "Apply for HIACDI programs and training opportunities."
+      },
+
+      "/verify": {
+        title: "Certificate Verification | HIACDI",
+        description:
+          "Verify a certificate issued through HIACDI."
+      },
+
+      "/contact": {
+        title: "Contact HIACDI",
+        description:
+          "Contact HIACDI for information, support, partnerships and community development inquiries."
+      },
+
+      "/community": {
+        title: "Community | HIACDI",
+        description:
+          "Discover HIACDI community initiatives, activities and development programs."
+      },
+
+      "/corporate": {
+        title: "Corporate | HIACDI",
+        description:
+          "Explore corporate information, partnerships and opportunities with HIACDI."
+      }
+    };
+
+    const current = seo[path] || {
+      title: "HIACDI | Humanity, Inclusion and Advancement",
+      description:
+        "HIACDI | Humanity, Inclusion and Advancement Community Development Initiative."
+    };
+
+    document.title = current.title;
+
+    let description = document.querySelector('meta[name="description"]');
+
+    if (!description) {
+      description = document.createElement("meta");
+      description.setAttribute("name", "description");
+      document.head.appendChild(description);
+    }
+
+    description.setAttribute("content", current.description);
+  }, []);
+
   return (
     <ApplicationWindowProvider>
       <BrowserRouter>
@@ -44,29 +132,71 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
             <Route path="/courses" element={<Courses />} />
-            <Route path="/courses/:categorySlug" element={<CourseCategory />} />
-            <Route path="/courses/:categorySlug/:programSlug" element={<CourseProgram />} />
+            <Route
+              path="/courses/:categorySlug"
+              element={<CourseCategory />}
+            />
+            <Route
+              path="/courses/:categorySlug/:programSlug"
+              element={<CourseProgram />}
+            />
+
             <Route path="/apply" element={<Apply />} />
-            <Route path="/register" element={<Navigate to="/apply" replace />} />
-            <Route path="/login" element={<Navigate to="/apply" replace />} />
-            <Route path="/forgot-password" element={<Navigate to="/apply" replace />} />
-            <Route path="/reset-password" element={<Navigate to="/apply" replace />} />
-            <Route path="/auth/callback" element={<Navigate to="/apply" replace />} />
-            <Route path="/account" element={<Navigate to="/apply" replace />} />
+
+            <Route
+              path="/register"
+              element={<Navigate to="/apply" replace />}
+            />
+            <Route
+              path="/login"
+              element={<Navigate to="/apply" replace />}
+            />
+            <Route
+              path="/forgot-password"
+              element={<Navigate to="/apply" replace />}
+            />
+            <Route
+              path="/reset-password"
+              element={<Navigate to="/apply" replace />}
+            />
+            <Route
+              path="/auth/callback"
+              element={<Navigate to="/apply" replace />}
+            />
+            <Route
+              path="/account"
+              element={<Navigate to="/apply" replace />}
+            />
+
             <Route path="/verify" element={<Verify />} />
-            <Route path="/verify/confirm/:token" element={<VerifyConfirm />} />
-            <Route path="/verify/:certificateId" element={<Verify />} />
+            <Route
+              path="/verify/confirm/:token"
+              element={<VerifyConfirm />}
+            />
+            <Route
+              path="/verify/:certificateId"
+              element={<Verify />}
+            />
+
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/about/careers" element={<Careers />} />
             <Route path="/about/faqs" element={<Faqs />} />
             <Route path="/corporate" element={<Corporate />} />
             <Route path="/community" element={<Community />} />
+
             <Route path="*" element={<NotFound />} />
           </Route>
 
-          <Route path={`${ADMIN_BASE}/login`} element={adminElement(<AdminLogin />)} />
-          <Route path={ADMIN_BASE} element={adminElement(<AdminLayout />)}>
+          <Route
+            path={`${ADMIN_BASE}/login`}
+            element={adminElement(<AdminLogin />)}
+          />
+
+          <Route
+            path={ADMIN_BASE}
+            element={adminElement(<AdminLayout />)}
+          >
             <Route index element={<AdminDashboard />} />
             <Route path="applications" element={<AdminApplications />} />
             <Route path="applicants" element={<AdminApplicants />} />
@@ -88,13 +218,19 @@ export default function App() {
 function NotFound() {
   return (
     <section className="px-5 py-20 text-center">
-      <h1 className="font-heading text-3xl font-bold text-navy">Page not found</h1>
-      <p className="mt-3 text-muted">That address does not exist on HIACDI Tech Hub.</p>
+      <h1 className="font-heading text-3xl font-bold text-navy">
+        Page not found
+      </h1>
+
+      <p className="mt-3 text-muted">
+        That address does not exist on HIACDI Tech Hub.
+      </p>
+
       <div className="mt-6 flex flex-wrap justify-center gap-4">
         <Link to="/" className="font-semibold text-gold">
           Home
         </Link>
-        </div>
-      </section>
+      </div>
+    </section>
   );
 }
