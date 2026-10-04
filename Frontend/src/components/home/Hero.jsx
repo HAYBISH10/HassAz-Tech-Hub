@@ -37,9 +37,14 @@ export default function Hero({ onBook }) {
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#f6edd2] via-white to-white">
       <img
+        src="/home/hero-background.jpg"
+        alt=""
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover object-[center_30%] opacity-[0.32]"
+      />
+      <img
         src={hero.logoSrc}
         alt=""
-        className="pointer-events-none absolute inset-0 m-auto h-[70%] w-[70%] max-w-lg object-contain opacity-[0.10] sm:w-[60%] sm:max-w-3xl"
+        className="pointer-events-none absolute inset-0 m-auto h-[70%] w-[70%] max-w-lg object-contain opacity-[0.08] sm:w-[60%] sm:max-w-3xl"
       />
       <div className="relative z-10 mx-auto w-full max-w-4xl px-4 pt-12 pb-20 text-center sm:px-6 sm:pt-20 sm:pb-16">
         <p className="min-h-[1.6em] font-heading text-lg font-bold text-gold sm:text-2xl">

@@ -11,13 +11,32 @@ export default function About() {
   return (
     <div>
       <PageHero eyebrow={about.eyebrow} title={about.title} text={about.intro}>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65 sm:text-base">{about.mission}</p>
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-white/65 sm:text-base">{about.standard}</p>
         <p className="mt-6 inline-flex items-center gap-2 rounded-full border border-gold/40 px-4 py-2 text-sm font-semibold text-gold">
           {site.motto}
         </p>
       </PageHero>
 
       <section className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+        <p className="text-sm font-semibold text-gold">What we stand for</p>
+        <h2 className="font-heading mt-2 max-w-3xl text-2xl font-bold text-navy sm:text-4xl">
+          Vision and Mission
+        </h2>
+        <div className="mt-10 grid gap-5 md:grid-cols-2">
+          <article className="relative overflow-hidden rounded-2xl border border-navy/10 bg-white p-7 shadow-[0_12px_40px_rgba(10,46,109,0.06)]">
+            <span className="absolute top-0 left-0 h-1 w-full bg-gold" />
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">Vision</p>
+            <p className="mt-3 text-sm leading-7 text-muted">{about.vision}</p>
+          </article>
+          <article className="relative overflow-hidden rounded-2xl border border-navy/10 bg-white p-7 shadow-[0_12px_40px_rgba(10,46,109,0.06)]">
+            <span className="absolute top-0 left-0 h-1 w-full bg-gold" />
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">Mission</p>
+            <p className="mt-3 text-sm leading-7 text-muted">{about.mission}</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-4 pb-14 sm:px-6 sm:pb-20">
         <p className="text-sm font-semibold text-gold">What the motto means here</p>
         <h2 className="font-heading mt-2 max-w-3xl text-2xl font-bold text-navy sm:text-4xl">
           Three standards, not three slogans

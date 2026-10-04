@@ -64,22 +64,19 @@ export const features = [
     title: "Accelerated Project-Based Learning",
     text: "Learn by building. Every HIACDI program is anchored in labs, reviews, and working projects, not slides alone.",
     color: "bg-gold",
-    image:
-      "https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=1200&q=80",
+    image: "/home/feature-1.jpg",
   },
   {
     title: "Technical Mentor Support with Live Instructor-Led Classes",
     text: "Train with practitioners who review your work, challenge your thinking, and help you apply skills with confidence.",
     color: "bg-navy",
-    image:
-      "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80",
+    image: "/home/feature-2.jpg",
   },
   {
     title: "From Learning to Building",
     text: "Move from classroom practice to real solutions, portfolios, and opportunity through the HIACDI technology ecosystem.",
     color: "bg-navy-dark",
-    image:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80",
+    image: "/home/feature-3.jpg",
   },
 ];
 

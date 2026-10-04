@@ -25,22 +25,19 @@ const pillars = [
   {
     title: "Talent",
     accent: "text-gold",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
+    image: "/corporate/talent.jpg",
     text: "HIACDI trains people who can write software, analyse data, and ship work under review. Hire graduates, sponsor a cohort, or bring a team in for a focused upskilling block.",
   },
   {
     title: "Quality",
     accent: "text-navy",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80",
+    image: "/corporate/quality.jpg",
     text: "Training is project-based. Mentors review code, datasets, and presentations the way a workplace would. Your staff leave with artefacts they can put on a live system, not a certificate alone.",
   },
   {
     title: "Expertise",
     accent: "text-gold-dark",
-    image:
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+    image: "/corporate/expertise.jpg",
     text: "Use the hub to design curricula, run labs, or stand up an applied build. We bring instructors, a delivery standard, and a clear scope so the engagement has an owner on both sides.",
   },
 ];
@@ -49,7 +46,7 @@ const stats = [
   { value: "6", label: "Learning paths for teams: software, data, cybersecurity, AI, DPO, and high-school tech" },
   { value: "3", label: "Yearly learner intakes (January, June, and December) so hiring and training can be planned" },
   { value: "Hands-on", label: "Project reviews, labs, and portfolio work instead of slide-only workshops" },
-  { value: "Kenya", label: "Delivery for organisations, campuses, and public institutions across East Africa" },
+  { value: "Worldwide", label: "Learners, partners, and organisations can join HIACDI from anywhere — remote, hybrid, or in person" },
 ];
 
 const steps = [
@@ -132,9 +129,9 @@ export default function Corporate() {
             cohort against a live problem. Learners build. Mentors review. You see the output.
           </p>
           <p className="mt-4 max-w-3xl text-sm leading-7 text-muted sm:text-base sm:leading-8">
-            We work in Kenya and with partners who need East Africa-ready talent: product companies, universities,
-            NGOs, and public institutions. Engagements can be remote, hybrid, or in person. Duration follows the
-            job: a focused staff workshop, a multi-week bootcamp, or a longer pipeline.
+            HIACDI Tech Hub works worldwide. We train learners and organisations wherever they are, and we welcome
+            partners who want the same project-based standard for their people. Engagements can be remote, hybrid,
+            or in person. Duration follows the job: a focused staff workshop, a multi-week bootcamp, or a longer pipeline.
           </p>
         </div>
       </section>
@@ -146,6 +143,11 @@ export default function Corporate() {
             We train the next generation of builders through project-based learning, and we work with organisations
             that want the same standard for their people.
           </p>
+          <img
+            src="/corporate/we-are-hiacdi.jpg"
+            alt="HIACDI graduation and community"
+            className="mx-auto mt-8 h-56 w-full max-w-4xl rounded-2xl object-cover sm:h-72"
+          />
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {stats.map((item) => (
               <article key={item.label} className="rounded-2xl bg-white p-6 text-navy">

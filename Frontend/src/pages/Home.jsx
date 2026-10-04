@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useOutletContext } from "react-router-dom";
 import Hero from "../components/home/Hero";
 import { useCatalog } from "../hooks/useContent";
@@ -216,25 +216,67 @@ function Testimonials() {
 }
 
 function Stories() {
+  const clips = [
+    { src: "/home/success-1.mp4", poster: "/home/success-1.jpg", title: "Graduation ceremony" },
+    { src: "/home/success-2.mp4", poster: "/home/success-2.jpg", title: "Learner success" },
+  ];
+
   return (
     <section className="bg-white px-4 pb-12 sm:px-6 sm:pb-20">
       <h2 className="font-heading text-center text-2xl font-bold text-gold sm:text-3xl">
         Learner Success Stories
       </h2>
       <div className="mx-auto mt-8 grid max-w-5xl gap-4 sm:mt-10 sm:gap-6 md:grid-cols-2">
-        {[
-          "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
-          "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=1200&q=80",
-        ].map((image) => (
-          <div key={image} className="relative overflow-hidden rounded-2xl">
-            <img src={image} alt="" className="h-48 w-full object-cover sm:h-64" />
-            <span className="absolute inset-0 m-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold text-xl text-white sm:h-16 sm:w-16 sm:text-2xl">
-              ▶
-            </span>
-          </div>
+        {clips.map((clip) => (
+          <StoryVideo key={clip.src} clip={clip} />
         ))}
       </div>
     </section>
+  );
+}
+
+function StoryVideo({ clip }) {
+  const videoRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+
+  function toggle() {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.paused) {
+      video.play();
+      setPlaying(true);
+    } else {
+      video.pause();
+      setPlaying(false);
+    }
+  }
+
+  return (
+    <div className="relative overflow-hidden rounded-2xl bg-navy-dark">
+      <video
+        ref={videoRef}
+        className="h-48 w-full object-cover sm:h-64"
+        poster={clip.poster}
+        playsInline
+        preload="metadata"
+        onClick={toggle}
+        onEnded={() => setPlaying(false)}
+        onPause={() => setPlaying(false)}
+        onPlay={() => setPlaying(true)}
+      >
+        <source src={clip.src} type="video/mp4" />
+      </video>
+      {playing ? null : (
+        <button
+          type="button"
+          onClick={toggle}
+          className="absolute inset-0 m-auto flex h-12 w-12 items-center justify-center rounded-full bg-gold text-xl text-white sm:h-16 sm:w-16 sm:text-2xl"
+          aria-label={`Play ${clip.title}`}
+        >
+          ▶
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -276,10 +318,10 @@ function StayUpdated() {
   }
 
   const images = [
-    "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1523580846011-d3a5bc25702b?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&w=800&q=80",
-    "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80",
+    "/home/stay-updated-1.jpg",
+    "/home/stay-updated-2.jpg",
+    "/home/stay-updated-3.jpg",
+    "/home/stay-updated-4.jpg",
   ];
 
   return (

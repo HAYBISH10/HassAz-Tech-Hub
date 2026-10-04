@@ -3,7 +3,11 @@ export const about = {
   title: "A professional technology institution for people who want to do the work",
   intro:
     "HIACDI Tech Hub is a Kenya-based centre for technology education, applied practice, and digital solutions. We welcome everyone with a passion to learn technology — whether you are in primary school, secondary school, a graduate, a working professional, or anyone who wants to know more about tech. If you have the passion to learn, you are highly welcome. Join us.",
+  vision:
+    "To build inclusive, empowered, and sustainable communities where every individual has equal opportunities to learn, grow, participate, and achieve a better quality of life.",
   mission:
+    "To empower individuals and communities through education, skills development, youth empowerment, health, sustainable agriculture, gender inclusion, environmental conservation, and community-driven initiatives that create lasting opportunities and improve lives.",
+  standard:
     "Our standard is simple. Learners should understand the craft, produce work they can defend, and leave ready for employment, further study, or building their own products.",
   pillars: [
     {
