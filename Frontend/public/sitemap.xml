@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://hiacdi.org/</loc>
+  </url>
+
+  <!-- About -->
+  <url>
+    <loc>https://hiacdi.org/about</loc>
+  </url>
+
+  <!-- Careers -->
+  <url>
+    <loc>https://hiacdi.org/about/careers</loc>
+  </url>
+
+  <!-- FAQs -->
+  <url>
+    <loc>https://hiacdi.org/about/faqs</loc>
+  </url>
+
+  <!-- Courses -->
+  <url>
+    <loc>https://hiacdi.org/courses</loc>
+  </url>
+
+  <!-- Applications -->
+  <url>
+    <loc>https://hiacdi.org/apply</loc>
+  </url>
+
+  <!-- Community -->
+  <url>
+    <loc>https://hiacdi.org/community</loc>
+  </url>
+
+  <!-- Corporate -->
+  <url>
+    <loc>https://hiacdi.org/corporate</loc>
+  </url>
+
+  <!-- Contact -->
+  <url>
+    <loc>https://hiacdi.org/contact</loc>
+  </url>
+
+</urlset>
